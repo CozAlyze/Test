@@ -1,0 +1,255 @@
+{
+  "_label": "CHICAGO APPLICATION-CLAIMS DRAFT — authored from the existing sourced evidence; development only; practitioner review required",
+  "schemaVersion": "application-claims/2.1.0-draft",
+  "chartId": "coz-8b196041b73ab15d",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. Evidence, mythology, symbols, source history, conflicts and trace-only factors remain internal.",
+  "records": [
+    {
+      "recordId": "IR-S2-RQ215-MOON-HOUSE-FOURTH",
+      "coverageItem": "graha-in-house.mo.4",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-4-HOME-CONTENTMENT",
+          "purposes": ["moon-through-house"],
+          "allowedMeaning": "Emotional well-being may be rooted in the person's private inner foundation: home, belonging and the people who make them feel supported."
+        },
+        {
+          "claimId": "APP-MOON-4-DOMESTIC-COMFORT",
+          "purposes": ["moon-through-house"],
+          "allowedMeaning": "Internal contentment may depend on having somewhere the person can emotionally settle, not merely a physical home but a place where they feel safe enough to be themselves."
+        },
+        {
+          "claimId": "APP-MOON-4-KIN-CONNECTION",
+          "purposes": ["moon-through-house"],
+          "allowedMeaning": "Family, chosen family or another dependable support system may form an important part of the person's emotional landscape."
+        },
+        {
+          "claimId": "APP-MOON-4-MATERNAL-INFLUENCE",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "evidenceStatus": "PENDING_SOURCE_AND_PRACTITIONER_REVIEW",
+          "sourceIds": [],
+          "allowedMeaning": "The relationship with the mother or primary maternal figure may significantly shape how the person understands comfort, care and emotional security; the chart does not determine whether that relationship was easy or difficult."
+        }
+      ],
+      "prohibitedExtensions": [
+        "guaranteed happiness",
+        "claims about the person's actual childhood or family history",
+        "claim that the maternal relationship was good, bad, present, absent, nurturing or harmful without separate evidence",
+        "blaming the mother or maternal figure",
+        "attachment-style claim",
+        "vulnerability or private-processing claim",
+        "property ownership or real-estate prediction"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ210-MOON-AQUARIUS",
+      "coverageItem": "graha-in-sign.mo.aquarius",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-AQUARIUS-FRIENDSHIP",
+          "purposes": ["moon-sign-expression"],
+          "allowedMeaning": "Friendship and supportive companionship may contribute to emotional ease."
+        },
+        {
+          "claimId": "APP-MOON-AQUARIUS-AESTHETIC-COMFORT",
+          "purposes": ["moon-sign-expression"],
+          "allowedMeaning": "Pleasant or aesthetically satisfying surroundings may contribute to emotional comfort."
+        }
+      ],
+      "traceOnlyEvidence": [
+        "The source mentions endurance during long travel, but that topic is not necessary for this Section 2 reading."
+      ],
+      "prohibitedExtensions": [
+        "universal humanitarian profile",
+        "innovation or futurism claim",
+        "emotional detachment claim",
+        "rebelliousness claim",
+        "social popularity prediction",
+        "travel prediction"
+      ]
+    },
+    {
+      "modelId": "NAK-25-PURVA_BHADRAPADA",
+      "coverageItem": "nakshatra.purva-bhadrapada",
+      "status": "EDITORIAL_APPLICATION_DRAFT_CONFLICT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-COZ-BATCH3-GAP-MEMO"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-PB-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Purva Bhadrapada is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-PB-PARADOX",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The emotional life may be capable of holding opposing feelings, ideas or truths without reducing them immediately to a simple answer."
+        },
+        {
+          "claimId": "APP-PB-IDEAL-INTENSITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Ideals and inner commitments may be experienced with intensity rather than casually."
+        },
+        {
+          "claimId": "APP-PB-MENTAL-RESOURCEFULNESS",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The mind may approach emotionally complex questions with cleverness and mental resourcefulness."
+        },
+        {
+          "claimId": "APP-PB-EMOTIONAL-WEIGHT",
+          "purposes": ["main-tension"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "Emotional experience may sometimes carry periods of worry, sorrow or unusual heaviness."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-PB-EMOTIONAL-WEIGHT may appear only with APP-PB-MENTAL-RESOURCEFULNESS or another constructive admitted claim in the same paragraph.",
+        "APP-PB-PARADOX and APP-PB-IDEAL-INTENSITY require at least one additional non-nakshatra chart factor in the reading."
+      ],
+      "customerExcludedLayers": [
+        "deity",
+        "funeral-cot, sword or two-faced symbolism",
+        "mythology",
+        "historical doctrine",
+        "source conflict explanation"
+      ],
+      "prohibitedExtensions": [
+        "mental-health diagnosis",
+        "romanticizing distress or suffering",
+        "moral judgment or lack-of-generosity claim",
+        "spouse or wealth prediction",
+        "death, funeral or violence imagery",
+        "extremism or fanaticism claim",
+        "claim that spiritual intensity is inherently superior"
+      ]
+    },
+    {
+      "modelId": "PADA-097-PURVA_BHADRAPADA-1",
+      "coverageItem": "pada.purva-bhadrapada.1",
+      "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-JAGANNATHHORA-PURVA-BHADRAPADA-PADAS",
+        "SRC-COZ-BATCH4-T4-GAP-MEMO"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-PB1-INITIATING-MODE",
+          "purposes": ["pada-refinement"],
+          "classification": "PROJECT_METHODOLOGY_DRAFT",
+          "allowedMeaning": "Purva Bhadrapada's intensity may take a more initiating and immediate mode of expression in this pada."
+        },
+        {
+          "claimId": "APP-PB1-CONVICTION-INTO-ACTION",
+          "purposes": ["pada-refinement"],
+          "classification": "MODERN_PRACTITIONER_APPLICATION",
+          "allowedMeaning": "Deeply held convictions may create a desire to act directly rather than remain only inwardly held."
+        },
+        {
+          "claimId": "APP-PB1-CHALLENGE-PATTERNS",
+          "purposes": ["pada-refinement"],
+          "classification": "MODERN_PRACTITIONER_APPLICATION",
+          "allowedMeaning": "The person may be willing to challenge established patterns when those patterns conflict with a deeply held conviction."
+        },
+        {
+          "claimId": "APP-PB1-PARADOX-ACTION-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "The combined pattern may create tension between remaining with complexity and acting decisively on conviction."
+        },
+        {
+          "claimId": "APP-PB1-DELIBERATE-DIRECTION",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve allowing conviction to become clear before directing its intensity into purposeful action."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-PB1-INITIATING-MODE",
+          "requiresAny": ["APP-PB-PARADOX", "APP-PB-IDEAL-INTENSITY"]
+        },
+        {
+          "claimId": "APP-PB1-CONVICTION-INTO-ACTION",
+          "requires": ["APP-PB-IDEAL-INTENSITY"]
+        },
+        {
+          "claimId": "APP-PB1-CHALLENGE-PATTERNS",
+          "requires": ["APP-PB-IDEAL-INTENSITY"]
+        },
+        {
+          "claimId": "APP-PB1-PARADOX-ACTION-TENSION",
+          "requires": ["APP-PB-PARADOX", "APP-PB1-INITIATING-MODE"]
+        },
+        {
+          "claimId": "APP-PB1-DELIBERATE-DIRECTION",
+          "requires": ["APP-PB-IDEAL-INTENSITY", "APP-PB1-CONVICTION-INTO-ACTION"]
+        }
+      ],
+      "customerExcludedLayers": [
+        "Aries navamsa explanation",
+        "naming syllable",
+        "source-gap explanation",
+        "technical refraction methodology"
+      ],
+      "prohibitedExtensions": [
+        "free-standing Aries personality description",
+        "aggression, violence or revolution claim",
+        "impulsiveness or recklessness claim",
+        "automatic independence or leadership claim",
+        "guaranteed transformation or successful outcome"
+      ]
+    }
+  ],
+  "traceOnlyDirective": {
+    "factors": [
+      "Saturn as Moon dispositor",
+      "Jupiter as Purva Bhadrapada lord"
+    ],
+    "chartFacts": [
+      "No graha drishti reaches the Moon.",
+      "Mars does not aspect the Moon and must never be described as doing so."
+    ],
+    "rule": "These factors remain in the internal trace and do not enter customer prose until separate application records license a useful personal interpretation."
+  },
+  "implementationRequirements": [
+    "Preserve each claim's purposes field and route dynamically by purpose rather than hard-coding Chicago claim IDs.",
+    "When a nakshatra first appears, define it briefly in plain language and explain that it refines how the Moon's emotional qualities are expressed before interpreting the named nakshatra.",
+    "Introduce the pada only after the nakshatra has been defined and interpreted.",
+    "Support both requires and requiresAny claim conditions.",
+    "Contract any paragraph whose routed claims cannot support its minimum word budget.",
+    "Do not pad the reading with source history, mythology, symbols, technical placements or trace-only factors.",
+    "Run the general acceptance suite; do not run the Lisbon-specific acceptance suite as the Chicago gate.",
+    "Production must continue returning zero customer claims because every record in this overlay is productionEligible false."
+  ]
+}
