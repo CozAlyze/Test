@@ -1034,7 +1034,7 @@ function startReveal() {
   document.getElementById("revealLive").textContent = "Opening your Vedic reading";
 
   // if the clip cannot even start (no network, blocked), move on rather than trap anyone
-  revealTimers.push(setTimeout(() => { if (!revealStarted) finishReveal(false); }, 7000));
+  revealTimers.push(setTimeout(() => { if (!revealStarted) finishReveal(false); }, 2500));
 
   revealStarted = false;
   try { revealVideo.currentTime = 0; } catch (e) {}
@@ -1075,11 +1075,9 @@ function finishReveal(immediate) {
     /* dev-review generation is async (chart request + local claim-file fetches);
        the reveal already runs several seconds so this normally resolves long
        before we get here, but we wait for it rather than risk a race. */
-    if (COZ_READING_READY && typeof COZ_READING_READY.then === "function") {
-      COZ_READING_READY.then(go).catch(go);
-    } else {
-      go();
-    }
+    /* land immediately: showFromHash renders a waiting screen if generation is
+       still running, so the reveal never stalls on a black screen. */
+    go();
   };
   if (immediate === true) { land(); return; }
   /* Sep 1 ruling: through the sun. Hold on the burst, then the camera drives into it, the light
