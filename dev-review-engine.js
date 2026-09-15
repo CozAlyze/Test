@@ -166,6 +166,7 @@
         productionVerified: false,
         matchedClaimIds: { section1: s1Match.matchedIds, section2: s2.matchedIds },
         sections3to6Source: entry ? entry.label : "no identity match -- placeholder shown",
+        sections3to6Unverified: !!(entry && entry.unverified),
         identityKey: identityKey
       }
     };

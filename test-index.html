@@ -15,10 +15,23 @@ button { padding: 15px 30px; font-size: 18px; margin: 10px 0; display: block; wi
 
 <button onclick="setTestChart('matthew')">Load Matthew (Gemini rising, Moon Virgo/Hasta)</button>
 <button onclick="setTestChart('rochester')">Load Rochester (Libra rising, Moon Sag/Mula)</button>
+<button onclick="setTestChart('steve')">Load Steve Smith (Reno NV, Jan 31 1987, 11:11 AM — real calculated chart)</button>
 <button onclick="setTestChart('new')">Load Unknown Chart (Aries rising, Moon Aquarius/Shatabhisha)</button>
 
 <p id="status"></p>
-<a href="vedic-reading_TEST.html?v=7" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading</a>
+<a href="vedic-reading_TEST.html?v=10" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading</a>
+
+<hr style="margin:30px 0;border:0;border-top:1px solid #d4a178">
+<h2 style="font-size:18px">Live draft generation (Sections 3–6)</h2>
+<p style="font-size:14px;opacity:.8">Use a <b>separate test key</b> with a spend cap, never your main key. The key is stored only in this phone's browser (localStorage). It is not in the repo. Anyone with your unlocked phone and dev tools could read it. Revoke it when review is done.</p>
+<label style="font-size:14px">Anthropic test API key</label>
+<input id="apiKey" type="password" placeholder="sk-ant-..." style="width:100%;padding:12px;font-size:16px;margin:6px 0 12px">
+<label style="font-size:14px">Model</label>
+<input id="model" type="text" style="width:100%;padding:12px;font-size:16px;margin:6px 0 12px">
+<button onclick="saveKey()">Save key to this phone</button>
+<button onclick="clearKey()">Remove key from this phone</button>
+<button onclick="clearDrafts()">Clear cached generated drafts (forces fresh generation)</button>
+<p id="keystatus" style="font-size:14px"></p>
 
 <script>
 var CHARTS = {
@@ -56,6 +69,7 @@ var CHARTS = {
       { name: "Ketu", signNumber: 11, degrees: 25, minutes: 0, house: 5, nakshatra: "Purva Bhadrapada", pada: 2 }
     ]
   },
+  steve: {"version": 1, "person": {"name": "Steve Smith"}, "ascendantSignNumber": 1, "planets": [{"name": "Ascendant", "signNumber": 1, "degrees": 21, "minutes": 10, "house": 1, "nakshatra": "Bharani", "pada": 3}, {"name": "Sun", "signNumber": 10, "degrees": 17, "minutes": 43, "house": 10, "nakshatra": "Shravana", "pada": 3}, {"name": "Moon", "signNumber": 11, "degrees": 18, "minutes": 17, "house": 11, "nakshatra": "Shatabhisha", "pada": 4}, {"name": "Mars", "signNumber": 12, "degrees": 22, "minutes": 36, "house": 12, "nakshatra": "Revati", "pada": 2}, {"name": "Mercury", "signNumber": 11, "degrees": 0, "minutes": 50, "house": 11, "nakshatra": "Dhanishtha", "pada": 3}, {"name": "Jupiter", "signNumber": 11, "degrees": 29, "minutes": 35, "house": 11, "nakshatra": "Purva Bhadrapada", "pada": 3}, {"name": "Venus", "signNumber": 9, "degrees": 1, "minutes": 33, "house": 9, "nakshatra": "Mula", "pada": 1}, {"name": "Saturn", "signNumber": 8, "degrees": 24, "minutes": 49, "house": 8, "nakshatra": "Jyeshtha", "pada": 3}, {"name": "Rahu", "signNumber": 12, "degrees": 21, "minutes": 12, "house": 12, "nakshatra": "Revati", "pada": 2}, {"name": "Ketu", "signNumber": 6, "degrees": 21, "minutes": 12, "house": 6, "nakshatra": "Hasta", "pada": 4}]},
   new: {
     version: 1,
     person: { name: "Test" },
@@ -74,6 +88,26 @@ var CHARTS = {
     ]
   }
 };
+function saveKey() {
+  var k = document.getElementById('apiKey').value.trim();
+  var m = document.getElementById('model').value.trim() || 'claude-sonnet-4-6';
+  if (!k) { document.getElementById('keystatus').textContent = 'No key entered.'; return; }
+  localStorage.setItem('cozTestApiKey', k);
+  localStorage.setItem('cozTestModel', m);
+  document.getElementById('apiKey').value = '';
+  showKeyStatus();
+}
+function clearKey() { localStorage.removeItem('cozTestApiKey'); showKeyStatus(); }
+function clearDrafts() {
+  var n = 0; Object.keys(localStorage).forEach(function (k) { if (k.indexOf('cozGenDraft:') === 0) { localStorage.removeItem(k); n++; } });
+  document.getElementById('keystatus').textContent = 'Cleared ' + n + ' cached draft(s).';
+}
+function showKeyStatus() {
+  var k = localStorage.getItem('cozTestApiKey'), m = localStorage.getItem('cozTestModel') || 'claude-sonnet-4-6';
+  document.getElementById('model').value = m;
+  document.getElementById('keystatus').textContent = k ? ('Key saved on this phone (ends in ...' + k.slice(-4) + '). Model: ' + m) : 'No key saved. Generation will fail until one is saved.';
+}
+showKeyStatus();
 function setTestChart(key) {
   localStorage.setItem('cozChartJSON', JSON.stringify(CHARTS[key]));
   localStorage.setItem('emergeAscendant', ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'][CHARTS[key].ascendantSignNumber - 1]);
