@@ -1,0 +1,301 @@
+{
+  "_label": "SECTION 1 BATCH 1 — universal guiding-planet application claims; development only; practitioner review required",
+  "schemaVersion": "application-claims/3.0.0-draft",
+  "sectionId": "s1",
+  "customerTitle": "Your Essential Nature & Guiding Planet",
+  "scope": "The seven classical rulers when functioning as the ruler of the Ascendant. These claims describe only the planet's licensed guiding emphasis; Ascendant-sign and Ascendant-lord-house records must supply the personal expression and life arena.",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. A guiding-planet claim may not be expanded into personality, events, status, relationships, health, vocation or outcomes without separately admitted sign and house claims.",
+  "records": [
+    {
+      "recordId": "IR-S1-GUIDING-SUN",
+      "coverageItem": "guiding-planet.su",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ228-SUN-CORE"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-SUN-ANIMATING-SELF",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
+          "allowedMeaning": "With the Sun ruling the Ascendant, the chart's guiding emphasis may return repeatedly to the person's animating sense of self: what feels internally vital, central and genuinely their own."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-SUN-COHERENT-DIRECTION",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Direction may feel more coherent when an important choice reflects that internal center rather than being shaped entirely by other people's expectations."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-SUN-FIXED-IDENTITY-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "A strong investment in one established self-definition may create tension when growth requires the person to understand themselves differently."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-SUN-COHERENT-DIRECTION", "requires": ["APP-S1-GUIDE-SUN-ANIMATING-SELF"]},
+        {"claimId": "APP-S1-GUIDE-SUN-FIXED-IDENTITY-TENSION", "requires": ["APP-S1-GUIDE-SUN-ANIMATING-SELF"]}
+      ],
+      "prohibitedExtensions": [
+        "automatic confidence, leadership, authority, visibility or success",
+        "father or government prediction",
+        "claim that the Sun alone determines purpose or vocation",
+        "ego, narcissism or identity diagnosis"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDING-MOON",
+      "coverageItem": "guiding-planet.mo",
+      "status": "EDITORIAL_APPLICATION_DRAFT_CROSS_SECTION_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ01-MOON-NATURAL-FUNCTION"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-IYER-1885", "SRC-BPHS-SANTHANAM-ONLINE"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-MOON-MIND-AS-GUIDE",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
+          "allowedMeaning": "With the Moon ruling the Ascendant, the mind and the person's changing internal response may play an especially central role in how direction is recognized."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-MOON-INTERNAL-CONSULTATION",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Important choices may become clearer when the person notices their internal response without assuming that the first feeling must determine the final direction."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-MOON-REACTION-IDENTITY-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "A temporary state of mind may sometimes be mistaken for a permanent truth about the self or the direction life should take."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-MOON-INTERNAL-CONSULTATION", "requires": ["APP-S1-GUIDE-MOON-MIND-AS-GUIDE"]},
+        {"claimId": "APP-S1-GUIDE-MOON-REACTION-IDENTITY-TENSION", "requires": ["APP-S1-GUIDE-MOON-MIND-AS-GUIDE"]}
+      ],
+      "compositionRequirements": [
+        "When the Ascendant lord is the Moon, Section 1 may use only these guiding-direction claims. It must not repeat the Moon's house, sign, nakshatra, pada or emotional interpretation owned by Section 2."
+      ],
+      "prohibitedExtensions": [
+        "duplication of any Section 2 Moon interpretation",
+        "automatic sensitivity, nurturance, intuition, attachment or domesticity",
+        "mood-disorder or instability diagnosis",
+        "claim that every passing feeling supplies reliable direction"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDING-MARS",
+      "coverageItem": "guiding-planet.ma",
+      "status": "EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ224-MARS-CORE"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-MARS-DIRECTED-FORCE",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
+          "allowedMeaning": "With Mars ruling the Ascendant, the chart's guiding emphasis may involve learning where and how to direct personal force."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-MARS-EFFECTIVE-EFFORT",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Direction may become clearer when energy is given a defined purpose rather than being spent against every source of resistance."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-MARS-FORCE-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Force may become counterproductive when immediate effort is used where timing, information or a different method is still needed."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-MARS-EFFECTIVE-EFFORT", "requires": ["APP-S1-GUIDE-MARS-DIRECTED-FORCE"]},
+        {"claimId": "APP-S1-GUIDE-MARS-FORCE-TENSION", "requires": ["APP-S1-GUIDE-MARS-DIRECTED-FORCE"]}
+      ],
+      "prohibitedExtensions": [
+        "automatic courage, initiative, anger, aggression, conflict or competition",
+        "violence, accident, injury or danger prediction",
+        "military, athletic, mechanical or leadership destiny",
+        "claim that force is always the correct response"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDING-MERCURY",
+      "coverageItem": "guiding-planet.me",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ225-MERCURY-CORE"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-MERCURY-SPEECH-AS-GUIDE",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
+          "allowedMeaning": "With Mercury ruling the Ascendant, speech and the act of giving something clear expression may become recurring channels through which direction is developed."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-MERCURY-NAMING-DIRECTION",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "An important choice may become more workable when the person can name it precisely, discuss it or put its meaning into words."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-MERCURY-WORDS-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Language may create the appearance of clarity before the underlying choice has actually become settled."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-MERCURY-NAMING-DIRECTION", "requires": ["APP-S1-GUIDE-MERCURY-SPEECH-AS-GUIDE"]},
+        {"claimId": "APP-S1-GUIDE-MERCURY-WORDS-TENSION", "requires": ["APP-S1-GUIDE-MERCURY-SPEECH-AS-GUIDE"]}
+      ],
+      "prohibitedExtensions": [
+        "guaranteed intelligence, analysis, adaptability, wit or communication skill",
+        "commerce, writing, teaching or technology profession prediction",
+        "nervous-system or attention diagnosis",
+        "claim that verbal explanation alone proves understanding"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDING-JUPITER",
+      "coverageItem": "guiding-planet.jp",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ226-JUPITER-CORE"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-JUPITER-KNOWLEDGE-HAPPINESS",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
+          "allowedMeaning": "With Jupiter ruling the Ascendant, knowledge and the kind of understanding that contributes to happiness may become recurring guides in the person's direction."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-JUPITER-LEARNING-DIRECTION",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "A path may feel more coherent when it continues to enlarge understanding rather than asking the person to stop learning in order to preserve certainty."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-JUPITER-KNOWLEDGE-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "The pursuit of a larger explanation may become ungrounded when accumulating knowledge replaces making a necessary choice."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-JUPITER-LEARNING-DIRECTION", "requires": ["APP-S1-GUIDE-JUPITER-KNOWLEDGE-HAPPINESS"]},
+        {"claimId": "APP-S1-GUIDE-JUPITER-KNOWLEDGE-TENSION", "requires": ["APP-S1-GUIDE-JUPITER-KNOWLEDGE-HAPPINESS"]}
+      ],
+      "prohibitedExtensions": [
+        "automatic wisdom, faith, teaching ability, expansion, luck or benefic protection",
+        "religious, academic, legal or advisory profession prediction",
+        "wealth, status or success prediction",
+        "claim that more knowledge always produces the correct decision"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDING-VENUS",
+      "coverageItem": "guiding-planet.ve",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ223-VENUS-CORE"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-VENUS-LOVE-DESIRE",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
+          "allowedMeaning": "With Venus ruling the Ascendant, love and desire may become important guides in recognizing what the person is genuinely drawn to sustain or pursue."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-VENUS-CHOICE-ALIGNMENT",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Direction may feel more personally coherent when a choice acknowledges what matters to the person rather than treating desire as irrelevant information."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-VENUS-DESIRE-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Desire may become an incomplete guide when immediate attraction is treated as sufficient evidence that a direction can be sustained."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-VENUS-CHOICE-ALIGNMENT", "requires": ["APP-S1-GUIDE-VENUS-LOVE-DESIRE"]},
+        {"claimId": "APP-S1-GUIDE-VENUS-DESIRE-TENSION", "requires": ["APP-S1-GUIDE-VENUS-LOVE-DESIRE"]}
+      ],
+      "prohibitedExtensions": [
+        "automatic beauty, charm, harmony, artistry, pleasure or relationship skill",
+        "sexuality, fertility, marriage or partner prediction",
+        "luxury, wealth, appearance or artistic profession prediction",
+        "claim that attraction or desire alone establishes compatibility or direction"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDING-SATURN",
+      "coverageItem": "guiding-planet.sa",
+      "status": "EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceRecordIds": ["IR-S2-RQ227-SATURN-CORE"],
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-SATURN-SORROW-AS-REALITY",
+          "purposes": ["guiding-planet-role"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_SEVERELY_LIMITED",
+          "allowedMeaning": "With Saturn ruling the Ascendant, the person's direction may be shaped in part by how they understand and respond to experiences of sorrow or heaviness."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-SATURN-HONEST-LIMITS",
+          "purposes": ["guiding-planet-application"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "A path may become clearer when difficulty is acknowledged honestly without being treated as the whole meaning of the person's life."
+        },
+        {
+          "claimId": "APP-S1-GUIDE-SATURN-HEAVINESS-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "A difficult period may narrow the sense of possibility when present heaviness is mistaken for a permanent description of what the future can hold."
+        }
+      ],
+      "claimConditions": [
+        {"claimId": "APP-S1-GUIDE-SATURN-HONEST-LIMITS", "requires": ["APP-S1-GUIDE-SATURN-SORROW-AS-REALITY"]},
+        {"claimId": "APP-S1-GUIDE-SATURN-HEAVINESS-TENSION", "requires": ["APP-S1-GUIDE-SATURN-SORROW-AS-REALITY"]}
+      ],
+      "compositionRequirements": [
+        "Every use of APP-S1-GUIDE-SATURN-SORROW-AS-REALITY must be accompanied by APP-S1-GUIDE-SATURN-HONEST-LIMITS in the same paragraph or the immediately following paragraph."
+      ],
+      "prohibitedExtensions": [
+        "automatic discipline, delay, endurance, responsibility, fear, limitation or maturity",
+        "suffering as necessary, deserved, spiritually superior or permanently defining",
+        "depression, grief disorder or other medical diagnosis",
+        "poverty, loneliness, punishment, failure or shortened-life prediction"
+      ]
+    }
+  ],
+  "batchAcceptanceRequirements": [
+    "Exactly seven records and twenty-one claims must load dynamically through the Section 1 overlay namespace.",
+    "Every claim must carry one or more evidenceRecordIds through its parent record and retain development-only status.",
+    "No claim may expand beyond the explicit graha-core evidence ceiling without being labeled editorial synthesis draft.",
+    "The Moon guiding-planet record must not duplicate Section 2's Moon house, sign, nakshatra or pada meanings.",
+    "Mars and Saturn must remain severely limited and their prohibited extensions must be machine-enforced.",
+    "Production must admit zero claims from every record.",
+    "Section 2 files and all thirteen Section 2 regressions must remain unchanged.",
+    "A Section 1 writer must remain fail-closed until an Ascendant-sign claim and an Ascendant-lord-house claim are also admitted for the same chart."
+  ]
+}

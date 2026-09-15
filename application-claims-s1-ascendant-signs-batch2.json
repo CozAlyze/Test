@@ -1,0 +1,133 @@
+{
+  "_label":"SECTION 1 BATCH 2A — universal Ascendant-sign application claims; development only; practitioner review required",
+  "schemaVersion":"application-claims/3.0.0-draft",
+  "sectionId":"s1",
+  "customerTitle":"Your Essential Nature & Guiding Planet",
+  "scope":"How the Ascendant sign may shape the person's general way of approaching life. Claims are conservative editorial applications of classical sign structure, not direct classical psychological delineations.",
+  "environment":"development",
+  "productionEligible":false,
+  "writerRule":"Use the Ascendant sign as an approach or orientation, never as a complete personality. Do not include sign mythology, imagery, anatomy, appearance, caste, gender, medical temperament, status or deterministic outcomes.",
+  "records":[
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-ARIES","coverageItem":"asc-sign.aries","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-ARIES"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-ARIES-DIRECT-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Aries rising, you may approach life most naturally by moving toward what requires a beginning, meeting experience directly rather than waiting for every condition to become settled."},
+        {"claimId":"APP-S1-ASC-ARIES-ACTION-CLARIFIES","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Taking an initial concrete action may help you discover what a situation actually requires and where your effort can be used effectively."},
+        {"claimId":"APP-S1-ASC-ARIES-PREMATURE-ACTION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"The urge to begin may become counterproductive when action starts before enough information, timing or direction is available."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-ARIES-ACTION-CLARIFIES","requires":["APP-S1-ASC-ARIES-DIRECT-ENTRY"]},{"claimId":"APP-S1-ASC-ARIES-PREMATURE-ACTION","requires":["APP-S1-ASC-ARIES-DIRECT-ENTRY"]}],
+      "prohibitedExtensions":["automatic bravery, aggression, leadership or competitiveness","impulsivity diagnosis","injury, conflict, military or athletic prediction","physical appearance or health"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-TAURUS","coverageItem":"asc-sign.taurus","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-TAURUS"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-TAURUS-STEADY-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Taurus rising, you may approach life by establishing something dependable and tangible before investing yourself more fully."},
+        {"claimId":"APP-S1-ASC-TAURUS-SUSTAIN-WHAT-WORKS","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"You may work best when progress can be made steadily and when time is available to strengthen what has already shown practical value."},
+        {"claimId":"APP-S1-ASC-TAURUS-FAMILIARITY-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Stability may become limiting when familiarity alone is treated as sufficient reason to preserve a direction that no longer works."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-TAURUS-SUSTAIN-WHAT-WORKS","requires":["APP-S1-ASC-TAURUS-STEADY-ENTRY"]},{"claimId":"APP-S1-ASC-TAURUS-FAMILIARITY-TENSION","requires":["APP-S1-ASC-TAURUS-STEADY-ENTRY"]}],
+      "prohibitedExtensions":["automatic stubbornness, materialism, sensuality or artistic taste","wealth, property or occupation prediction","body or appearance description","claim that change is inherently harmful"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-GEMINI","coverageItem":"asc-sign.gemini","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-GEMINI"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-GEMINI-MULTIPLE-ANGLES","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Gemini rising, you may approach life by examining more than one angle and noticing how a change in language or perspective alters what becomes possible."},
+        {"claimId":"APP-S1-ASC-GEMINI-ADAPT-THROUGH-EXCHANGE","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Conversation, questions and comparison may help you adapt your approach without requiring one first interpretation to remain final."},
+        {"claimId":"APP-S1-ASC-GEMINI-DISPERSION-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Adaptability may lose direction when every new possibility receives attention but none is carried far enough to become useful."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-GEMINI-ADAPT-THROUGH-EXCHANGE","requires":["APP-S1-ASC-GEMINI-MULTIPLE-ANGLES"]},{"claimId":"APP-S1-ASC-GEMINI-DISPERSION-TENSION","requires":["APP-S1-ASC-GEMINI-MULTIPLE-ANGLES"]}],
+      "prohibitedExtensions":["guaranteed intelligence, wit, communication talent or sociability","attention or nervous-system diagnosis","commerce, writing or media career prediction","duplicating Section 2 Moon-in-Gemini meanings"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-CANCER","coverageItem":"asc-sign.cancer","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-CANCER"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-CANCER-RESPONSIVE-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Cancer rising, you may approach life by first registering the human and situational context, including what appears to need protection, support or a sense of belonging."},
+        {"claimId":"APP-S1-ASC-CANCER-CONTEXTUAL-ACTION","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"You may act most coherently when your response fits the actual needs of the situation rather than following an impersonal method automatically."},
+        {"claimId":"APP-S1-ASC-CANCER-CLIMATE-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Responsiveness may become over-adjustment when the surrounding emotional climate determines your direction more strongly than your own considered position."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-CANCER-CONTEXTUAL-ACTION","requires":["APP-S1-ASC-CANCER-RESPONSIVE-ENTRY"]},{"claimId":"APP-S1-ASC-CANCER-CLIMATE-TENSION","requires":["APP-S1-ASC-CANCER-RESPONSIVE-ENTRY"]}],
+      "prohibitedExtensions":["automatic sensitivity, nurturance, domesticity or psychic intuition","mother or family outcome","mood or attachment diagnosis","duplication of Section 2 Moon meanings"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-LEO","coverageItem":"asc-sign.leo","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-LEO"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-LEO-INNER-CENTER","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Leo rising, you may approach life by identifying the position or expression that feels genuinely yours and giving it sustained form."},
+        {"claimId":"APP-S1-ASC-LEO-CONSISTENT-EXPRESSION","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"You may become more effective when your outward choices remain connected to a stable internal center rather than changing solely to secure a response."},
+        {"claimId":"APP-S1-ASC-LEO-RECOGNITION-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Self-expression may become rigid when recognition is treated as proof that the expression is valid, or its absence as proof that it is not."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-LEO-CONSISTENT-EXPRESSION","requires":["APP-S1-ASC-LEO-INNER-CENTER"]},{"claimId":"APP-S1-ASC-LEO-RECOGNITION-TENSION","requires":["APP-S1-ASC-LEO-INNER-CENTER"]}],
+      "prohibitedExtensions":["automatic leadership, confidence, authority, fame or theatricality","royal status or public success","ego or narcissism diagnosis","physical appearance"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-VIRGO","coverageItem":"asc-sign.virgo","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-VIRGO"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-VIRGO-DISCRIMINATING-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Virgo rising, you may approach life by observing what is actually present, distinguishing its parts and identifying what can be made more workable."},
+        {"claimId":"APP-S1-ASC-VIRGO-PRACTICAL-REFINEMENT","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Careful adjustment may help you turn a broad intention into a practical method that can be tested and improved."},
+        {"claimId":"APP-S1-ASC-VIRGO-CORRECTION-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Refinement may become self-defeating when constant correction prevents you from recognizing that something is already sufficiently functional."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-VIRGO-PRACTICAL-REFINEMENT","requires":["APP-S1-ASC-VIRGO-DISCRIMINATING-ENTRY"]},{"claimId":"APP-S1-ASC-VIRGO-CORRECTION-TENSION","requires":["APP-S1-ASC-VIRGO-DISCRIMINATING-ENTRY"]}],
+      "prohibitedExtensions":["perfectionism, anxiety, obsessive or medical diagnosis","automatic service, purity, modesty or criticism","health or occupation prediction","claim that every detail requires correction"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-LIBRA","coverageItem":"asc-sign.libra","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-LIBRA"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-LIBRA-RELATIONAL-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Libra rising, you may approach life by comparing positions, recognizing the other side of an exchange and looking for terms that allow movement between them."},
+        {"claimId":"APP-S1-ASC-LIBRA-NEGOTIATED-ACTION","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Your approach may become clearer through dialogue and negotiation, especially when fairness is translated into explicit choices rather than left as an ideal."},
+        {"claimId":"APP-S1-ASC-LIBRA-EXTERNAL-REFERENCE-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Comparison may weaken direction when another person's position is consulted so repeatedly that your own judgment never becomes decisive."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-LIBRA-NEGOTIATED-ACTION","requires":["APP-S1-ASC-LIBRA-RELATIONAL-ENTRY"]},{"claimId":"APP-S1-ASC-LIBRA-EXTERNAL-REFERENCE-TENSION","requires":["APP-S1-ASC-LIBRA-RELATIONAL-ENTRY"]}],
+      "prohibitedExtensions":["automatic charm, beauty, diplomacy, indecision or people-pleasing","marriage or partner prediction","moral judgment from classical sign wording","claim that agreement is always preferable to conflict"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-SCORPIO","coverageItem":"asc-sign.scorpio","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-SCORPIO"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-SCORPIO-CONCENTRATED-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With Scorpio rising, you may approach life by concentrating privately on what appears consequential rather than distributing your attention across every available concern."},
+        {"claimId":"APP-S1-ASC-SCORPIO-SUSTAINED-INVOLVEMENT","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Once you judge something to be significant, you may remain involved long enough to understand what is not immediately visible or easily resolved."},
+        {"claimId":"APP-S1-ASC-SCORPIO-CONTROL-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Concentration may become control when uncertainty is treated as something that must be eliminated before movement or trust is possible."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-SCORPIO-SUSTAINED-INVOLVEMENT","requires":["APP-S1-ASC-SCORPIO-CONCENTRATED-ENTRY"]},{"claimId":"APP-S1-ASC-SCORPIO-CONTROL-TENSION","requires":["APP-S1-ASC-SCORPIO-CONCENTRATED-ENTRY"]}],
+      "prohibitedExtensions":["danger, secrecy, manipulation, sexuality, vengeance or destructive power","trauma, suspicion or personality diagnosis","death, crisis or betrayal prediction","moral judgment from classical source language"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-SAGITTARIUS","coverageItem":"asc-sign.sagittarius","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-SAGITTARIUS"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-SAGITTARIUS-BROADER-DIRECTION","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Sagittarius rising, you may approach life by looking for the larger direction or principle that makes a particular experience meaningful."},
+        {"claimId":"APP-S1-ASC-SAGITTARIUS-EXPLORATORY-APPLICATION","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Exploration and learning may help you revise your direction when the current frame has become too narrow to explain what you are encountering."},
+        {"claimId":"APP-S1-ASC-SAGITTARIUS-HORIZON-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"A broader horizon may become an escape from application when the next possibility is pursued before the present understanding has been put into practice."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-SAGITTARIUS-EXPLORATORY-APPLICATION","requires":["APP-S1-ASC-SAGITTARIUS-BROADER-DIRECTION"]},{"claimId":"APP-S1-ASC-SAGITTARIUS-HORIZON-TENSION","requires":["APP-S1-ASC-SAGITTARIUS-BROADER-DIRECTION"]}],
+      "prohibitedExtensions":["automatic optimism, honesty, wisdom, faith, travel or teaching ability","religious or philosophical destiny","foreign travel or higher-education prediction","claim that expansion is always beneficial"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-CAPRICORN","coverageItem":"asc-sign.capricorn","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-CAPRICORN"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-CAPRICORN-STRUCTURED-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Capricorn rising, you may approach life by identifying what must be organized, made workable or carried into tangible form."},
+        {"claimId":"APP-S1-ASC-CAPRICORN-SEQUENCED-ACTION","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Direction may become clearer when a large responsibility is converted into defined steps, realistic limits and a structure that can be maintained."},
+        {"claimId":"APP-S1-ASC-CAPRICORN-DUTY-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Structure may become constricting when obligation is treated as the only legitimate basis for choosing a direction."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-CAPRICORN-SEQUENCED-ACTION","requires":["APP-S1-ASC-CAPRICORN-STRUCTURED-ENTRY"]},{"claimId":"APP-S1-ASC-CAPRICORN-DUTY-TENSION","requires":["APP-S1-ASC-CAPRICORN-STRUCTURED-ENTRY"]}],
+      "prohibitedExtensions":["automatic discipline, ambition, pessimism, hardship or delay","suffering as necessary for growth","career, status or poverty prediction","physical appearance or medical claims"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-AQUARIUS","coverageItem":"asc-sign.aquarius","status":"EDITORIAL_APPLICATION_DRAFT_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-AQUARIUS"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-AQUARIUS-SYSTEMIC-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With Aquarius rising, you may approach life by noticing the larger pattern or system in which an individual problem is operating."},
+        {"claimId":"APP-S1-ASC-AQUARIUS-PRINCIPLED-ALTERNATIVE","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"You may sustain an alternative approach when it rests on a clear principle and improves how the larger arrangement functions."},
+        {"claimId":"APP-S1-ASC-AQUARIUS-ABSTRACTION-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"System-level thinking may lose contact with lived reality when the principle becomes more important than the people or circumstances it is meant to serve."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-AQUARIUS-PRINCIPLED-ALTERNATIVE","requires":["APP-S1-ASC-AQUARIUS-SYSTEMIC-ENTRY"]},{"claimId":"APP-S1-ASC-AQUARIUS-ABSTRACTION-TENSION","requires":["APP-S1-ASC-AQUARIUS-SYSTEMIC-ENTRY"]}],
+      "prohibitedExtensions":["automatic humanitarianism, rebellion, innovation, detachment or eccentricity","collective destiny or social status","mythology or sign imagery","claim that unconventional choices are inherently superior"]
+    },
+    {
+      "recordId":"APPREC-S1-ASC-SIGN-PISCES","coverageItem":"asc-sign.pisces","status":"EDITORIAL_APPLICATION_DRAFT_SOURCE_BOUNDARY","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-SIGN-PISCES","IR-S2-RQ10-PISCES-ASC-SOURCE-BOUNDARY"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-BRIHAT-JATAKA-IYER-1885","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
+      "applicationClaims":[
+        {"claimId":"APP-S1-ASC-PISCES-RECEPTIVE-ENTRY","purposes":["ascendant-orientation"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_SOURCE_BOUNDARY","allowedMeaning":"With Pisces rising, you may approach life by remaining receptive to more than one current in a situation before deciding how they fit together."},
+        {"claimId":"APP-S1-ASC-PISCES-SYNTHESIZING-APPLICATION","purposes":["ascendant-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_SOURCE_BOUNDARY","allowedMeaning":"Your approach may become clearer when different impressions are gathered into one workable direction rather than being forced prematurely into a single explanation."},
+        {"claimId":"APP-S1-ASC-PISCES-DIFFUSION-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_SOURCE_BOUNDARY","allowedMeaning":"Receptivity may become diffusion when too many surrounding influences are allowed to shape the direction without a clear point of decision."}
+      ],
+      "claimConditions":[{"claimId":"APP-S1-ASC-PISCES-SYNTHESIZING-APPLICATION","requires":["APP-S1-ASC-PISCES-RECEPTIVE-ENTRY"]},{"claimId":"APP-S1-ASC-PISCES-DIFFUSION-TENSION","requires":["APP-S1-ASC-PISCES-RECEPTIVE-ENTRY"]}],
+      "compositionRequirements":["The writer must not present sensitivity, intuition, imagination, compassion or spirituality as direct source-supported Pisces traits unless separate admitted claims license them."],
+      "prohibitedExtensions":["automatic intuition, spirituality, imagination, compassion, psychic receptivity or weak boundaries","escapism, addiction or mental-health diagnosis","savior, victim or martyr framing","claim that every impression is meaningful or reliable"]
+    }
+  ]
+}
