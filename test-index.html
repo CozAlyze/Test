@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vedic Reading Test</title>
+<style>
+body { font-family: sans-serif; padding: 20px; background: #000f26; color: #e5d4c5; }
+button { padding: 15px 30px; font-size: 18px; margin: 10px 0; display: block; width: 100%; }
+</style>
+</head>
+<body>
+<h1>Vedic Reading Test</h1>
+<p>This page fakes the chart data that sidereal-reveal.html normally writes to localStorage.</p>
+
+<button onclick="setTestChart('matthew')">Load Matthew (Gemini rising, Moon Virgo/Hasta)</button>
+<button onclick="setTestChart('rochester')">Load Rochester (Libra rising, Moon Sag/Mula)</button>
+<button onclick="setTestChart('new')">Load Unknown Chart (Aries rising, Moon Aquarius/Shatabhisha)</button>
+
+<p id="status"></p>
+<a href="vedic-reading TEST.html" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading</a>
+
+<script>
+var CHARTS = {
+  matthew: {
+    version: 1,
+    person: { name: "Matthew" },
+    ascendantSignNumber: 3,
+    planets: [
+      { name: "Ascendant", signNumber: 3, degrees: 18, minutes: 15, house: 1, nakshatra: "Mrigashira", pada: 3 },
+      { name: "Sun", signNumber: 6, degrees: 10, minutes: 30, house: 4, nakshatra: "Hasta", pada: 1 },
+      { name: "Moon", signNumber: 6, degrees: 12, minutes: 45, house: 4, nakshatra: "Hasta", pada: 1 },
+      { name: "Mars", signNumber: 5, degrees: 22, minutes: 10, house: 3, nakshatra: "Purva Phalguni", pada: 3 },
+      { name: "Mercury", signNumber: 6, degrees: 5, minutes: 20, house: 4, nakshatra: "Uttara Phalguni", pada: 4 },
+      { name: "Jupiter", signNumber: 7, degrees: 8, minutes: 0, house: 5, nakshatra: "Chitra", pada: 4 },
+      { name: "Venus", signNumber: 7, degrees: 25, minutes: 40, house: 5, nakshatra: "Vishakha", pada: 1 },
+      { name: "Saturn", signNumber: 6, degrees: 28, minutes: 15, house: 4, nakshatra: "Chitra", pada: 2 },
+      { name: "Rahu", signNumber: 4, degrees: 14, minutes: 30, house: 2, nakshatra: "Pushya", pada: 4 },
+      { name: "Ketu", signNumber: 10, degrees: 14, minutes: 30, house: 8, nakshatra: "Shravana", pada: 2 }
+    ]
+  },
+  rochester: {
+    version: 1,
+    person: { name: "Rochester" },
+    ascendantSignNumber: 7,
+    planets: [
+      { name: "Ascendant", signNumber: 7, degrees: 5, minutes: 0, house: 1, nakshatra: "Chitra", pada: 3 },
+      { name: "Sun", signNumber: 8, degrees: 15, minutes: 0, house: 2, nakshatra: "Anuradha", pada: 4 },
+      { name: "Moon", signNumber: 9, degrees: 8, minutes: 0, house: 3, nakshatra: "Mula", pada: 3 },
+      { name: "Mars", signNumber: 5, degrees: 20, minutes: 0, house: 11, nakshatra: "Purva Phalguni", pada: 2 },
+      { name: "Mercury", signNumber: 8, degrees: 2, minutes: 0, house: 2, nakshatra: "Vishakha", pada: 4 },
+      { name: "Jupiter", signNumber: 4, degrees: 10, minutes: 0, house: 10, nakshatra: "Pushya", pada: 3 },
+      { name: "Venus", signNumber: 8, degrees: 28, minutes: 0, house: 2, nakshatra: "Jyeshtha", pada: 4 },
+      { name: "Saturn", signNumber: 5, degrees: 15, minutes: 0, house: 11, nakshatra: "Purva Phalguni", pada: 1 },
+      { name: "Rahu", signNumber: 5, degrees: 25, minutes: 0, house: 11, nakshatra: "Purva Phalguni", pada: 4 },
+      { name: "Ketu", signNumber: 11, degrees: 25, minutes: 0, house: 5, nakshatra: "Purva Bhadrapada", pada: 2 }
+    ]
+  },
+  new: {
+    version: 1,
+    person: { name: "Test" },
+    ascendantSignNumber: 1,
+    planets: [
+      { name: "Ascendant", signNumber: 1, degrees: 10, minutes: 0, house: 1, nakshatra: "Ashwini", pada: 4 },
+      { name: "Sun", signNumber: 1, degrees: 5, minutes: 0, house: 1, nakshatra: "Ashwini", pada: 2 },
+      { name: "Moon", signNumber: 11, degrees: 12, minutes: 0, house: 11, nakshatra: "Shatabhisha", pada: 2 },
+      { name: "Mars", signNumber: 10, degrees: 20, minutes: 0, house: 10, nakshatra: "Shravana", pada: 4 },
+      { name: "Mercury", signNumber: 12, degrees: 15, minutes: 0, house: 12, nakshatra: "Uttara Bhadrapada", pada: 3 },
+      { name: "Jupiter", signNumber: 2, degrees: 8, minutes: 0, house: 2, nakshatra: "Krittika", pada: 4 },
+      { name: "Venus", signNumber: 2, degrees: 22, minutes: 0, house: 2, nakshatra: "Rohini", pada: 4 },
+      { name: "Saturn", signNumber: 8, degrees: 18, minutes: 0, house: 8, nakshatra: "Jyeshtha", pada: 1 },
+      { name: "Rahu", signNumber: 3, degrees: 5, minutes: 0, house: 3, nakshatra: "Mrigashira", pada: 4 },
+      { name: "Ketu", signNumber: 9, degrees: 5, minutes: 0, house: 9, nakshatra: "Mula", pada: 2 }
+    ]
+  }
+};
+function setTestChart(key) {
+  localStorage.setItem('cozChartJSON', JSON.stringify(CHARTS[key]));
+  localStorage.setItem('emergeAscendant', ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'][CHARTS[key].ascendantSignNumber - 1]);
+  document.getElementById('status').textContent = 'Loaded ' + key + ' into localStorage. Now open Vedic Reading.';
+}
+</script>
+</body>
+</html>
