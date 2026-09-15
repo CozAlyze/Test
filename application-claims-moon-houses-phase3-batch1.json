@@ -1,0 +1,401 @@
+{
+  "_label": "PHASE 3 BATCH 1 — remaining Moon-house application claims; universal, development only, practitioner review required",
+  "schemaVersion": "application-claims/3.0.0-draft",
+  "scope": "Moon houses 1, 2, 5, 6, 7, 8, 9, 10 and 11. Houses 3, 4 and 12 remain in the existing Denver, Chicago and Lisbon overlays and are not duplicated here.",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. Research history, technical doctrine, source gaps and prohibited extensions remain internal trace.",
+  "records": [
+    {
+      "recordId": "IR-S2-MOON-HOUSE-1-APPLICATION-DRAFT",
+      "coverageItem": "graha-in-house.mo.1",
+      "status": "EDITORIAL_DRAFT_PENDING_EVIDENCE_AND_CONDITIONAL_METHOD",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "supersedesForDevelopment": "X-MOON-HOUSE-1",
+      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 1}]},
+      "sourceIds": [],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-1-IMMEDIATE-PRESENCE",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "The person's changing emotional state may be closely connected with how they meet life and how others initially experience their presence."
+        },
+        {
+          "claimId": "APP-MOON-1-SELF-AWARENESS",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Understanding personal reactions and emotional rhythms may be an important part of developing a stable sense of self."
+        },
+        {
+          "claimId": "APP-MOON-1-RESPONSIVE-IDENTITY",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "The person may sometimes need to distinguish a temporary feeling from a lasting truth about who they are."
+        }
+      ],
+      "compositionRequirements": [
+        "Every Moon-in-first application must be combined with the admitted Moon-sign record; first-house placement alone cannot define the person's identity or sensitivity."
+      ],
+      "prohibitedExtensions": [
+        "claim that emotions are always visible",
+        "unstable-identity claim",
+        "automatic sensitivity, attractiveness or popularity",
+        "physical appearance or health prediction",
+        "personality conclusion without the Moon-sign modifier"
+      ]
+    },
+    {
+      "recordId": "IR-S2-MOON-HOUSE-2-APPLICATION-DRAFT",
+      "coverageItem": "graha-in-house.mo.2",
+      "status": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "supersedesForDevelopment": "X-MOON-HOUSE-2",
+      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 2}]},
+      "sourceIds": [],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-2-SECURITY",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Emotional steadiness may be connected with a dependable sense of support, resources and continuity."
+        },
+        {
+          "claimId": "APP-MOON-2-VOICE",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Tone of voice and the way feelings are spoken may carry particular emotional significance."
+        },
+        {
+          "claimId": "APP-MOON-2-FAMILY-VALUES",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Family or inherited values may help shape what the person associates with safety and belonging, without determining the actual family history."
+        },
+        {
+          "claimId": "APP-MOON-2-INNER-VALUE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve building security without allowing temporary material uncertainty to define personal worth."
+        }
+      ],
+      "prohibitedExtensions": [
+        "wealth, poverty, inheritance or financial-loss prediction",
+        "food or eating-behavior claim",
+        "claim about the person's actual family history",
+        "guaranteed speaking ability",
+        "equating money with emotional health"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ216-MOON-HOUSE-FIFTH",
+      "coverageItem": "graha-in-house.mo.5",
+      "status": "EDITORIAL_APPLICATION_DRAFT_MIXED_EVIDENCE",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-5-REFLECTIVE-CAPACITY",
+          "purposes": ["moon-through-house"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The mind may have a strong reflective or interpretive capacity when engaging with something personally meaningful."
+        },
+        {
+          "claimId": "APP-MOON-5-CREATIVE-INVESTMENT",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Creative expression may become emotionally important because it gives inner experience a form that can be developed and shared."
+        },
+        {
+          "claimId": "APP-MOON-5-JOY-AND-PLAY",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Play, personal interests or experiences of heartfelt enjoyment may help restore emotional vitality."
+        },
+        {
+          "claimId": "APP-MOON-5-GUIDING-OTHERS",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Caring for, teaching or encouraging younger people or creative work may carry emotional meaning, without predicting parenthood."
+        }
+      ],
+      "prohibitedExtensions": [
+        "pregnancy, fertility or children prediction",
+        "guaranteed creativity, talent or intelligence",
+        "romantic outcome or gambling prediction",
+        "claim that the person must become a parent",
+        "automatic need for attention"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ217-MOON-HOUSE-SIXTH",
+      "coverageItem": "graha-in-house.mo.6",
+      "status": "EDITORIAL_APPLICATION_DRAFT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-6-STRAIN-REACTIVITY",
+          "purposes": ["moon-through-house"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "Irritation may arise more quickly when responsibilities, conflict or ongoing demands create emotional strain."
+        },
+        {
+          "claimId": "APP-MOON-6-DAILY-RHYTHM",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Daily routines and the conditions surrounding regular work may have a noticeable effect on emotional steadiness."
+        },
+        {
+          "claimId": "APP-MOON-6-USEFUL-CONTRIBUTION",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "A sense of making a useful contribution may support the person's state of mind when it does not require ignoring personal limits."
+        },
+        {
+          "claimId": "APP-MOON-6-SUSTAINABLE-PRACTICE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve creating sustainable routines and responding to pressure before frustration accumulates."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-MOON-6-STRAIN-REACTIVITY must appear with APP-MOON-6-SUSTAINABLE-PRACTICE or another constructive admitted claim."
+      ],
+      "prohibitedExtensions": [
+        "medical, appetite, weakness or illness prediction",
+        "enemy or litigation prediction",
+        "laziness or moral judgment",
+        "guaranteed employment or service role",
+        "mental-health or nervous-system diagnosis"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ218-MOON-HOUSE-SEVENTH",
+      "coverageItem": "graha-in-house.mo.7",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-7-RELATIONAL-INTENSITY",
+          "purposes": ["moon-through-house"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "Close relationships may be experienced with strong emotional intensity rather than emotional neutrality."
+        },
+        {
+          "claimId": "APP-MOON-7-RELATIONAL-AWARENESS",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "The person's state of mind may be affected by the quality of exchange within important one-to-one relationships."
+        },
+        {
+          "claimId": "APP-MOON-7-SELF-OTHER-BALANCE",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "The person may sometimes need to separate their own emotional needs from the feelings or responses of someone close to them."
+        },
+        {
+          "claimId": "APP-MOON-7-DIRECT-DIALOGUE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve naming personal needs directly while leaving room for mutual response and negotiation."
+        }
+      ],
+      "prohibitedExtensions": [
+        "jealousy as a fixed trait",
+        "marriage, divorce, betrayal or partner prediction",
+        "attachment-style diagnosis",
+        "claim about another person's behavior",
+        "dependency or inability to be alone"
+      ]
+    },
+    {
+      "recordId": "IR-S2-MOON-HOUSE-8-APPLICATION-DRAFT",
+      "coverageItem": "graha-in-house.mo.8",
+      "status": "BLOCKED_PENDING_ADOPTION_RULING",
+      "developmentEligible": false,
+      "productionEligible": false,
+      "supersedesForDevelopment": "X-MOON-HOUSE-8",
+      "adoptionGate": {"blockedDate": "2026-09-11", "blockedBy": "pipeline/validate-adoption-provenance.mjs", "blockingEvidenceRecordId": "IR-S2-RQ03-MOON-EIGHTH-PSYCHOLOGY-GAP", "reason": "coverageItem graha-in-house.mo.8 matches an interpretive-records.json evidence record (IR-S2-RQ03-MOON-EIGHTH-PSYCHOLOGY-GAP) carrying conflictingDoctrine.methodologyRulingRequired=true and conflictingDoctrine.ruling=null. This application-claims record does not share that evidence record's recordId and no explicit adoption ruling authorizes its depth/hidden-perception/guarded-access content. Historical ruling: adoption-decision-s2.md row 3.", "unblockRequires": "An explicit, recorded practitioner/Jason ruling on adoption-decision-s2.md row 3 (or IR-S2-RQ03's conflictingDoctrine.ruling being set to a non-null resolution), after which developmentEligible may be restored."},
+      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 8}]},
+      "sourceIds": [],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-8-PRIVATE-PROCESSING",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Some emotional experiences may require privacy and time before the person is ready to explain them."
+        },
+        {
+          "claimId": "APP-MOON-8-TRUST-AND-SHARING",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Trust may influence how readily the person shares emotionally significant or vulnerable material."
+        },
+        {
+          "claimId": "APP-MOON-8-CHANGE-PROCESSING",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Periods of major change may prompt deep emotional processing around what can be retained and what must be allowed to change."
+        },
+        {
+          "claimId": "APP-MOON-8-DEPTH-WITHOUT-FIXATION",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve honoring emotional depth without allowing uncertainty or past pain to become the only lens through which the present is understood."
+        }
+      ],
+      "prohibitedExtensions": [
+        "death, longevity, inheritance or crisis prediction",
+        "trauma claim",
+        "psychic or occult-power claim",
+        "sexual history or abuse claim",
+        "paranoia, secrecy or mental-health diagnosis",
+        "claim that suffering guarantees transformation"
+      ]
+    },
+    {
+      "recordId": "IR-S2-MOON-HOUSE-9-APPLICATION-DRAFT",
+      "coverageItem": "graha-in-house.mo.9",
+      "status": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "supersedesForDevelopment": "X-MOON-HOUSE-9",
+      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 9}]},
+      "sourceIds": [],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-9-MEANING",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Emotional steadiness may be supported by a sense that life has meaning, direction or a larger context."
+        },
+        {
+          "claimId": "APP-MOON-9-BELIEF-REFLECTION",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Beliefs, ethics or spiritual questions may be processed personally and emotionally rather than remaining purely abstract ideas."
+        },
+        {
+          "claimId": "APP-MOON-9-LEARNING-PERSPECTIVE",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Study, teachers, travel or exposure to unfamiliar perspectives may help the person reconsider what they feel and believe."
+        },
+        {
+          "claimId": "APP-MOON-9-LIVED-TRUTH",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve allowing beliefs to mature through experience instead of demanding one permanent answer to every question."
+        }
+      ],
+      "prohibitedExtensions": [
+        "religious destiny or spiritual superiority",
+        "guru, father or teacher prediction",
+        "foreign travel or immigration prediction",
+        "guaranteed fortune, prosperity or higher education",
+        "claim that one belief system is correct"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ220-MOON-HOUSE-TENTH",
+      "coverageItem": "graha-in-house.mo.10",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-10-PUBLIC-ACTION",
+          "purposes": ["moon-through-house"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The mind may be strongly engaged by undertaking visible responsibilities and bringing important efforts toward completion."
+        },
+        {
+          "claimId": "APP-MOON-10-ACCOMPLISHMENT",
+          "purposes": ["moon-through-house"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "Progress in meaningful work may contribute to emotional satisfaction, without guaranteeing recognition or success."
+        },
+        {
+          "claimId": "APP-MOON-10-PUBLIC-RESPONSE",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "The person may need to distinguish genuine purpose from the changing approval or expectations of the public environment."
+        },
+        {
+          "claimId": "APP-MOON-10-INTERNAL-MEASURE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve defining accomplishment through meaningful contribution as well as external results."
+        }
+      ],
+      "prohibitedExtensions": [
+        "career, fame, status, wealth or promotion prediction",
+        "guaranteed success",
+        "specific vocation claim",
+        "claim that public approval is emotionally necessary",
+        "workaholism diagnosis"
+      ]
+    },
+    {
+      "recordId": "IR-S2-MOON-HOUSE-11-APPLICATION-DRAFT",
+      "coverageItem": "graha-in-house.mo.11",
+      "status": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "supersedesForDevelopment": "X-MOON-HOUSE-11",
+      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 11}]},
+      "sourceIds": [],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-11-BELONGING",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Friendships, groups or communities may contribute to the person's sense of emotional belonging."
+        },
+        {
+          "claimId": "APP-MOON-11-SHARED-AIMS",
+          "purposes": ["moon-through-house"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Working toward an aspiration with other people may help the person feel connected to something beyond immediate personal concerns."
+        },
+        {
+          "claimId": "APP-MOON-11-CHANGING-CIRCLES",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Because social needs and aspirations can change, the person may periodically reassess which communities still feel emotionally aligned."
+        },
+        {
+          "claimId": "APP-MOON-11-AUTHENTIC-CONNECTION",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+          "allowedMeaning": "Development may involve choosing friendships and collective goals that support genuine connection rather than belonging at any cost."
+        }
+      ],
+      "prohibitedExtensions": [
+        "income, gains, popularity or social-status prediction",
+        "guaranteed fulfillment of desires",
+        "claim about the number or quality of friendships",
+        "universal humanitarian profile",
+        "claim that changing friendships indicates betrayal"
+      ]
+    }
+  ],
+  "implementationRequirements": [
+    "Merge this overlay additively without modifying the frozen Lisbon, Chicago or Denver overlays.",
+    "Do not duplicate the existing Moon-house 3, 4 or 12 application records.",
+    "Route claims exclusively from their purposes fields; no house-specific claim ID may be hard-coded in planner or writer logic.",
+    "Preserve each classification and expose it in internal trace.",
+    "For any record with supersedesForDevelopment, restore the original gap prohibition in production.",
+    "Production must admit zero claims from this file until individual practitioner approval changes productionEligible.",
+    "Unused admitted claims must be logged as ADMITTED_NOT_USED without causing a warning or failure.",
+    "The writer must name a nakshatra once only; the following pada introduction must not repeat the nakshatra name."
+  ]
+}

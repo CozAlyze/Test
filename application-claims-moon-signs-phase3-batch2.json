@@ -1,0 +1,381 @@
+{
+  "_label": "PHASE 3 BATCH 2 — remaining Moon-sign application claims; universal, development only, practitioner review required",
+  "schemaVersion": "application-claims/3.0.0-draft",
+  "scope": "Moon signs Aries, Taurus, Gemini, Cancer, Libra, Scorpio, Capricorn, Sagittarius and Pisces. Leo, Virgo and Aquarius remain in the tested Lisbon, Denver and Chicago overlays and are not duplicated here.",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. Classical source history, excluded predictions, stereotypes and technical factors remain internal trace.",
+  "records": [
+    {
+      "recordId": "IR-S2-RQ201-MOON-ARIES",
+      "coverageItem": "graha-in-sign.mo.aries",
+      "status": "EDITORIAL_APPLICATION_DRAFT_MIXED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-ARIES-QUICK-RESPONSE",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Emotional responses may arise quickly and directly rather than developing slowly out of view."
+        },
+        {
+          "claimId": "APP-MOON-ARIES-RELENTING",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Even when a reaction is immediate, the person may be able to soften, relent or move forward rather than remain fixed indefinitely."
+        },
+        {
+          "claimId": "APP-MOON-ARIES-COURAGEOUS-ENGAGEMENT",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may meet emotionally demanding situations with courage and a willingness to act."
+        },
+        {
+          "claimId": "APP-MOON-ARIES-MOVEMENT-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "A need for movement or change may sometimes compete with the patience required to remain with one feeling or situation."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-MOON-ARIES-QUICK-RESPONSE and APP-MOON-ARIES-RELENTING must appear together when either is used."
+      ],
+      "prohibitedExtensions": [
+        "aggression, violence or recklessness claim",
+        "automatic anger or impulsiveness",
+        "automatic leadership or independence",
+        "travel prediction",
+        "claim that feelings pass quickly in every situation"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ202-MOON-TAURUS",
+      "coverageItem": "graha-in-sign.mo.taurus",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-TAURUS-STEADINESS",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The emotional temperament may favor steadiness and continuity over rapid or unnecessary change."
+        },
+        {
+          "claimId": "APP-MOON-TAURUS-ENDURANCE",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may have the capacity to remain emotionally present with something important over time."
+        },
+        {
+          "claimId": "APP-MOON-TAURUS-FORGIVENESS",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Forgiveness and generosity may help the person restore emotional balance after disappointment."
+        },
+        {
+          "claimId": "APP-MOON-TAURUS-STEADFAST-FRIENDSHIP",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Friendship may be approached with loyalty and a desire to remain dependable."
+        }
+      ],
+      "prohibitedExtensions": [
+        "fixed stubbornness claim",
+        "materialism or possessiveness claim",
+        "guaranteed emotional stability",
+        "fertility, wealth or life-period prediction",
+        "automatic artistic or sensual profile"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ203-MOON-GEMINI",
+      "coverageItem": "graha-in-sign.mo.gemini",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-GEMINI-MENTAL-AGILITY",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The mind may respond with agility, wit and an ability to see more than one way of expressing an idea."
+        },
+        {
+          "claimId": "APP-MOON-GEMINI-PERSUASIVE-SPEECH",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Speech may be engaging or persuasive, especially when the person has had time to understand what they want to communicate."
+        },
+        {
+          "claimId": "APP-MOON-GEMINI-LEARNED-ARTS",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Music, dance, language or another learned art may provide the mind with meaningful stimulation."
+        }
+      ],
+      "prohibitedExtensions": [
+        "two-faced or unreliable personality claim",
+        "scattered attention or inability to commit",
+        "automatic emotional verbalization without a supporting house or Mercury factor",
+        "guaranteed intelligence, eloquence or artistic talent",
+        "sexual or bodily prediction"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ204-MOON-CANCER",
+      "coverageItem": "graha-in-sign.mo.cancer",
+      "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-CANCER-GENTLE-RESPONSE",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may respond especially well to communication that is gentle, considerate and emotionally respectful."
+        },
+        {
+          "claimId": "APP-MOON-CANCER-FRIENDSHIP",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Trusted friendships may contribute meaningfully to emotional ease."
+        },
+        {
+          "claimId": "APP-MOON-CANCER-RESTORATIVE-SETTING",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "A comfortable home or restorative surroundings, particularly settings connected with nature or water, may help the mind settle."
+        },
+        {
+          "claimId": "APP-MOON-CANCER-FLUCTUATION",
+          "purposes": ["main-tension"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "The emotional state may move and fluctuate, making it important not to treat every passing mood as a permanent conclusion."
+        }
+      ],
+      "prohibitedExtensions": [
+        "automatic nurturer, mothering or domestic-role claim",
+        "extreme sensitivity claim",
+        "mood-disorder diagnosis",
+        "property or residence prediction",
+        "claim that water has a medical or spiritual effect"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ02-MOON-LIBRA-CALIBRATION-LIMITED",
+      "coverageItem": "graha-in-sign.mo.libra",
+      "status": "EDITORIAL_APPLICATION_DRAFT_SYNTHESIS_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-LIBRA-COMPARISON",
+          "purposes": ["moon-sign-expression"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The mind may understand a feeling by comparing perspectives and considering how different parts of a situation relate to one another."
+        },
+        {
+          "claimId": "APP-MOON-LIBRA-FAIRNESS",
+          "purposes": ["moon-sign-expression"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Fairness and balanced exchange may influence whether a situation feels emotionally settled."
+        },
+        {
+          "claimId": "APP-MOON-LIBRA-LEARNING",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Learning and thoughtful consideration may give the mind a constructive way to reach clarity."
+        },
+        {
+          "claimId": "APP-MOON-LIBRA-INDECISION-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Considering several sides may support fairness, but it may also delay a decision when the person continues weighing after the essential truth is already clear."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-MOON-LIBRA-COMPARISON and APP-MOON-LIBRA-FAIRNESS must be labeled synthesis in trace and may not be represented as direct classical doctrine."
+      ],
+      "prohibitedExtensions": [
+        "automatic harmony, charm, beauty or diplomacy",
+        "people-pleasing or conflict-avoidance diagnosis",
+        "indecisiveness as a fixed trait",
+        "relationship or marriage prediction",
+        "trade, wealth or status prediction"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ207-MOON-SCORPIO",
+      "coverageItem": "graha-in-sign.mo.scorpio",
+      "status": "EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-SCORPIO-PRIVACY",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "The person may keep some feelings private until they decide that disclosure is appropriate."
+        },
+        {
+          "claimId": "APP-MOON-SCORPIO-SELECTIVE-DISCLOSURE",
+          "purposes": ["moon-sign-expression"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Emotional expression may be selective rather than immediate, particularly when the person is still deciding what they wish to reveal."
+        }
+      ],
+      "compositionRequirements": [
+        "This record is intentionally thin. The planner must contract the Moon-sign paragraph rather than pad it with familiar Scorpio stereotypes."
+      ],
+      "prohibitedExtensions": [
+        "trauma, abuse, betrayal or crisis claim",
+        "psychic, occult or intuitive-power claim",
+        "emotional depth or transformation claim",
+        "jealousy, manipulation, vengeance or sexual-intensity claim",
+        "medical, separation or moral prediction"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ209-MOON-CAPRICORN",
+      "coverageItem": "graha-in-sign.mo.capricorn",
+      "status": "EDITORIAL_APPLICATION_DRAFT_MIXED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-CAPRICORN-CLOSE-CARE",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Care for close family or trusted people may carry substantial emotional importance."
+        },
+        {
+          "claimId": "APP-MOON-CAPRICORN-COUNSEL",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may be receptive to thoughtful counsel when it comes from someone whose judgment they respect."
+        },
+        {
+          "claimId": "APP-MOON-CAPRICORN-MEMORY-AND-WORDS",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Memory, language or literary interests may give the mind a durable way to organize experience."
+        },
+        {
+          "claimId": "APP-MOON-CAPRICORN-ENERGY-CONTRAST",
+          "purposes": ["main-tension"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "Periods of strength and active engagement may alternate with times when motivation is slower to gather."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-MOON-CAPRICORN-ENERGY-CONTRAST must be presented as a mixed tendency, never as laziness or incapacity."
+      ],
+      "prohibitedExtensions": [
+        "automatic ambition, discipline or career focus",
+        "coldness, pessimism or emotional repression",
+        "laziness or acquisitiveness as a moral judgment",
+        "wealth, property or travel prediction",
+        "guaranteed memory or literary talent"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ208-MOON-SAGITTARIUS",
+      "coverageItem": "graha-in-sign.mo.sagittarius",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-SAGITTARIUS-GENEROSITY",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Generosity may be a natural way of expressing emotional goodwill."
+        },
+        {
+          "claimId": "APP-MOON-SAGITTARIUS-MATURE-EXPRESSION",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may communicate with wit and increasing maturity when speaking about matters that carry meaning."
+        },
+        {
+          "claimId": "APP-MOON-SAGITTARIUS-ENERGETIC-ACTION",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Once emotionally engaged, the person may bring considerable energy to action."
+        },
+        {
+          "claimId": "APP-MOON-SAGITTARIUS-PERSUASION-NOT-FORCE",
+          "purposes": ["practical-takeaway"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may respond more openly to reasoned persuasion than to pressure or force."
+        }
+      ],
+      "prohibitedExtensions": [
+        "automatic optimism, freedom-seeking or adventurousness",
+        "travel or foreign-residence prediction",
+        "religious superiority or fixed belief claim",
+        "bluntness or commitment-avoidance stereotype",
+        "guaranteed literary or speaking talent"
+      ]
+    },
+    {
+      "recordId": "IR-S2-RQ211-MOON-PISCES",
+      "coverageItem": "graha-in-sign.mo.pisces",
+      "status": "EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MOON-PISCES-LEARNING",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Learning may provide the mind with a meaningful source of engagement and satisfaction."
+        },
+        {
+          "claimId": "APP-MOON-PISCES-HOME-ATTACHMENT",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "The person may become emotionally attached to the home, possessions or surroundings that carry familiarity and personal meaning."
+        },
+        {
+          "claimId": "APP-MOON-PISCES-AESTHETIC-COMFORT",
+          "purposes": ["moon-sign-expression"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Adornment or visually pleasing surroundings may contribute to emotional comfort."
+        }
+      ],
+      "compositionRequirements": [
+        "This record must remain narrow. The planner must contract the Moon-sign paragraph rather than add familiar Pisces spirituality, empathy or imagination language."
+      ],
+      "prohibitedExtensions": [
+        "mysticism, psychic ability or spiritual destiny",
+        "empathy, compassion or emotional permeability claim",
+        "imagination, escapism, addiction or weak-boundary claim",
+        "wealth, property or relationship prediction",
+        "guaranteed artistic sensitivity"
+      ]
+    }
+  ],
+  "implementationRequirements": [
+    "Merge this overlay additively without modifying the Lisbon, Chicago, Denver or Moon-house overlays.",
+    "Do not duplicate the existing Moon-sign records for Leo, Virgo or Aquarius.",
+    "Route claims exclusively from each claim's purposes field; no sign or claim ID may be hard-coded in pipeline logic.",
+    "Contract deliberately thin sign paragraphs, especially Scorpio and Pisces, instead of filling them with conventional stereotypes.",
+    "Preserve classifications and prohibited extensions in internal trace.",
+    "Unused admitted claims must be logged as ADMITTED_NOT_USED without creating a warning or failure.",
+    "A connective reference such as 'those qualities' in a pada paragraph must not cite the nakshatra context claim outside its planned paragraph.",
+    "Name the nakshatra once only; introduce the pada without repeating the nakshatra name.",
+    "Production must admit zero claims from this file until individual records are practitioner-approved and explicitly made productionEligible."
+  ]
+}
