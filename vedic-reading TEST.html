@@ -610,13 +610,33 @@ function fetchJSON(path) {
 
 var COZ_READING_READY = requestChartData().then(function (chart) {
   if (!chart || !chart.planets) { window.COZ_VEDIC_READING_UNAVAILABLE = true; window.COZ_VEDIC_DEBUG = "No chart in localStorage.cozChartJSON (got: " + JSON.stringify(chart).slice(0,80) + ")"; return; }
-  return fetchJSON("manifest.json").then(function (manifest) {
-    return Promise.all([
-      Promise.all(manifest.section1Files.map(function (f) { return fetchJSON(f); })),
-      Promise.all(manifest.section2Files.map(function (f) { return fetchJSON(f); })),
-      fetchJSON("section3-6-review-drafts.json")
-    ]);
-  }).then(function (results) {
+  var SECTION1_FILES = [
+    "application-claims-s1-ascendant-lord-houses-batch2.json",
+    "application-claims-s1-ascendant-signs-batch2.json",
+    "application-claims-s1-guiding-planets-batch1.json",
+    "application-claims-s1-hidden-role-fixture-batch1.json",
+    "application-claims-s1-v26-compiled-overlay.json"
+];
+  var SECTION2_FILES = [
+    "application-claims-chicago.json",
+    "application-claims-denver.json",
+    "application-claims-moon-houses-phase3-batch1.json",
+    "application-claims-moon-signs-phase3-batch2.json",
+    "application-claims-nakshatras-phase3-batch3a.json",
+    "application-claims-nakshatras-phase3-batch3b.json",
+    "application-claims-nakshatras-phase3-batch3c.json",
+    "application-claims-nakshatras-phase3-batch3d.json",
+    "application-claims-padas-batch4a.json",
+    "application-claims-padas-batch4b.json",
+    "application-claims-padas-batch4c.json",
+    "application-claims-padas-batch4d.json",
+    "application-claims.json"
+];
+  return Promise.all([
+    Promise.all(SECTION1_FILES.map(function (f) { return fetchJSON(f); })),
+    Promise.all(SECTION2_FILES.map(function (f) { return fetchJSON(f); })),
+    fetchJSON("section3-6-review-drafts.json")
+  ]).then(function (results) {
     var claimData = { section1Files: results[0], section2Files: results[1] };
     var snippets36 = results[2];
     if (!window.CozDevReview) throw new Error("dev-review-engine.js did not load (window.CozDevReview missing)");
