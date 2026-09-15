@@ -609,7 +609,7 @@ function fetchJSON(path) {
 }
 
 var COZ_READING_READY = requestChartData().then(function (chart) {
-  if (!chart || !chart.planets) { window.COZ_VEDIC_READING_UNAVAILABLE = true; return; }
+  if (!chart || !chart.planets) { window.COZ_VEDIC_READING_UNAVAILABLE = true; window.COZ_VEDIC_DEBUG = "No chart in localStorage.cozChartJSON (got: " + JSON.stringify(chart).slice(0,80) + ")"; return; }
   return fetchJSON("manifest.json").then(function (manifest) {
     return Promise.all([
       Promise.all(manifest.section1Files.map(function (f) { return fetchJSON(f); })),
@@ -619,6 +619,7 @@ var COZ_READING_READY = requestChartData().then(function (chart) {
   }).then(function (results) {
     var claimData = { section1Files: results[0], section2Files: results[1] };
     var snippets36 = results[2];
+    if (!window.CozDevReview) throw new Error("dev-review-engine.js did not load (window.CozDevReview missing)");
     var firstName = chart.person && chart.person.name;
     var result = window.CozDevReview.generateDevReview(chart, claimData, snippets36, firstName);
     window.COZ_VEDIC_READING = result.reading;
@@ -626,6 +627,7 @@ var COZ_READING_READY = requestChartData().then(function (chart) {
   }).catch(function (e) {
     console.log("[EMERGE FLOW] dev-review generation failed:", e);
     window.COZ_VEDIC_READING_UNAVAILABLE = true;
+    window.COZ_VEDIC_DEBUG = "Generation error: " + (e && (e.stack || e.message || String(e)));
   });
 });
 
@@ -722,6 +724,7 @@ function renderUnavailableNotice() {
     <div class="vedic-divider" aria-hidden="true">${STAR_SVG}</div>
     <section class="vedic-body">
       <p>This chart was calculated successfully. A full composed reading has not yet been generated for this development sample.</p>
+      <p style="font-size:14px;opacity:.7;word-break:break-all">DEBUG: ${esc(window.COZ_VEDIC_DEBUG || "no debug info captured")}</p>
       <p><button type="button" id="vedicRetry" class="vedic-nav-next">Try again</button></p>
     </section>
     <nav class="vedic-nav" aria-label="Reading navigation">
