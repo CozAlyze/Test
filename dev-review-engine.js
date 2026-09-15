@@ -133,9 +133,25 @@
     var entry = null;
     (snippets36.entries || []).forEach(function (e) { if (e.identityKey === identityKey) entry = e; });
 
+    /* Voice contract: the Moon's nakshatra is named exactly once, in the Section 2
+       intro. Any later mention of that name, and the word "pada", are removed from
+       the claim prose. A claim sentence that only defines the nakshatra is dropped. */
+    var nakName = String(s2.moon.nakshatra || "");
+    var s2Sentences = s2.sentences.filter(function (t) {
+      return !/is the Moon's nakshatra, one of the smaller lunar sections/i.test(t);
+    }).map(function (t) {
+      if (nakName) {
+        t = t.replace(new RegExp("\\b" + nakName + "'s\\b", "g"), "this nakshatra's");
+        t = t.replace(new RegExp("\\b" + nakName + "\\b", "g"), "this nakshatra");
+      }
+      t = t.replace(/\bThis pada\b/g, "This part of it").replace(/\bthis pada\b/g, "this part of it");
+      t = t.replace(/\bThe pada\b/g, "This part of it").replace(/\bthe pada\b/g, "this part of it");
+      return t;
+    });
+
     var reading = {
       "essential-nature": toParagraphs(s1Match.sentences, introS1),
-      "mind-intuition": toParagraphs(s2.sentences, introS2)
+      "mind-intuition": toParagraphs(s2Sentences, introS2)
     };
 
     var placeholderNote = function (label, fact) {

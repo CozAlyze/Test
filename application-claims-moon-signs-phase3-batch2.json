@@ -24,13 +24,13 @@
           "claimId": "APP-MOON-ARIES-RELENTING",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Even when a reaction is immediate, the person may be able to soften, relent or move forward rather than remain fixed indefinitely."
+          "allowedMeaning": "Even when a reaction is immediate, you may be able to soften, relent or move forward rather than remain fixed indefinitely."
         },
         {
           "claimId": "APP-MOON-ARIES-COURAGEOUS-ENGAGEMENT",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may meet emotionally demanding situations with courage and a willingness to act."
+          "allowedMeaning": "You may meet emotionally demanding situations with courage and a willingness to act."
         },
         {
           "claimId": "APP-MOON-ARIES-MOVEMENT-TENSION",
@@ -68,13 +68,13 @@
           "claimId": "APP-MOON-TAURUS-ENDURANCE",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may have the capacity to remain emotionally present with something important over time."
+          "allowedMeaning": "You may have the capacity to remain emotionally present with something important over time."
         },
         {
           "claimId": "APP-MOON-TAURUS-FORGIVENESS",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Forgiveness and generosity may help the person restore emotional balance after disappointment."
+          "allowedMeaning": "Forgiveness and generosity may help you restore emotional balance after disappointment."
         },
         {
           "claimId": "APP-MOON-TAURUS-STEADFAST-FRIENDSHIP",
@@ -109,7 +109,7 @@
           "claimId": "APP-MOON-GEMINI-PERSUASIVE-SPEECH",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Speech may be engaging or persuasive, especially when the person has had time to understand what they want to communicate."
+          "allowedMeaning": "Speech may be engaging or persuasive, especially when you have had time to understand what they want to communicate."
         },
         {
           "claimId": "APP-MOON-GEMINI-LEARNED-ARTS",
@@ -138,7 +138,7 @@
           "claimId": "APP-MOON-CANCER-GENTLE-RESPONSE",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may respond especially well to communication that is gentle, considerate and emotionally respectful."
+          "allowedMeaning": "You may respond especially well to communication that is gentle, considerate and emotionally respectful."
         },
         {
           "claimId": "APP-MOON-CANCER-FRIENDSHIP",
@@ -197,7 +197,7 @@
           "claimId": "APP-MOON-LIBRA-INDECISION-TENSION",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "Considering several sides may support fairness, but it may also delay a decision when the person continues weighing after the essential truth is already clear."
+          "allowedMeaning": "Considering several sides may support fairness, but it may also delay a decision when you continues weighing after the essential truth is already clear."
         }
       ],
       "compositionRequirements": [
@@ -223,13 +223,13 @@
           "claimId": "APP-MOON-SCORPIO-PRIVACY",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
-          "allowedMeaning": "The person may keep some feelings private until they decide that disclosure is appropriate."
+          "allowedMeaning": "You may keep some feelings private until they decide that disclosure is appropriate."
         },
         {
           "claimId": "APP-MOON-SCORPIO-SELECTIVE-DISCLOSURE",
           "purposes": ["moon-sign-expression"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
-          "allowedMeaning": "Emotional expression may be selective rather than immediate, particularly when the person is still deciding what they wish to reveal."
+          "allowedMeaning": "Emotional expression may be selective rather than immediate, particularly when you are still deciding what they wish to reveal."
         }
       ],
       "compositionRequirements": [
@@ -261,7 +261,7 @@
           "claimId": "APP-MOON-CAPRICORN-COUNSEL",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may be receptive to thoughtful counsel when it comes from someone whose judgment they respect."
+          "allowedMeaning": "You may be receptive to thoughtful counsel when it comes from someone whose judgment they respect."
         },
         {
           "claimId": "APP-MOON-CAPRICORN-MEMORY-AND-WORDS",
@@ -305,19 +305,19 @@
           "claimId": "APP-MOON-SAGITTARIUS-MATURE-EXPRESSION",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may communicate with wit and increasing maturity when speaking about matters that carry meaning."
+          "allowedMeaning": "You may communicate with wit and increasing maturity when speaking about matters that carry meaning."
         },
         {
           "claimId": "APP-MOON-SAGITTARIUS-ENERGETIC-ACTION",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Once emotionally engaged, the person may bring considerable energy to action."
+          "allowedMeaning": "Once emotionally engaged, you may bring considerable energy to action."
         },
         {
           "claimId": "APP-MOON-SAGITTARIUS-PERSUASION-NOT-FORCE",
           "purposes": ["practical-takeaway"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may respond more openly to reasoned persuasion than to pressure or force."
+          "allowedMeaning": "You may respond more openly to reasoned persuasion than to pressure or force."
         }
       ],
       "prohibitedExtensions": [
@@ -346,7 +346,7 @@
           "claimId": "APP-MOON-PISCES-HOME-ATTACHMENT",
           "purposes": ["moon-sign-expression"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
-          "allowedMeaning": "The person may become emotionally attached to the home, possessions or surroundings that carry familiarity and personal meaning."
+          "allowedMeaning": "You may become emotionally attached to the home, possessions or surroundings that carry familiarity and personal meaning."
         },
         {
           "claimId": "APP-MOON-PISCES-AESTHETIC-COMFORT",

@@ -24,7 +24,7 @@
           "claimId": "APP-PUNARVASU-CALM-RESTRAINT",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may approach emotionally charged situations with restraint and an underlying preference for calm."
+          "allowedMeaning": "You may approach emotionally charged situations with restraint and an underlying preference for calm."
         },
         {
           "claimId": "APP-PUNARVASU-RESTORATIVE-RETURN",
@@ -70,7 +70,7 @@
           "claimId": "APP-PUSHYA-CALM-DISCIPLINE",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Calmness and restraint may help the person remain emotionally steady when consistency is required."
+          "allowedMeaning": "Calmness and restraint may help you remain emotionally steady when consistency is required."
         },
         {
           "claimId": "APP-PUSHYA-LEARNING-GUIDANCE",
@@ -122,13 +122,13 @@
           "claimId": "APP-ASHLESHA-BINDING-PATTERNS",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
-          "allowedMeaning": "The person may be especially aware of the attachments, obligations or unspoken patterns that bind people and situations together."
+          "allowedMeaning": "You may be especially aware of the attachments, obligations or unspoken patterns that bind people and situations together."
         },
         {
           "claimId": "APP-ASHLESHA-INSIGHT-ENTANGLEMENT-TENSION",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
-          "allowedMeaning": "Insight into a complicated emotional pattern may become entanglement when the person remains inside it after recognizing what it is."
+          "allowedMeaning": "Insight into a complicated emotional pattern may become entanglement when you remain inside it after recognizing what it is."
         },
         {
           "claimId": "APP-ASHLESHA-CLEAR-BOUNDARIES",
@@ -176,7 +176,7 @@
           "claimId": "APP-PF-GENERATIVE-SHARING",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
-          "allowedMeaning": "The person may feel emotionally engaged when creating or sharing something that can bring enjoyment to others."
+          "allowedMeaning": "You may feel emotionally engaged when creating or sharing something that can bring enjoyment to others."
         },
         {
           "claimId": "APP-PF-ENJOYMENT-WITHOUT-PERFORMANCE",
@@ -223,7 +223,7 @@
           "claimId": "APP-HASTA-COMPETENT-ACTION",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
-          "allowedMeaning": "Emotional confidence may increase when the person can apply a skill and see a tangible result from their effort."
+          "allowedMeaning": "Emotional confidence may increase when you can apply a skill and see a tangible result from their effort."
         },
         {
           "claimId": "APP-HASTA-GRASP-CONTROL-TENSION",

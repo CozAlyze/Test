@@ -19,8 +19,31 @@ button { padding: 15px 30px; font-size: 18px; margin: 10px 0; display: block; wi
 <button onclick="setTestChart('new')">Load Unknown Chart (Aries rising, Moon Aquarius/Shatabhisha)</button>
 
 <p id="status"></p>
-<a href="vedic-reading_TEST.html?v=10" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading</a>
+<a href="vedic-reading_TEST.html?v=11" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading</a>
 
+
+<hr style="margin:30px 0;border:0;border-top:1px solid #d4a178">
+<h2 style="font-size:20px;color:#d4a178">Enter a new chart</h2>
+<p style="font-size:14px;opacity:.85">Any fictional person. The real sidereal calculator runs on this data, then the reading is assembled and Sections 3&ndash;6 are generated live.</p>
+
+<label style="font-size:14px">Name</label>
+<input id="bName" type="text" placeholder="e.g. Dana Reyes" style="width:100%;padding:12px;font-size:16px;margin:6px 0 12px">
+
+<label style="font-size:14px">Birth date</label>
+<input id="bDate" type="date" style="width:100%;padding:12px;font-size:16px;margin:6px 0 12px">
+
+<label style="font-size:14px">Exact birth time</label>
+<input id="bTime" type="time" style="width:100%;padding:12px;font-size:16px;margin:6px 0 12px">
+
+<label style="font-size:14px">Birth city, country</label>
+<input id="bPlace" type="text" placeholder="e.g. Lisbon, Portugal" style="width:100%;padding:12px;font-size:16px;margin:6px 0 6px">
+<button onclick="lookupPlace()">Find this place</button>
+<p id="placeStatus" style="font-size:14px"></p>
+
+<button id="calcBtn" onclick="calcChart()" style="background:#d4a178;color:#000f26;font-weight:bold">Calculate chart &amp; open reading</button>
+<p id="calcStatus" style="font-size:14px"></p>
+<pre id="calcOut" style="font-size:12px;white-space:pre-wrap;opacity:.85"></pre>
+<iframe id="calcFrame" style="display:none;width:1px;height:1px;border:0" title="calculator"></iframe>
 <hr style="margin:30px 0;border:0;border-top:1px solid #d4a178">
 <h2 style="font-size:18px">Live draft generation (Sections 3–6)</h2>
 <p style="font-size:14px;opacity:.8">Use a <b>separate test key</b> with a spend cap, never your main key. The key is stored only in this phone's browser (localStorage). It is not in the repo. Anyone with your unlocked phone and dev tools could read it. Revoke it when review is done.</p>
@@ -88,6 +111,92 @@ var CHARTS = {
     ]
   }
 };
+
+/* ---------- new-chart entry: real calculator, real timezone, real geocoding ---------- */
+var COZ_PLACE = null;
+function lookupPlace() {
+  var q = document.getElementById('bPlace').value.trim();
+  var st = document.getElementById('placeStatus');
+  if (!q) { st.textContent = 'Type a city first.'; return; }
+  st.textContent = 'Looking up...';
+  fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(q))
+    .then(function (r) { return r.json(); })
+    .then(function (a) {
+      if (!a.length) throw new Error('not found');
+      var lat = parseFloat(a[0].lat), lon = parseFloat(a[0].lon);
+      return fetch('https://timeapi.io/api/TimeZone/coordinate?latitude=' + lat + '&longitude=' + lon)
+        .then(function (r) { return r.json(); })
+        .then(function (tz) {
+          COZ_PLACE = { name: a[0].display_name.split(',')[0].trim(), country: a[0].display_name.split(',').pop().trim(),
+                        latitude: lat, longitude: lon, timezone: tz.timeZone };
+          st.textContent = 'Found: ' + COZ_PLACE.name + ', ' + COZ_PLACE.country + '  (' + lat.toFixed(4) + ', ' + lon.toFixed(4) + ')  tz ' + COZ_PLACE.timezone;
+        });
+    })
+    .catch(function (e) { COZ_PLACE = null; st.textContent = 'Could not find that place. Try "City, Country".'; });
+}
+
+/* local wall-clock time in an IANA zone -> exact UTC, historical DST included */
+function cozLocalToUTC(y, mo, d, h, mi, zone) {
+  var guess = Date.UTC(y, mo - 1, d, h, mi);
+  for (var i = 0; i < 3; i++) {
+    var p = new Intl.DateTimeFormat('en-US', { timeZone: zone, year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).formatToParts(new Date(guess));
+    var g = {}; p.forEach(function (x) { g[x.type] = x.value; });
+    var asLocal = Date.UTC(+g.year, +g.month - 1, +g.day, +g.hour % 24, +g.minute, +g.second);
+    var diff = Date.UTC(y, mo - 1, d, h, mi) - asLocal;
+    if (!diff) break;
+    guess += diff;
+  }
+  return new Date(guess);
+}
+
+function calcChart() {
+  var name = document.getElementById('bName').value.trim();
+  var date = document.getElementById('bDate').value;
+  var time = document.getElementById('bTime').value;
+  var st = document.getElementById('calcStatus'), out = document.getElementById('calcOut');
+  out.textContent = '';
+  if (!name || !date || !time) { st.textContent = 'Name, date and time are all required.'; return; }
+  if (!COZ_PLACE) { st.textContent = 'Find the birth place first.'; return; }
+
+  var dp = date.split('-').map(Number), tp = time.split(':').map(Number);
+  var utc = cozLocalToUTC(dp[0], dp[1], dp[2], tp[0], tp[1], COZ_PLACE.timezone);
+  var h12 = tp[0] % 12 === 0 ? 12 : tp[0] % 12;
+  var record = { system: 'sidereal', name: name, birthDate: date,
+    birthTime: h12 + ':' + String(tp[1]).padStart(2, '0') + ' ' + (tp[0] < 12 ? 'AM' : 'PM'),
+    utc: utc.toISOString(), location: COZ_PLACE };
+  localStorage.setItem('emergeBirthData', JSON.stringify(record));
+  localStorage.removeItem('cozChartJSON');
+
+  st.textContent = 'Calculating with the real sidereal engine...';
+  var done = false;
+  function onMsg(ev) {
+    var d = ev.data || {};
+    if (d.coz === 'CHART_READY') {
+      done = true; window.removeEventListener('message', onMsg);
+      var c = d.chart;
+      c.person = { name: name, firstName: name.split(/\s+/)[0] };
+      localStorage.setItem('cozChartJSON', JSON.stringify(c));
+      localStorage.setItem('emergeAscendant', ['aries','taurus','gemini','cancer','leo','virgo','libra','scorpio','sagittarius','capricorn','aquarius','pisces'][c.ascendantSignNumber - 1]);
+      var S = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
+      out.textContent = c.birth.date + '  ' + c.birth.time + '  ' + c.birth.location + '  ' + c.birth.timezone + '\n' +
+        c.calculation.ayanamsha + '  ·  ' + c.calculation.houses + '\n\n' +
+        c.planets.map(function (p) {
+          return p.name.padEnd(10) + S[p.signNumber - 1].padEnd(12) + (p.degrees + '\u00B0' + String(p.minutes).padStart(2, '0')).padEnd(7) +
+            'H' + p.house + '  ' + p.nakshatra + ' ' + p.pada;
+        }).join('\n');
+      st.innerHTML = 'Chart calculated. <a href="vedic-reading_TEST.html?v=11" style="color:#d4a178">\u2192 Open Vedic Reading</a>';
+      document.getElementById('calcFrame').src = 'about:blank';
+    } else if (d.coz === 'CHART_ERROR') {
+      done = true; window.removeEventListener('message', onMsg);
+      st.textContent = 'Calculator could not export this chart: ' + d.message;
+    }
+  }
+  window.addEventListener('message', onMsg);
+  document.getElementById('calcFrame').src = 'calc-sidereal.html?calc=' + Date.now();
+  setTimeout(function () { if (!done) { window.removeEventListener('message', onMsg); st.textContent = 'Calculator timed out. Check the date, time and place and try again.'; } }, 20000);
+}
+
 function saveKey() {
   var k = document.getElementById('apiKey').value.trim();
   var m = document.getElementById('model').value.trim() || 'claude-sonnet-4-6';

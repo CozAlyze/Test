@@ -15,9 +15,9 @@
       "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
       "applicationClaims": [
         {"claimId": "APP-MULA-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Mula is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
-        {"claimId": "APP-MULA-STEADY-FOCUS", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "The person may bring steadiness and one-minded focus to emotionally important questions."},
+        {"claimId": "APP-MULA-STEADY-FOCUS", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "You may bring steadiness and one-minded focus to emotionally important questions."},
         {"claimId": "APP-MULA-ROOT-SEEKING", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The mind may look beneath surface explanations in order to understand the underlying cause of a feeling or situation."},
-        {"claimId": "APP-MULA-EXPLANATION-STRIPPING-TENSION", "purposes": ["main-tension"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Searching for the root may become exhausting when every explanation is dismantled before the person recognizes what is already clear."},
+        {"claimId": "APP-MULA-EXPLANATION-STRIPPING-TENSION", "purposes": ["main-tension"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Searching for the root may become exhausting when every explanation is dismantled before you recognizes what is already clear."},
         {"claimId": "APP-MULA-ROOT-WITHOUT-DESTRUCTION", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Development may involve seeking the essential cause without assuming that everything surrounding it must be discarded."}
       ],
       "compositionRequirements": [
@@ -26,7 +26,7 @@
         "APP-MULA-NAKSHATRA-CONTEXT must appear before every other Mula interpretation."
       ],
       "customerExcludedLayers": ["deity", "root or uprooting imagery", "mythology", "destruction doctrine", "Ketu rulership", "deity-identification uncertainty", "source history"],
-      "prohibitedExtensions": ["death, ruin, destruction or loss prediction", "trauma or crisis claim", "claim that the person destroys relationships or structures", "claim that suffering is required for transformation", "luxury or status prediction", "presenting modern synthesis as classical quotation"]
+      "prohibitedExtensions": ["death, ruin, destruction or loss prediction", "trauma or crisis claim", "claim that you destroys relationships or structures", "claim that suffering is required for transformation", "luxury or status prediction", "presenting modern synthesis as classical quotation"]
     },
     {
       "modelId": "NAK-20-PURVA_ASHADHA",
@@ -38,8 +38,8 @@
       "applicationClaims": [
         {"claimId": "APP-PA-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Purva Ashadha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
         {"claimId": "APP-PA-STEADFAST-FRIENDSHIP", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "Friendship may be approached with emotional loyalty and a desire to remain steadfast."},
-        {"claimId": "APP-PA-INNER-CONVICTION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The person may protect an inner conviction while it is still gathering enough clarity and strength to be expressed."},
-        {"claimId": "APP-PA-RENEWED-MOMENTUM", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "Emotional momentum may return when the person reconnects with an aim that still feels genuinely worth pursuing."},
+        {"claimId": "APP-PA-INNER-CONVICTION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "You may protect an inner conviction while it is still gathering enough clarity and strength to be expressed."},
+        {"claimId": "APP-PA-RENEWED-MOMENTUM", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "Emotional momentum may return when you reconnects with an aim that still feels genuinely worth pursuing."},
         {"claimId": "APP-PA-CONVICTION-RECONSIDERATION", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Development may involve defending a meaningful conviction while remaining willing to reconsider how it should be carried forward."}
       ],
       "compositionRequirements": [
@@ -60,7 +60,7 @@
       "applicationClaims": [
         {"claimId": "APP-UA-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Uttara Ashadha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
         {"claimId": "APP-UA-GENTLE-GRATITUDE", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "Gentleness and gratitude may support emotional steadiness and constructive relationships."},
-        {"claimId": "APP-UA-LARGER-PRINCIPLE", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The person may become deeply committed to a principle that feels larger than immediate preference or convenience."},
+        {"claimId": "APP-UA-LARGER-PRINCIPLE", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "You may become deeply committed to a principle that feels larger than immediate preference or convenience."},
         {"claimId": "APP-UA-DURABLE-COMMITMENT", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "Emotional confidence may strengthen through commitments that have been tested and sustained over time."},
         {"claimId": "APP-UA-PRINCIPLE-WITH-FLEXIBILITY", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Development may involve remaining loyal to an important principle without confusing durability with refusal to adapt."}
       ],
@@ -83,7 +83,7 @@
         {"claimId": "APP-SHRAVANA-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Shravana is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
         {"claimId": "APP-SHRAVANA-LEARNING", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "Learning and the careful reception of knowledge may carry emotional importance."},
         {"claimId": "APP-SHRAVANA-LISTENING", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The mind may understand a situation by listening closely before deciding what it means."},
-        {"claimId": "APP-SHRAVANA-CONNECTING-PATTERNS", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The person may recognize meaning by connecting information gathered across different conversations, teachings or experiences."},
+        {"claimId": "APP-SHRAVANA-CONNECTING-PATTERNS", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "You may recognize meaning by connecting information gathered across different conversations, teachings or experiences."},
         {"claimId": "APP-SHRAVANA-LISTENING-AND-JUDGMENT", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Development may involve listening openly while retaining independent judgment about what deserves to be accepted and carried forward."}
       ],
       "compositionRequirements": [
@@ -103,10 +103,10 @@
       "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
       "applicationClaims": [
         {"claimId": "APP-DHANISHTA-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Dhanishta is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
-        {"claimId": "APP-DHANISHTA-GENEROUS-COURAGE", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "Generosity and courage may become important ways of responding when the person feels emotionally engaged."},
+        {"claimId": "APP-DHANISHTA-GENEROUS-COURAGE", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "Generosity and courage may become important ways of responding when you feel emotionally engaged."},
         {"claimId": "APP-DHANISHTA-RHYTHMIC-AFFINITY", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED", "allowedMeaning": "Music or rhythm may provide the mind with a meaningful form of stimulation and expression."},
-        {"claimId": "APP-DHANISHTA-COORDINATED-ACTION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The person may work effectively when individual effort can join a shared rhythm or coordinated undertaking."},
-        {"claimId": "APP-DHANISHTA-PERSONAL-COLLECTIVE-TEMPO", "purposes": ["main-tension"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Tension may arise when the person's own timing differs from the pace expected by a group or collective effort."}
+        {"claimId": "APP-DHANISHTA-COORDINATED-ACTION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "You may work effectively when individual effort can join a shared rhythm or coordinated undertaking."},
+        {"claimId": "APP-DHANISHTA-PERSONAL-COLLECTIVE-TEMPO", "purposes": ["main-tension"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Tension may arise when your own timing differs from the pace expected by a group or collective effort."}
       ],
       "compositionRequirements": [
         "APP-DHANISHTA-COORDINATED-ACTION requires at least one additional non-nakshatra chart factor in the reading.",
@@ -125,10 +125,10 @@
       "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
       "applicationClaims": [
         {"claimId": "APP-SHATABHISHA-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Shatabhisha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
-        {"claimId": "APP-SHATABHISHA-DIRECT-TRUTH", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED", "allowedMeaning": "The person may prefer emotional truth to be spoken plainly, even when the message requires care in its delivery."},
+        {"claimId": "APP-SHATABHISHA-DIRECT-TRUTH", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED", "allowedMeaning": "You may prefer emotional truth to be spoken plainly, even when the message requires care in its delivery."},
         {"claimId": "APP-SHATABHISHA-INDEPENDENT-COURAGE", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED", "allowedMeaning": "The emotional temperament may include courage and resistance to being controlled or unnecessarily subordinated."},
         {"claimId": "APP-SHATABHISHA-PROTECTED-INVESTIGATION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED", "allowedMeaning": "The mind may investigate a difficult question most effectively when it has privacy, clear limits and enough distance to examine the pattern carefully."},
-        {"claimId": "APP-SHATABHISHA-TRUTH-WITH-CARE", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED", "allowedMeaning": "Development may involve preserving independence and honesty while considering how direct truth will affect the person receiving it."}
+        {"claimId": "APP-SHATABHISHA-TRUTH-WITH-CARE", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED", "allowedMeaning": "Development may involve preserving independence and honesty while considering how direct truth will land for the person receiving it."}
       ],
       "compositionRequirements": [
         "APP-SHATABHISHA-DIRECT-TRUTH must appear with APP-SHATABHISHA-TRUTH-WITH-CARE or another constructive admitted claim.",
@@ -170,8 +170,8 @@
       "applicationClaims": [
         {"claimId": "APP-REVATI-NAKSHATRA-CONTEXT", "purposes": ["nakshatra-influence"], "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT", "allowedMeaning": "Revati is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."},
         {"claimId": "APP-REVATI-GRACEFUL-COURAGE", "purposes": ["nakshatra-influence"], "classification": "SOURCE_PRINCIPLE_APPLICATION", "allowedMeaning": "Courage may be expressed with grace rather than force."},
-        {"claimId": "APP-REVATI-GUIDANCE", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "The person may feel emotionally engaged when offering direction or practical support that helps something vulnerable move forward safely."},
-        {"claimId": "APP-REVATI-COMPLETION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "Completion may carry emotional significance, particularly when the person can bring an experience to a thoughtful and humane conclusion."},
+        {"claimId": "APP-REVATI-GUIDANCE", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "You may feel emotionally engaged when offering direction or practical support that helps something vulnerable move forward safely."},
+        {"claimId": "APP-REVATI-COMPLETION", "purposes": ["nakshatra-influence"], "classification": "AI_SYNTHESIS_FROM_SOURCES", "allowedMeaning": "Completion may carry emotional significance, particularly when you can bring an experience to a thoughtful and humane conclusion."},
         {"claimId": "APP-REVATI-GUIDANCE-WITHOUT-CARRYING", "purposes": ["practical-takeaway"], "classification": "EDITORIAL_SYNTHESIS_DRAFT", "allowedMeaning": "Development may involve helping others move forward without assuming responsibility for carrying their entire journey."
         }
       ],

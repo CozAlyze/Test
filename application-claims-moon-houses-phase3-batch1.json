@@ -20,7 +20,7 @@
           "claimId": "APP-MOON-1-IMMEDIATE-PRESENCE",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "The person's changing emotional state may be closely connected with how they meet life and how others initially experience their presence."
+          "allowedMeaning": "Your changing emotional state may be closely connected with how they meet life and how others initially experience their presence."
         },
         {
           "claimId": "APP-MOON-1-SELF-AWARENESS",
@@ -32,11 +32,11 @@
           "claimId": "APP-MOON-1-RESPONSIVE-IDENTITY",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "The person may sometimes need to distinguish a temporary feeling from a lasting truth about who they are."
+          "allowedMeaning": "You may sometimes need to distinguish a temporary feeling from a lasting truth about who they are."
         }
       ],
       "compositionRequirements": [
-        "Every Moon-in-first application must be combined with the admitted Moon-sign record; first-house placement alone cannot define the person's identity or sensitivity."
+        "Every Moon-in-first application must be combined with the admitted Moon-sign record; first-house placement alone cannot define your identity or sensitivity."
       ],
       "prohibitedExtensions": [
         "claim that emotions are always visible",
@@ -72,7 +72,7 @@
           "claimId": "APP-MOON-2-FAMILY-VALUES",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Family or inherited values may help shape what the person associates with safety and belonging, without determining the actual family history."
+          "allowedMeaning": "Family or inherited values may help shape what you associates with safety and belonging, without determining the actual family history."
         },
         {
           "claimId": "APP-MOON-2-INNER-VALUE",
@@ -84,7 +84,7 @@
       "prohibitedExtensions": [
         "wealth, poverty, inheritance or financial-loss prediction",
         "food or eating-behavior claim",
-        "claim about the person's actual family history",
+        "claim about your actual family history",
         "guaranteed speaking ability",
         "equating money with emotional health"
       ]
@@ -126,7 +126,7 @@
         "pregnancy, fertility or children prediction",
         "guaranteed creativity, talent or intelligence",
         "romantic outcome or gambling prediction",
-        "claim that the person must become a parent",
+        "claim that you must become a parent",
         "automatic need for attention"
       ]
     },
@@ -154,7 +154,7 @@
           "claimId": "APP-MOON-6-USEFUL-CONTRIBUTION",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "A sense of making a useful contribution may support the person's state of mind when it does not require ignoring personal limits."
+          "allowedMeaning": "A sense of making a useful contribution may support your state of mind when it does not require ignoring personal limits."
         },
         {
           "claimId": "APP-MOON-6-SUSTAINABLE-PRACTICE",
@@ -192,13 +192,13 @@
           "claimId": "APP-MOON-7-RELATIONAL-AWARENESS",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "The person's state of mind may be affected by the quality of exchange within important one-to-one relationships."
+          "allowedMeaning": "Your state of mind may be affected by the quality of exchange within important one-to-one relationships."
         },
         {
           "claimId": "APP-MOON-7-SELF-OTHER-BALANCE",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "The person may sometimes need to separate their own emotional needs from the feelings or responses of someone close to them."
+          "allowedMeaning": "You may sometimes need to separate their own emotional needs from the feelings or responses of someone close to them."
         },
         {
           "claimId": "APP-MOON-7-DIRECT-DIALOGUE",
@@ -230,13 +230,13 @@
           "claimId": "APP-MOON-8-PRIVATE-PROCESSING",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Some emotional experiences may require privacy and time before the person is ready to explain them."
+          "allowedMeaning": "Some emotional experiences may require privacy and time before you are ready to explain them."
         },
         {
           "claimId": "APP-MOON-8-TRUST-AND-SHARING",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Trust may influence how readily the person shares emotionally significant or vulnerable material."
+          "allowedMeaning": "Trust may influence how readily you shares emotionally significant or vulnerable material."
         },
         {
           "claimId": "APP-MOON-8-CHANGE-PROCESSING",
@@ -286,7 +286,7 @@
           "claimId": "APP-MOON-9-LEARNING-PERSPECTIVE",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Study, teachers, travel or exposure to unfamiliar perspectives may help the person reconsider what they feel and believe."
+          "allowedMeaning": "Study, teachers, travel or exposure to unfamiliar perspectives may help you reconsider what they feel and believe."
         },
         {
           "claimId": "APP-MOON-9-LIVED-TRUTH",
@@ -327,7 +327,7 @@
           "claimId": "APP-MOON-10-PUBLIC-RESPONSE",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "The person may need to distinguish genuine purpose from the changing approval or expectations of the public environment."
+          "allowedMeaning": "You may need to distinguish genuine purpose from the changing approval or expectations of the public environment."
         },
         {
           "claimId": "APP-MOON-10-INTERNAL-MEASURE",
@@ -358,19 +358,19 @@
           "claimId": "APP-MOON-11-BELONGING",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Friendships, groups or communities may contribute to the person's sense of emotional belonging."
+          "allowedMeaning": "Friendships, groups or communities may contribute to your sense of emotional belonging."
         },
         {
           "claimId": "APP-MOON-11-SHARED-AIMS",
           "purposes": ["moon-through-house"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Working toward an aspiration with other people may help the person feel connected to something beyond immediate personal concerns."
+          "allowedMeaning": "Working toward an aspiration with other people may help you feel connected to something beyond immediate personal concerns."
         },
         {
           "claimId": "APP-MOON-11-CHANGING-CIRCLES",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Because social needs and aspirations can change, the person may periodically reassess which communities still feel emotionally aligned."
+          "allowedMeaning": "Because social needs and aspirations can change, you may periodically reassess which communities still feel emotionally aligned."
         },
         {
           "claimId": "APP-MOON-11-AUTHENTIC-CONNECTION",

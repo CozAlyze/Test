@@ -30,7 +30,7 @@
           "claimId": "APP-ASHWINI-SKILLFUL-RESPONSE",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Skill and intelligence may become most apparent when the person can respond actively rather than remain passive."
+          "allowedMeaning": "Skill and intelligence may become most apparent when you can respond actively rather than remain passive."
         },
         {
           "claimId": "APP-ASHWINI-SPEED-DISCERNMENT",
@@ -64,25 +64,25 @@
           "claimId": "APP-BHARANI-RESOLVE-ENDURANCE",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may approach emotionally important matters with firm resolve and the capacity to endure pressure over time."
+          "allowedMeaning": "You may approach emotionally important matters with firm resolve and the capacity to endure pressure over time."
         },
         {
           "claimId": "APP-BHARANI-RESPONSIBLE-COMPLETION",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
-          "allowedMeaning": "Responsibility may carry emotional weight, particularly when the person has committed to carrying something through to completion."
+          "allowedMeaning": "Responsibility may carry emotional weight, particularly when you have committed to carrying something through to completion."
         },
         {
           "claimId": "APP-BHARANI-TRUTHFUL-DEXTERITY",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Truthfulness and practical dexterity may help the person manage demanding situations without losing sight of what matters."
+          "allowedMeaning": "Truthfulness and practical dexterity may help you manage demanding situations without losing sight of what matters."
         },
         {
           "claimId": "APP-BHARANI-CARRYING-LIMITS",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "Endurance may become burdensome when the person continues carrying a responsibility after its useful purpose has ended."
+          "allowedMeaning": "Endurance may become burdensome when you continues carrying a responsibility after its useful purpose has ended."
         }
       ],
       "compositionRequirements": [
@@ -157,13 +157,13 @@
           "claimId": "APP-ROHINI-STEADY-MIND",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "The person may bring steadiness of mind to what they value and wish to develop."
+          "allowedMeaning": "You may bring steadiness of mind to what they value and wish to develop."
         },
         {
           "claimId": "APP-ROHINI-PERSUASIVE-SINCERITY",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Sincere and persuasive communication may help the person give tangible form to an idea or intention."
+          "allowedMeaning": "Sincere and persuasive communication may help you give tangible form to an idea or intention."
         },
         {
           "claimId": "APP-ROHINI-GROWTH-INTO-FORM",
@@ -209,13 +209,13 @@
           "claimId": "APP-MRIGASHIRA-INGENUITY-SKILL",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Ingenuity and skill may help the person follow a question beyond its first or most obvious answer."
+          "allowedMeaning": "Ingenuity and skill may help you follow a question beyond its first or most obvious answer."
         },
         {
           "claimId": "APP-MRIGASHIRA-HOPEFUL-ENERGY",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Hopefulness and energy may return when the person has something worthwhile to explore or pursue."
+          "allowedMeaning": "Hopefulness and energy may return when you have something worthwhile to explore or pursue."
         },
         {
           "claimId": "APP-MRIGASHIRA-SEARCH-SETTLE-TENSION",
@@ -255,7 +255,7 @@
           "claimId": "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
-          "allowedMeaning": "The person may develop strength through the effort of facing difficult material and working through what cannot simply be ignored."
+          "allowedMeaning": "You may develop strength through the effort of facing difficult material and working through what cannot simply be ignored."
         },
         {
           "claimId": "APP-ARDRA-INTENSITY-DIRECTION",

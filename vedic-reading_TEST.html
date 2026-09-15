@@ -561,7 +561,7 @@ body[data-view="reading"] .vedic-reading-page { animation: none; }
 
 <div class="vedic-stamp" aria-hidden="true">VEDIC READING · R3.4 · birth chart door</div>
 
-<script src="dev-review-engine.js?v=5"></script>
+<script src="dev-review-engine.js?v=6"></script>
 <script>
 /* ============================================================
    SECTION DATA (spec, verbatim)
@@ -760,7 +760,7 @@ var COZ_READING_READY = requestChartData().then(function (chart) {
     var claimData = { section1Files: results[0], section2Files: results[1] };
     var snippets36 = results[2];
     if (!window.CozDevReview) throw new Error("dev-review-engine.js did not load (window.CozDevReview missing)");
-    var firstName = chart.person && chart.person.name;
+    var firstName = chart.person && (chart.person.firstName || String(chart.person.name || "").split(/\s+/)[0]);
     var result = window.CozDevReview.generateDevReview(chart, claimData, snippets36, firstName);
     window.COZ_VEDIC_REVIEW_META = result.meta;
     var hasReviewed = !/no identity match/i.test(String(result.meta.sections3to6Source || ""));

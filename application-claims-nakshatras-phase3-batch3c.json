@@ -24,7 +24,7 @@
           "claimId": "APP-CHITRA-AESTHETIC-AWARENESS",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
-          "allowedMeaning": "Color, beauty and visual coherence may have a noticeable effect on what captures the person's attention."
+          "allowedMeaning": "Color, beauty and visual coherence may have a noticeable effect on what captures your attention."
         },
         {
           "claimId": "APP-CHITRA-DESIGN-INTELLIGENCE",
@@ -36,7 +36,7 @@
           "claimId": "APP-CHITRA-REFINEMENT",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
-          "allowedMeaning": "Refinement may matter emotionally because the person wants the visible form of something to reflect its underlying intention."
+          "allowedMeaning": "Refinement may matter emotionally because you want the visible form of something to reflect its underlying intention."
         },
         {
           "claimId": "APP-CHITRA-FORM-AND-SUBSTANCE",
@@ -71,7 +71,7 @@
           "claimId": "APP-SWATI-SELF-RESTRAINT",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Self-restraint may help the person respond thoughtfully rather than allowing the first reaction to determine the entire exchange."
+          "allowedMeaning": "Self-restraint may help you respond thoughtfully rather than allowing the first reaction to determine the entire exchange."
         },
         {
           "claimId": "APP-SWATI-GENEROUS-SPEECH",
@@ -83,7 +83,7 @@
           "claimId": "APP-SWATI-ADAPTIVE-INDEPENDENCE",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
-          "allowedMeaning": "The person may need room to adapt and move independently while discovering what allows them to remain internally centered."
+          "allowedMeaning": "You may need room to adapt and move independently while discovering what allows them to remain internally centered."
         },
         {
           "claimId": "APP-SWATI-CENTER-AMID-CHANGE",
@@ -123,13 +123,13 @@
           "claimId": "APP-VISHAKHA-CULTIVATED-FRUIT",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
-          "allowedMeaning": "The person may be emotionally invested in cultivating an intention until it produces a tangible result."
+          "allowedMeaning": "You may be emotionally invested in cultivating an intention until it produces a tangible result."
         },
         {
           "claimId": "APP-VISHAKHA-FOCUS-NARROWING-TENSION",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
-          "allowedMeaning": "Strong focus may become narrowing when reaching the goal begins to matter more than understanding how the pursuit is affecting the person."
+          "allowedMeaning": "Strong focus may become narrowing when reaching the goal begins to matter more than understanding how the pursuit is affecting you."
         },
         {
           "claimId": "APP-VISHAKHA-WORTHY-CULTIVATION",
@@ -165,7 +165,7 @@
           "claimId": "APP-ANURADHA-DEVOTION",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
-          "allowedMeaning": "The person may bring sustained devotion to a value, relationship, practice or community that has earned emotional importance."
+          "allowedMeaning": "You may bring sustained devotion to a value, relationship, practice or community that has earned emotional importance."
         },
         {
           "claimId": "APP-ANURADHA-ALLIANCE",
@@ -214,13 +214,13 @@
           "claimId": "APP-JYESHTHA-CONTENTMENT",
           "purposes": ["nakshatra-influence"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Contentment may become possible when the person trusts what has already been developed rather than continually proving their worth."
+          "allowedMeaning": "Contentment may become possible when you trust what has already been developed rather than continually proving their worth."
         },
         {
           "claimId": "APP-JYESHTHA-RESPONSIBILITY",
           "purposes": ["nakshatra-influence"],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
-          "allowedMeaning": "The person may feel emotionally responsible for protecting what has been placed in their care."
+          "allowedMeaning": "You may feel emotionally responsible for protecting what has been placed in their care."
         },
         {
           "claimId": "APP-JYESHTHA-COMPETENCE",
