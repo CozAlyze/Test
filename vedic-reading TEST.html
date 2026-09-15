@@ -561,7 +561,7 @@ body[data-view="reading"] .vedic-reading-page { animation: none; }
 
 <div class="vedic-stamp" aria-hidden="true">VEDIC READING · R3.4 · birth chart door</div>
 
-<script src="dev-review-engine.js"></script>
+<script src="dev-review-engine.js?v=4"></script>
 <script>
 /* ============================================================
    SECTION DATA (spec, verbatim)
@@ -764,18 +764,25 @@ function showFromHash() {
     return;
   }
   document.body.dataset.view = "reading";
-  if (window.COZ_VEDIC_READING_UNAVAILABLE || !loadReading()) {
-    history.replaceState({ id: "essential-nature" }, "", "#/essential-nature");
-    renderUnavailableNotice();
+  /* wait for generation to settle before deciding placeholder vs reading
+     (direct load / reload lands here before the fetches finish) */
+  const proceed = () => {
+    if (window.COZ_VEDIC_READING_UNAVAILABLE || !loadReading()) {
+      if (!window.COZ_VEDIC_DEBUG) window.COZ_VEDIC_DEBUG = "Generation finished but no reading was stored (COZ_VEDIC_READING=" + typeof window.COZ_VEDIC_READING + ")";
+      history.replaceState({ id: "essential-nature" }, "", "#/essential-nature");
+      renderUnavailableNotice();
+      window.scrollTo({ top: 0, behavior: "instant" });
+      return;
+    }
+    const section = sectionById(id);
+    if (id !== section.id) {
+      history.replaceState({ id: section.id }, "", `#/${section.id}`);
+    }
+    renderSection(section);
     window.scrollTo({ top: 0, behavior: "instant" });
-    return;
-  }
-  const section = sectionById(id);
-  if (id !== section.id) {
-    history.replaceState({ id: section.id }, "", `#/${section.id}`);
-  }
-  renderSection(section);
-  window.scrollTo({ top: 0, behavior: "instant" });
+  };
+  if (COZ_READING_READY && typeof COZ_READING_READY.then === "function") COZ_READING_READY.then(proceed).catch(proceed);
+  else proceed();
 }
 
 document.getElementById("vedicBack").addEventListener("click", goDashboard);
