@@ -1,0 +1,90 @@
+{
+ "_label": "APPLICATION-CLAIMS OVERLAY v2 — authored by ChatGPT, never by code. The frozen foundation is untouched; this layer joins to it by recordId/modelId. Only applicationClaims reach the writer. internalEvidence and all excluded layers are trace-only.",
+ "environment": "development",
+ "productionEligible": false,
+ "records": [
+  {
+   "recordId": "IR-S2-MOON-HOUSE-12-APPLICATION-DRAFT",
+   "status": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "supersedesForDevelopment": "X-MOON-HOUSE-12",
+   "selector": { "all": [ { "factId": "graha:mo", "field": "house", "equals": 12 } ] },
+   "applicationClaims": [
+    { "claimId": "APP-MOON-12-PRIVATE", "allowedMeaning": "Emotional processing may happen privately or beneath what other people immediately see." },
+    { "claimId": "APP-MOON-12-SOLITUDE", "allowedMeaning": "Periods of solitude and reflection may help the person understand accumulated feelings." },
+    { "claimId": "APP-MOON-12-SUBCONSCIOUS", "allowedMeaning": "Dreams, subtle impressions or quiet reflection may bring subconscious emotional material closer to awareness." },
+    { "claimId": "APP-MOON-12-RELEASE", "allowedMeaning": "Emotional development may involve recognizing what should be retained and what is ready to be released." }
+   ],
+   "prohibitedExtensions": [
+    "death prediction",
+    "financial-loss prediction",
+    "forced isolation",
+    "mental-health diagnosis",
+    "psychic or prophetic-dream claim",
+    "karmic punishment",
+    "foreign-residence prediction"
+   ]
+  },
+  {
+   "recordId": "IR-S2-RQ205-MOON-LEO",
+   "applicationClaims": [
+    { "claimId": "APP-MOON-LEO-WARMTH", "allowedMeaning": "The emotional temperament may include warmth, generosity, courage and steadiness of mind." },
+    { "claimId": "APP-MOON-LEO-HEAT", "allowedMeaning": "The emotional temperament may also include quick heat or irritation." },
+    { "claimId": "APP-MOON-LEO-MIXED", "allowedMeaning": "Warmth and emotional heat are two sides of the same mixed temperament and must be presented together." }
+   ],
+   "compositionRequirements": [
+    "APP-MOON-LEO-WARMTH and APP-MOON-LEO-HEAT must appear together"
+   ],
+   "prohibitedExtensions": [
+    "automatic leadership claim",
+    "automatic confidence claim",
+    "one-sided flattering interpretation",
+    "one-sided negative interpretation"
+   ]
+  },
+  {
+   "modelId": "NAK-10-MAGHA",
+   "applicationClaims": [
+    { "claimId": "APP-MAGHA-STEWARDSHIP", "allowedMeaning": "The person may feel emotionally oriented toward lineage, inheritance, stewardship and what deserves to be carried forward." },
+    { "claimId": "APP-MAGHA-CONTINUITY", "allowedMeaning": "Questions of continuity, responsibility and what should continue through the person\u2019s choices may hold emotional significance." },
+    { "claimId": "APP-MAGHA-DEVOTION", "allowedMeaning": "The person may bring energy and devotion to what feels meaningful and worth preserving." }
+   ],
+   "customerExcludedLayers": [
+    "deity",
+    "symbol",
+    "mythology",
+    "historical doctrine",
+    "source explanation",
+    "throne or royal imagery"
+   ],
+   "prohibitedExtensions": [
+    "claims about the person\u2019s actual family history",
+    "royalty or elevated-status claim",
+    "entitlement claim",
+    "caste claim",
+    "ancestral destiny claim"
+   ]
+  },
+  {
+   "modelId": "PADA-038-MAGHA-2",
+   "applicationClaims": [
+    { "claimId": "APP-MAGHA-2-STABILITY", "allowedMeaning": "Magha\u2019s influence may be expressed with greater steadiness, practicality and patience." },
+    { "claimId": "APP-MAGHA-2-CONTINUITY", "allowedMeaning": "The person may remain loyal to what has demonstrated lasting value and may pursue important aims steadily." },
+    { "claimId": "APP-MAGHA-2-RELEASE-TENSION", "allowedMeaning": "Attachment to continuity may make familiar emotional patterns more difficult to release." },
+    { "claimId": "APP-MAGHA-2-DISCERNMENT", "allowedMeaning": "Development may involve distinguishing between preserving what remains supportive and holding on merely because it is familiar." }
+   ],
+   "claimConditions": [
+    { "claimId": "APP-MAGHA-2-RELEASE-TENSION", "requires": ["APP-MOON-12-RELEASE"] },
+    { "claimId": "APP-MAGHA-2-DISCERNMENT", "requires": ["APP-MAGHA-STEWARDSHIP", "APP-MOON-12-RELEASE"] }
+   ],
+   "prohibitedExtensions": [
+    "wealth claim",
+    "possession claim",
+    "guaranteed material stability",
+    "fixed stubbornness claim"
+   ]
+  }
+ ],
+ "traceOnlyDirective": "For this Lisbon development test the Ketu-placement record, Jupiter-aspect record, Mars-aspect fact and Sun-dispositor record remain in the internal trace. Their applicationClaims are empty, so they must not appear in customer prose. Deity, symbol, mythology, source history and technical doctrine are never generation inputs."
+}

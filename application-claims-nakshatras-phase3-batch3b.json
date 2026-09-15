@@ -1,0 +1,255 @@
+{
+  "_label": "PHASE 3 BATCH 3B — nakshatra application claims for Punarvasu through Hasta, excluding already-covered Magha and Uttara Phalguni; universal, development only",
+  "schemaVersion": "application-claims/3.0.0-draft",
+  "scope": "Punarvasu, Pushya, Ashlesha, Purva Phalguni and Hasta.",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. Deities, symbols, mythology, source history, technical rulerships and excluded classical judgments remain internal trace.",
+  "records": [
+    {
+      "modelId": "NAK-07-PUNARVASU",
+      "coverageItem": "nakshatra.punarvasu",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-PUNARVASU-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Punarvasu is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-PUNARVASU-CALM-RESTRAINT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may approach emotionally charged situations with restraint and an underlying preference for calm."
+        },
+        {
+          "claimId": "APP-PUNARVASU-RESTORATIVE-RETURN",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "After distraction or disruption, the mind may have a recurring ability to return to what restores coherence and emotional steadiness."
+        },
+        {
+          "claimId": "APP-PUNARVASU-CONTENTMENT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Contentment may grow through recognizing what is already sufficient rather than continually increasing what is required."
+        },
+        {
+          "claimId": "APP-PUNARVASU-RETURN-WITH-AWARENESS",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve returning to a stabilizing practice or principle without simply repeating an old pattern unchanged."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-PUNARVASU-RESTORATIVE-RETURN requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-PUNARVASU-NAKSHATRA-CONTEXT must appear before every other Punarvasu interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "bow or house imagery", "mythology", "Jupiter rulership", "source history"],
+      "prohibitedExtensions": ["guaranteed recovery, happiness or return", "claim that a relationship or opportunity will return", "health prediction", "dullness or moral judgment", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-08-PUSHYA",
+      "coverageItem": "nakshatra.pushya",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-PUSHYA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Pushya is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-PUSHYA-CALM-DISCIPLINE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Calmness and restraint may help the person remain emotionally steady when consistency is required."
+        },
+        {
+          "claimId": "APP-PUSHYA-LEARNING-GUIDANCE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Learning, teaching or thoughtful guidance may carry emotional significance."
+        },
+        {
+          "claimId": "APP-PUSHYA-SUSTAINED-CARE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Care may be expressed through structure, duty and the steady support that allows something valuable to continue growing."
+        },
+        {
+          "claimId": "APP-PUSHYA-CARE-WITH-LIMITS",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve offering dependable care without assuming responsibility for everything or everyone."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-PUSHYA-SUSTAINED-CARE requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-PUSHYA-NAKSHATRA-CONTEXT must appear before every other Pushya interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "flower, udder or arrow imagery", "mythology", "spiritual-vitality doctrine", "Saturn rulership", "source history"],
+      "prohibitedExtensions": ["automatic nurturer, parent or caretaker identity", "religious superiority or priestly destiny", "self-sacrifice requirement", "guaranteed wisdom or learning", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-09-ASHLESHA",
+      "coverageItem": "nakshatra.ashlesha",
+      "status": "EDITORIAL_APPLICATION_DRAFT_CONFLICT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-ASHLESHA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Ashlesha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-ASHLESHA-PENETRATING-PERCEPTION",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "The mind may look beneath the surface and notice emotional dynamics that are concealed, layered or difficult to separate."
+        },
+        {
+          "claimId": "APP-ASHLESHA-BINDING-PATTERNS",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "The person may be especially aware of the attachments, obligations or unspoken patterns that bind people and situations together."
+        },
+        {
+          "claimId": "APP-ASHLESHA-INSIGHT-ENTANGLEMENT-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Insight into a complicated emotional pattern may become entanglement when the person remains inside it after recognizing what it is."
+        },
+        {
+          "claimId": "APP-ASHLESHA-CLEAR-BOUNDARIES",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Development may involve using perceptiveness to create clarity and appropriate boundaries rather than to control an uncertain situation."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-ASHLESHA-PENETRATING-PERCEPTION requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ASHLESHA-BINDING-PATTERNS requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ASHLESHA-INSIGHT-ENTANGLEMENT-TENSION must appear with APP-ASHLESHA-CLEAR-BOUNDARIES or another constructive admitted claim.",
+        "APP-ASHLESHA-NAKSHATRA-CONTEXT must appear before every other Ashlesha interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "serpent, poison or coiling imagery", "mythology", "Mercury rulership", "classical moral judgments", "source history"],
+      "prohibitedExtensions": ["dishonesty, treachery, ingratitude or harmful-character verdict", "manipulation, toxicity or dangerousness claim", "sexual, appetite or addiction claim", "psychic power or mind-reading claim", "trauma or personality-disorder diagnosis", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-11-PURVA_PHALGUNI",
+      "coverageItem": "nakshatra.purva-phalguni",
+      "status": "EDITORIAL_APPLICATION_DRAFT_TEXTUAL_ASSIGNMENT_REVIEW",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-PF-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Purva Phalguni is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-PF-AFFABLE-GENEROSITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Warm social exchange and generosity may be natural ways of expressing emotional goodwill."
+        },
+        {
+          "claimId": "APP-PF-CREATIVE-RELEASE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Pleasure or creative expression may provide an important release for emotional energy."
+        },
+        {
+          "claimId": "APP-PF-GENERATIVE-SHARING",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The person may feel emotionally engaged when creating or sharing something that can bring enjoyment to others."
+        },
+        {
+          "claimId": "APP-PF-ENJOYMENT-WITHOUT-PERFORMANCE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve allowing enjoyment and creative expression to have value without requiring them to produce recognition or a particular outcome."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-PF-CREATIVE-RELEASE requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-PF-GENERATIVE-SHARING requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-PF-NAKSHATRA-CONTEXT must appear before every other Purva Phalguni interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "bed, hammock or reproductive imagery", "mythology", "Venus rulership", "deity-assignment conflict", "source history"],
+      "prohibitedExtensions": ["pregnancy, fertility or sexual claim", "romance, marriage or partner prediction", "indulgence or vanity stereotype", "fame, distinction or travel prediction", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-13-HASTA",
+      "coverageItem": "nakshatra.hasta",
+      "status": "EDITORIAL_APPLICATION_DRAFT_CONFLICT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-HASTA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Hasta is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-HASTA-BOLD-ENGAGEMENT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "The emotional temperament may include boldness and an animated willingness to engage with what is happening."
+        },
+        {
+          "claimId": "APP-HASTA-PRACTICAL-SHAPING",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "The mind may work well when it can grasp the practical details of a situation and shape them into something more workable."
+        },
+        {
+          "claimId": "APP-HASTA-COMPETENT-ACTION",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "Emotional confidence may increase when the person can apply a skill and see a tangible result from their effort."
+        },
+        {
+          "claimId": "APP-HASTA-GRASP-CONTROL-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "The desire to make a situation workable may become controlling when uncertainty cannot yet be resolved through action."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-HASTA-PRACTICAL-SHAPING requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-HASTA-COMPETENT-ACTION requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-HASTA-GRASP-CONTROL-TENSION must appear with a constructive admitted claim.",
+        "APP-HASTA-NAKSHATRA-CONTEXT must appear before every other Hasta interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "hand or grasping imagery", "mythology", "Moon rulership", "classical moral judgments", "source history"],
+      "prohibitedExtensions": ["cruelty, theft, intoxication or harmful-character verdict", "manipulation or dishonesty claim", "literal hand symbolism", "guaranteed craftsmanship or competence", "claim that everything can be controlled", "presenting modern synthesis as classical quotation"]
+    }
+  ],
+  "implementationRequirements": [
+    "Merge this overlay additively without modifying earlier application-claim overlays.",
+    "Route every claim exclusively from its purposes field; no nakshatra name or claim ID may be hard-coded into planner or writer logic.",
+    "Use the universal nakshatra introduction pattern, name the nakshatra once only and introduce the pada without repeating the nakshatra name.",
+    "Never send customerExcludedLayers, source history, deity assignments or technical rulerships to the writer.",
+    "Enforce every composition requirement and prohibited extension.",
+    "Log unused admitted claims as ADMITTED_NOT_USED without warning or failure.",
+    "Production must admit zero claims from this file until individual practitioner approval changes productionEligible.",
+    "Preserve conflict-restricted and textual-assignment-review statuses in ledger and trace."
+  ]
+}

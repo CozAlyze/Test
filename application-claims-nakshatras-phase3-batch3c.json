@@ -1,0 +1,259 @@
+{
+  "_label": "PHASE 3 BATCH 3C — nakshatra application claims for Chitra through Jyeshtha; universal, development only, practitioner review required",
+  "schemaVersion": "application-claims/3.0.0-draft",
+  "scope": "Chitra, Swati, Vishakha, Anuradha and Jyeshtha.",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. Deities, symbols, mythology, source history, technical rulerships and excluded classical judgments remain internal trace.",
+  "records": [
+    {
+      "modelId": "NAK-14-CHITRA",
+      "coverageItem": "nakshatra.chitra",
+      "status": "EDITORIAL_APPLICATION_DRAFT_TEXTUAL_ASSIGNMENT_REVIEW",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-CHITRA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Chitra is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-CHITRA-AESTHETIC-AWARENESS",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "Color, beauty and visual coherence may have a noticeable effect on what captures the person's attention."
+        },
+        {
+          "claimId": "APP-CHITRA-DESIGN-INTELLIGENCE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The mind may be drawn to shaping separate elements into a distinctive and coherent form."
+        },
+        {
+          "claimId": "APP-CHITRA-REFINEMENT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Refinement may matter emotionally because the person wants the visible form of something to reflect its underlying intention."
+        },
+        {
+          "claimId": "APP-CHITRA-FORM-AND-SUBSTANCE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve using discernment to improve form without allowing appearance to replace substance."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-CHITRA-DESIGN-INTELLIGENCE requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-CHITRA-REFINEMENT requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-CHITRA-NAKSHATRA-CONTEXT must appear before every other Chitra interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "jewel imagery", "mythology", "merit doctrine", "Mars rulership", "deity-assignment conflict", "source history"],
+      "prohibitedExtensions": ["guaranteed beauty, attractiveness or artistic talent", "vanity or superficiality claim", "status or merit prediction", "literal jewel symbolism", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-15-SWATI",
+      "coverageItem": "nakshatra.swati",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-SWATI-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Swati is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-SWATI-SELF-RESTRAINT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Self-restraint may help the person respond thoughtfully rather than allowing the first reaction to determine the entire exchange."
+        },
+        {
+          "claimId": "APP-SWATI-GENEROUS-SPEECH",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Generosity and agreeable speech may support constructive emotional exchange."
+        },
+        {
+          "claimId": "APP-SWATI-ADAPTIVE-INDEPENDENCE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The person may need room to adapt and move independently while discovering what allows them to remain internally centered."
+        },
+        {
+          "claimId": "APP-SWATI-CENTER-AMID-CHANGE",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve adapting to change without surrendering the principles or relationships that provide genuine stability."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-SWATI-ADAPTIVE-INDEPENDENCE requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-SWATI-NAKSHATRA-CONTEXT must appear before every other Swati interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "shoot, coral or wind imagery", "mythology", "transformation doctrine", "Rahu rulership", "source history"],
+      "prohibitedExtensions": ["automatic independence or avoidance of commitment", "restlessness or inability to settle", "business, trade or wealth prediction", "religious superiority", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-16-VISHAKHA",
+      "coverageItem": "nakshatra.vishakha",
+      "status": "EDITORIAL_APPLICATION_DRAFT_CONFLICT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-VISHAKHA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Vishakha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-VISHAKHA-CHOSEN-AIM",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "Once an aim feels personally meaningful, the mind may gather around it with strong focus."
+        },
+        {
+          "claimId": "APP-VISHAKHA-CULTIVATED-FRUIT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "The person may be emotionally invested in cultivating an intention until it produces a tangible result."
+        },
+        {
+          "claimId": "APP-VISHAKHA-FOCUS-NARROWING-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Strong focus may become narrowing when reaching the goal begins to matter more than understanding how the pursuit is affecting the person."
+        },
+        {
+          "claimId": "APP-VISHAKHA-WORTHY-CULTIVATION",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Development may involve periodically asking whether a chosen aim remains worthy of the energy being devoted to it."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-VISHAKHA-CHOSEN-AIM requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-VISHAKHA-CULTIVATED-FRUIT requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-VISHAKHA-FOCUS-NARROWING-TENSION must appear with APP-VISHAKHA-WORTHY-CULTIVATION or another constructive admitted claim.",
+        "APP-VISHAKHA-NAKSHATRA-CONTEXT must appear before every other Vishakha interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "arch, gateway or tree imagery", "mythology", "cultivation doctrine", "Jupiter rulership", "classical moral judgments", "source history"],
+      "prohibitedExtensions": ["jealousy, avarice, quarrelsomeness or selfish-character verdict", "manipulation or ruthless ambition", "guaranteed achievement or success", "claim that the end justifies the means", "copying language from Jason's benchmark", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-17-ANURADHA",
+      "coverageItem": "nakshatra.anuradha",
+      "status": "EDITORIAL_APPLICATION_DRAFT_SYNTHESIS_LIMITED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-ANURADHA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Anuradha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-ANURADHA-DEVOTION",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The person may bring sustained devotion to a value, relationship, practice or community that has earned emotional importance."
+        },
+        {
+          "claimId": "APP-ANURADHA-ALLIANCE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Emotional strength may develop through meaningful alliances and the experience of working alongside others toward something valued."
+        },
+        {
+          "claimId": "APP-ANURADHA-HONORING-COMMITMENT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Honoring a genuine commitment may matter more than maintaining a connection through habit alone."
+        },
+        {
+          "claimId": "APP-ANURADHA-DEVOTION-DISCERNMENT",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve directing loyalty toward relationships and principles that continue to support mutual growth."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-ANURADHA-DEVOTION requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ANURADHA-ALLIANCE requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ANURADHA-HONORING-COMMITMENT requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ANURADHA-DEVOTION-DISCERNMENT requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ANURADHA-NAKSHATRA-CONTEXT must appear before every other Anuradha interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "lotus or staff imagery", "mythology", "worship doctrine", "Saturn rulership", "source history"],
+      "prohibitedExtensions": ["foreign residence or travel prediction", "wealth or prosperity prediction", "hunger or medical claim", "automatic friendship, popularity or loyalty", "teacher or guru destiny", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-18-JYESHTHA",
+      "coverageItem": "nakshatra.jyeshtha",
+      "status": "EDITORIAL_APPLICATION_DRAFT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-JYESHTHA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Jyeshtha is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-JYESHTHA-CONTENTMENT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Contentment may become possible when the person trusts what has already been developed rather than continually proving their worth."
+        },
+        {
+          "claimId": "APP-JYESHTHA-RESPONSIBILITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The person may feel emotionally responsible for protecting what has been placed in their care."
+        },
+        {
+          "claimId": "APP-JYESHTHA-COMPETENCE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Competence and the ability to meet a difficult responsibility may contribute to emotional confidence."
+        },
+        {
+          "claimId": "APP-JYESHTHA-RANK-RESPONSIBILITY-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Responsibility may become emotionally burdensome when competence is measured primarily through rank, control or comparison."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-JYESHTHA-RESPONSIBILITY requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-JYESHTHA-COMPETENCE requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-JYESHTHA-RANK-RESPONSIBILITY-TENSION must appear with APP-JYESHTHA-CONTENTMENT or another constructive admitted claim.",
+        "APP-JYESHTHA-NAKSHATRA-CONTEXT must appear before every other Jyeshtha interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "earring, talisman or umbrella imagery", "mythology", "conquest doctrine", "Mercury rulership", "source history"],
+      "prohibitedExtensions": ["few friends, isolation or unpopularity prediction", "anger, aggression or volatility claim without separate support", "status, superiority or domination claim", "moral virtue verdict", "guaranteed courage or competence", "presenting modern synthesis as classical quotation"]
+    }
+  ],
+  "implementationRequirements": [
+    "Merge this overlay additively without modifying earlier application-claim overlays.",
+    "Route every claim exclusively from its purposes field; no nakshatra name or claim ID may be hard-coded into planner or writer logic.",
+    "Use the universal nakshatra introduction pattern, name the nakshatra once only and introduce the pada without repeating the nakshatra name.",
+    "Never send customerExcludedLayers, source history, deity assignments or technical rulerships to the writer.",
+    "Enforce every composition requirement and prohibited extension.",
+    "Log unused admitted claims as ADMITTED_NOT_USED without warning or failure.",
+    "Production must admit zero claims from this file until individual practitioner approval changes productionEligible.",
+    "Preserve conflict-restricted, restricted and textual-assignment-review statuses in ledger and trace.",
+    "Vishakha wording must be evaluated for chart-neutrality and compared against Jason's benchmark; distinctive benchmark language must not be reused."
+  ]
+}

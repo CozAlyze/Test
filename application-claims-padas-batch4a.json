@@ -1,0 +1,2357 @@
+{
+ "_label": "COMPILED from PHASE 3 BATCH 4A — authored pada application meanings 001–027; deterministic expansion required; development only — mechanical expansion, meanings verbatim from source",
+ "schemaVersion": "application-claims/2.1.1-draft",
+ "environment": "development",
+ "productionEligible": false,
+ "compiledFrom": {
+  "schemaVersion": "pada-claim-source/1.0.0-draft",
+  "range": {
+   "start": 1,
+   "end": 27
+  }
+ },
+ "records": [
+  {
+   "modelId": "PADA-001-ASHWINI-1",
+   "coverageItem": "pada.ashwini.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-001-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may give Ashwini's quick, responsive current a more initiating and immediate expression."
+    },
+    {
+     "claimId": "APP-PADA-001-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may move rapidly from recognizing a need to trying a practical response, especially through learning, guidance or direct initiative."
+    },
+    {
+     "claimId": "APP-PADA-001-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Immediate action may outrun understanding when beginning the response feels more urgent than confirming what will actually help."
+    },
+    {
+     "claimId": "APP-PADA-001-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve preserving initiative while pausing long enough to choose the response that fits the real need."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-001-REFINEMENT",
+     "requiresAny": [
+      "APP-ASHWINI-QUICK-MOBILIZATION",
+      "APP-ASHWINI-SKILLFUL-RESPONSE",
+      "APP-ASHWINI-SPEED-DISCERNMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-001-APPLICATION",
+     "requires": [
+      "APP-PADA-001-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-001-TENSION",
+     "requires": [
+      "APP-PADA-001-REFINEMENT",
+      "APP-PADA-001-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-001-TAKEAWAY",
+     "requires": [
+      "APP-PADA-001-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "rescuer identity",
+    "automatic leadership",
+    "wealth or spouse prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-002-ASHWINI-2",
+   "coverageItem": "pada.ashwini.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-002-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may ask Ashwini's quick response to become steadier, repeatable and practically sustainable."
+    },
+    {
+     "claimId": "APP-PADA-002-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may prefer to turn a fresh solution into something dependable rather than treating speed alone as success."
+    },
+    {
+     "claimId": "APP-PADA-002-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The desire to move quickly may conflict with the patience required to establish a stable new approach."
+    },
+    {
+     "claimId": "APP-PADA-002-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve giving a promising response enough consistency to prove whether it can last."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-002-REFINEMENT",
+     "requiresAny": [
+      "APP-ASHWINI-QUICK-MOBILIZATION",
+      "APP-ASHWINI-SKILLFUL-RESPONSE",
+      "APP-ASHWINI-SPEED-DISCERNMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-002-APPLICATION",
+     "requires": [
+      "APP-PADA-002-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-002-TENSION",
+     "requires": [
+      "APP-PADA-002-REFINEMENT",
+      "APP-PADA-002-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-002-TAKEAWAY",
+     "requires": [
+      "APP-PADA-002-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "stubbornness claim",
+    "fame, property or marriage prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-003-ASHWINI-3",
+   "coverageItem": "pada.ashwini.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-003-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may route Ashwini's responsive current through language, comparison and the exchange of information."
+    },
+    {
+     "claimId": "APP-PADA-003-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "Talking through several possible responses may help the person find the quickest workable path forward."
+    },
+    {
+     "claimId": "APP-PADA-003-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Considering multiple approaches may scatter the original impulse before one useful response is chosen."
+    },
+    {
+     "claimId": "APP-PADA-003-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve using communication to clarify action rather than allowing discussion to replace it."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-003-REFINEMENT",
+     "requiresAny": [
+      "APP-ASHWINI-QUICK-MOBILIZATION",
+      "APP-ASHWINI-SKILLFUL-RESPONSE",
+      "APP-ASHWINI-SPEED-DISCERNMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-003-APPLICATION",
+     "requires": [
+      "APP-PADA-003-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-003-TENSION",
+     "requires": [
+      "APP-PADA-003-REFINEMENT",
+      "APP-PADA-003-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-003-TAKEAWAY",
+     "requires": [
+      "APP-PADA-003-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "scattered personality claim",
+    "career or spouse prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-004-ASHWINI-4",
+   "coverageItem": "pada.ashwini.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-004-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may give Ashwini's rapid response a more protective, emotionally invested and supportive expression."
+    },
+    {
+     "claimId": "APP-PADA-004-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may act quickly when someone or something important appears to need protection or reassurance."
+    },
+    {
+     "claimId": "APP-PADA-004-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Protective urgency may make it difficult to determine whether immediate intervention is actually wanted or necessary."
+    },
+    {
+     "claimId": "APP-PADA-004-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve combining responsiveness with enough emotional space for others to express what support means to them."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-004-REFINEMENT",
+     "requiresAny": [
+      "APP-ASHWINI-QUICK-MOBILIZATION",
+      "APP-ASHWINI-SKILLFUL-RESPONSE",
+      "APP-ASHWINI-SPEED-DISCERNMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-004-APPLICATION",
+     "requires": [
+      "APP-PADA-004-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-004-TENSION",
+     "requires": [
+      "APP-PADA-004-REFINEMENT",
+      "APP-PADA-004-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-004-TAKEAWAY",
+     "requires": [
+      "APP-PADA-004-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "automatic nurturer or parent identity",
+    "relationship-event or moral prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-005-BHARANI-1",
+   "coverageItem": "pada.bharani.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-005-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may give Bharani's endurance and responsibility a more personally directed and visibly owned expression."
+    },
+    {
+     "claimId": "APP-PADA-005-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may be willing to take clear responsibility for a difficult decision and stand behind the direction chosen."
+    },
+    {
+     "claimId": "APP-PADA-005-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Owning responsibility may become over-identification when the person feels that changing course would diminish personal authority."
+    },
+    {
+     "claimId": "APP-PADA-005-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve leading a difficult process without making every outcome a verdict on personal worth."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-005-REFINEMENT",
+     "requiresAny": [
+      "APP-BHARANI-RESOLVE-ENDURANCE",
+      "APP-BHARANI-RESPONSIBLE-COMPLETION",
+      "APP-BHARANI-TRUTHFUL-DEXTERITY",
+      "APP-BHARANI-CARRYING-LIMITS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-005-APPLICATION",
+     "requires": [
+      "APP-PADA-005-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-005-TENSION",
+     "requires": [
+      "APP-PADA-005-REFINEMENT",
+      "APP-PADA-005-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-005-TAKEAWAY",
+     "requires": [
+      "APP-PADA-005-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "automatic authority or leadership",
+    "rank or marriage prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-006-BHARANI-2",
+   "coverageItem": "pada.bharani.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-006-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may make Bharani's responsibility operate through discrimination, practical refinement and correction."
+    },
+    {
+     "claimId": "APP-PADA-006-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may manage demanding obligations by examining details, improving the method and addressing what is not working."
+    },
+    {
+     "claimId": "APP-PADA-006-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Responsibility may become burdensome when continual correction makes completion feel permanently out of reach."
+    },
+    {
+     "claimId": "APP-PADA-006-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve distinguishing necessary improvement from the belief that everything must be perfected before it can be released."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-006-REFINEMENT",
+     "requiresAny": [
+      "APP-BHARANI-RESOLVE-ENDURANCE",
+      "APP-BHARANI-RESPONSIBLE-COMPLETION",
+      "APP-BHARANI-TRUTHFUL-DEXTERITY",
+      "APP-BHARANI-CARRYING-LIMITS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-006-APPLICATION",
+     "requires": [
+      "APP-PADA-006-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-006-TENSION",
+     "requires": [
+      "APP-PADA-006-REFINEMENT",
+      "APP-PADA-006-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-006-TAKEAWAY",
+     "requires": [
+      "APP-PADA-006-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "perfectionism diagnosis",
+    "income, age or marriage prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-007-BHARANI-3",
+   "coverageItem": "pada.bharani.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-007-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may make Bharani's responsibility negotiate balance, reciprocity and the needs of relationship."
+    },
+    {
+     "claimId": "APP-PADA-007-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may carry a difficult process best when expectations and responsibilities are clearly shared rather than silently assumed."
+    },
+    {
+     "claimId": "APP-PADA-007-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The wish to preserve balance may prolong an obligation that is no longer genuinely reciprocal."
+    },
+    {
+     "claimId": "APP-PADA-007-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve reviewing whether shared responsibilities remain fair before recommitting to them."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-007-REFINEMENT",
+     "requiresAny": [
+      "APP-BHARANI-RESOLVE-ENDURANCE",
+      "APP-BHARANI-RESPONSIBLE-COMPLETION",
+      "APP-BHARANI-TRUTHFUL-DEXTERITY",
+      "APP-BHARANI-CARRYING-LIMITS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-007-APPLICATION",
+     "requires": [
+      "APP-PADA-007-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-007-TENSION",
+     "requires": [
+      "APP-PADA-007-REFINEMENT",
+      "APP-PADA-007-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-007-TAKEAWAY",
+     "requires": [
+      "APP-PADA-007-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "people-pleasing diagnosis",
+    "guaranteed gain or relationship outcome"
+   ]
+  },
+  {
+   "modelId": "PADA-008-BHARANI-4",
+   "coverageItem": "pada.bharani.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-008-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may carry Bharani's endurance beneath appearances and through emotionally complex change."
+    },
+    {
+     "claimId": "APP-PADA-008-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may remain engaged during the final demanding stage of a process when others would prefer to withdraw."
+    },
+    {
+     "claimId": "APP-PADA-008-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Endurance under pressure may become unnecessary risk when persistence is treated as proof that the original commitment was correct."
+    },
+    {
+     "claimId": "APP-PADA-008-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve recognizing when persistence serves completion and when a responsible ending requires release."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-008-REFINEMENT",
+     "requiresAny": [
+      "APP-BHARANI-RESOLVE-ENDURANCE",
+      "APP-BHARANI-RESPONSIBLE-COMPLETION",
+      "APP-BHARANI-TRUTHFUL-DEXTERITY",
+      "APP-BHARANI-CARRYING-LIMITS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-008-APPLICATION",
+     "requires": [
+      "APP-PADA-008-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-008-TENSION",
+     "requires": [
+      "APP-PADA-008-REFINEMENT",
+      "APP-PADA-008-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-008-TAKEAWAY",
+     "requires": [
+      "APP-PADA-008-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "crisis, trauma or danger claim",
+    "friend, team or spouse prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-009-KRITTIKA-1",
+   "coverageItem": "pada.krittika.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-009-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may direct Krittika's discernment toward meaning, learning and a wider set of principles."
+    },
+    {
+     "claimId": "APP-PADA-009-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may test an idea strongly when deciding whether it belongs within a larger truth or guiding philosophy."
+    },
+    {
+     "claimId": "APP-PADA-009-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Conviction may sharpen into judgment when one principle is applied before the full context has been understood."
+    },
+    {
+     "claimId": "APP-PADA-009-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve using discernment to deepen understanding rather than merely proving one interpretation correct."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-009-REFINEMENT",
+     "requiresAny": [
+      "APP-KRITTIKA-SPIRITED-INTENSITY",
+      "APP-KRITTIKA-CLARIFYING-DISCERNMENT",
+      "APP-KRITTIKA-SHARPNESS-TENSION",
+      "APP-KRITTIKA-PURPOSEFUL-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-009-APPLICATION",
+     "requires": [
+      "APP-PADA-009-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-009-TENSION",
+     "requires": [
+      "APP-PADA-009-REFINEMENT",
+      "APP-PADA-009-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-009-TAKEAWAY",
+     "requires": [
+      "APP-PADA-009-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "religious superiority",
+    "competitive, wealth or appearance prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-010-KRITTIKA-2",
+   "coverageItem": "pada.krittika.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-010-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may place Krittika's discernment inside structure, sequence and sustained responsibility."
+    },
+    {
+     "claimId": "APP-PADA-010-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may clarify a difficult situation by organizing it into practical stages and addressing each part deliberately."
+    },
+    {
+     "claimId": "APP-PADA-010-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The wish for orderly correction may become rigid when a changing situation cannot follow the expected sequence."
+    },
+    {
+     "claimId": "APP-PADA-010-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve using structure as support while allowing the method to mature with experience."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-010-REFINEMENT",
+     "requiresAny": [
+      "APP-KRITTIKA-SPIRITED-INTENSITY",
+      "APP-KRITTIKA-CLARIFYING-DISCERNMENT",
+      "APP-KRITTIKA-SHARPNESS-TENSION",
+      "APP-KRITTIKA-PURPOSEFUL-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-010-APPLICATION",
+     "requires": [
+      "APP-PADA-010-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-010-TENSION",
+     "requires": [
+      "APP-PADA-010-REFINEMENT",
+      "APP-PADA-010-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-010-TAKEAWAY",
+     "requires": [
+      "APP-PADA-010-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "coldness or rigidity as fixed traits",
+    "career, rank or marriage prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-011-KRITTIKA-3",
+   "coverageItem": "pada.krittika.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-011-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may direct Krittika's discernment toward systems, networks and less conventional solutions."
+    },
+    {
+     "claimId": "APP-PADA-011-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may identify where a larger pattern is failing and communicate a corrective approach that others have not considered."
+    },
+    {
+     "claimId": "APP-PADA-011-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Seeing the system clearly may create distance from the individual feelings contained within it."
+    },
+    {
+     "claimId": "APP-PADA-011-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve improving the larger pattern without losing sight of the people affected by the correction."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-011-REFINEMENT",
+     "requiresAny": [
+      "APP-KRITTIKA-SPIRITED-INTENSITY",
+      "APP-KRITTIKA-CLARIFYING-DISCERNMENT",
+      "APP-KRITTIKA-SHARPNESS-TENSION",
+      "APP-KRITTIKA-PURPOSEFUL-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-011-APPLICATION",
+     "requires": [
+      "APP-PADA-011-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-011-TENSION",
+     "requires": [
+      "APP-PADA-011-REFINEMENT",
+      "APP-PADA-011-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-011-TAKEAWAY",
+     "requires": [
+      "APP-PADA-011-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "universal humanitarian or rebel identity",
+    "relationship prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-012-KRITTIKA-4",
+   "coverageItem": "pada.krittika.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-012-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may make Krittika's discernment more receptive, integrative and responsive to subtle emotional information."
+    },
+    {
+     "claimId": "APP-PADA-012-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may sense that a situation requires both clear distinction and compassion for what cannot be reduced to a simple answer."
+    },
+    {
+     "claimId": "APP-PADA-012-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Receptivity may blur the boundary between understanding complexity and avoiding a necessary decision."
+    },
+    {
+     "claimId": "APP-PADA-012-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve allowing empathy to inform discernment without replacing it."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-012-REFINEMENT",
+     "requiresAny": [
+      "APP-KRITTIKA-SPIRITED-INTENSITY",
+      "APP-KRITTIKA-CLARIFYING-DISCERNMENT",
+      "APP-KRITTIKA-SHARPNESS-TENSION",
+      "APP-KRITTIKA-PURPOSEFUL-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-012-APPLICATION",
+     "requires": [
+      "APP-PADA-012-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-012-TENSION",
+     "requires": [
+      "APP-PADA-012-REFINEMENT",
+      "APP-PADA-012-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-012-TAKEAWAY",
+     "requires": [
+      "APP-PADA-012-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "empath, psychic or mystical identity",
+    "family or spouse prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-013-ROHINI-1",
+   "coverageItem": "pada.rohini.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-013-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may give Rohini's growth-oriented current a more initiating and personally directed expression."
+    },
+    {
+     "claimId": "APP-PADA-013-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may feel motivated to begin shaping an idea, bond or resource as soon as its potential becomes emotionally compelling."
+    },
+    {
+     "claimId": "APP-PADA-013-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The desire to begin building may move faster than the emotional security needed to support what is being created."
+    },
+    {
+     "claimId": "APP-PADA-013-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve beginning boldly while establishing the support that continued growth will require."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-013-REFINEMENT",
+     "requiresAny": [
+      "APP-ROHINI-STEADY-MIND",
+      "APP-ROHINI-PERSUASIVE-SINCERITY",
+      "APP-ROHINI-GROWTH-INTO-FORM",
+      "APP-ROHINI-GROWTH-WITHOUT-COMPARISON"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-013-APPLICATION",
+     "requires": [
+      "APP-PADA-013-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-013-TENSION",
+     "requires": [
+      "APP-PADA-013-REFINEMENT",
+      "APP-PADA-013-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-013-TAKEAWAY",
+     "requires": [
+      "APP-PADA-013-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "automatic ambition",
+    "career, wealth or spouse prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-014-ROHINI-2",
+   "coverageItem": "pada.rohini.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-014-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may make Rohini's cultivation especially steady, repeatable and attentive to practical sustainability."
+    },
+    {
+     "claimId": "APP-PADA-014-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may prefer to grow something through consistent care, clear resources and attention to tangible detail."
+    },
+    {
+     "claimId": "APP-PADA-014-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Stability may become attachment when preserving what has been built matters more than recognizing that its needs have changed."
+    },
+    {
+     "claimId": "APP-PADA-014-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve protecting continuity while making practical adjustments that keep growth alive."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-014-REFINEMENT",
+     "requiresAny": [
+      "APP-ROHINI-STEADY-MIND",
+      "APP-ROHINI-PERSUASIVE-SINCERITY",
+      "APP-ROHINI-GROWTH-INTO-FORM",
+      "APP-ROHINI-GROWTH-WITHOUT-COMPARISON"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-014-APPLICATION",
+     "requires": [
+      "APP-PADA-014-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-014-TENSION",
+     "requires": [
+      "APP-PADA-014-REFINEMENT",
+      "APP-PADA-014-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-014-TAKEAWAY",
+     "requires": [
+      "APP-PADA-014-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "possessiveness or materialism claim",
+    "luxury or marriage prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-015-ROHINI-3",
+   "coverageItem": "pada.rohini.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-015-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may develop Rohini's growth through communication, exchange and the exploration of multiple approaches."
+    },
+    {
+     "claimId": "APP-PADA-015-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may strengthen an idea or skill by discussing it, testing different expressions and learning from response."
+    },
+    {
+     "claimId": "APP-PADA-015-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Continual variation may interrupt the consistency required for the chosen form to mature."
+    },
+    {
+     "claimId": "APP-PADA-015-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve letting communication improve the work while maintaining enough continuity for it to take shape."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-015-REFINEMENT",
+     "requiresAny": [
+      "APP-ROHINI-STEADY-MIND",
+      "APP-ROHINI-PERSUASIVE-SINCERITY",
+      "APP-ROHINI-GROWTH-INTO-FORM",
+      "APP-ROHINI-GROWTH-WITHOUT-COMPARISON"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-015-APPLICATION",
+     "requires": [
+      "APP-PADA-015-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-015-TENSION",
+     "requires": [
+      "APP-PADA-015-REFINEMENT",
+      "APP-PADA-015-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-015-TAKEAWAY",
+     "requires": [
+      "APP-PADA-015-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "mind-reading claim",
+    "government, career or relationship prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-016-ROHINI-4",
+   "coverageItem": "pada.rohini.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-016-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may connect Rohini's cultivation with protection, belonging and felt emotional response."
+    },
+    {
+     "claimId": "APP-PADA-016-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may invest most deeply in growth that also creates a sense of support, safety or meaningful belonging."
+    },
+    {
+     "claimId": "APP-PADA-016-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Emotional investment may make a necessary change feel like a threat to everything already cultivated."
+    },
+    {
+     "claimId": "APP-PADA-016-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve protecting what matters while allowing growth to alter its form."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-016-REFINEMENT",
+     "requiresAny": [
+      "APP-ROHINI-STEADY-MIND",
+      "APP-ROHINI-PERSUASIVE-SINCERITY",
+      "APP-ROHINI-GROWTH-INTO-FORM",
+      "APP-ROHINI-GROWTH-WITHOUT-COMPARISON"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-016-APPLICATION",
+     "requires": [
+      "APP-PADA-016-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-016-TENSION",
+     "requires": [
+      "APP-PADA-016-REFINEMENT",
+      "APP-PADA-016-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-016-TAKEAWAY",
+     "requires": [
+      "APP-PADA-016-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "automatic nurturer identity",
+    "career or spouse prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-017-MRIGASHIRA-1",
+   "coverageItem": "pada.mrigashira.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-017-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may give Mrigashira's searching current a more expressive, personally directed and visible form."
+    },
+    {
+     "claimId": "APP-PADA-017-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may explore most energetically when a question can become a creative project or personally owned expression."
+    },
+    {
+     "claimId": "APP-PADA-017-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The wish for recognition may influence the search before the person has discovered what genuinely satisfies the original question."
+    },
+    {
+     "claimId": "APP-PADA-017-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve letting exploration find its authentic direction before deciding how it should be seen."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-017-REFINEMENT",
+     "requiresAny": [
+      "APP-MRIGASHIRA-SEARCHING-CURIOSITY",
+      "APP-MRIGASHIRA-INGENUITY-SKILL",
+      "APP-MRIGASHIRA-HOPEFUL-ENERGY",
+      "APP-MRIGASHIRA-SEARCH-SETTLE-TENSION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-017-APPLICATION",
+     "requires": [
+      "APP-PADA-017-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-017-TENSION",
+     "requires": [
+      "APP-PADA-017-REFINEMENT",
+      "APP-PADA-017-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-017-TAKEAWAY",
+     "requires": [
+      "APP-PADA-017-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "fame or attention-seeking claim",
+    "wealth or luxury prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-018-MRIGASHIRA-2",
+   "coverageItem": "pada.mrigashira.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-018-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may make Mrigashira's search more analytical, discriminating and practically testable."
+    },
+    {
+     "claimId": "APP-PADA-018-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may pursue a question through research, writing, comparison and the correction of weak assumptions."
+    },
+    {
+     "claimId": "APP-PADA-018-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Continual analysis may keep the search active after practical evidence has already supplied a sufficient answer."
+    },
+    {
+     "claimId": "APP-PADA-018-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve knowing when careful inquiry has produced enough clarity to support a decision."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-018-REFINEMENT",
+     "requiresAny": [
+      "APP-MRIGASHIRA-SEARCHING-CURIOSITY",
+      "APP-MRIGASHIRA-INGENUITY-SKILL",
+      "APP-MRIGASHIRA-HOPEFUL-ENERGY",
+      "APP-MRIGASHIRA-SEARCH-SETTLE-TENSION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-018-APPLICATION",
+     "requires": [
+      "APP-PADA-018-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-018-TENSION",
+     "requires": [
+      "APP-PADA-018-REFINEMENT",
+      "APP-PADA-018-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-018-TAKEAWAY",
+     "requires": [
+      "APP-PADA-018-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "anxiety or perfectionism diagnosis",
+    "business or romantic prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-019-MRIGASHIRA-3",
+   "coverageItem": "pada.mrigashira.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-019-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may guide Mrigashira's exploration through comparison, reciprocity and relational balance."
+    },
+    {
+     "claimId": "APP-PADA-019-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may understand a question more fully by considering another perspective and testing whether the exchange remains balanced."
+    },
+    {
+     "claimId": "APP-PADA-019-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Searching for the perfectly balanced answer may delay recognition that different needs cannot always be made equal."
+    },
+    {
+     "claimId": "APP-PADA-019-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve using dialogue to broaden the search while accepting when a clear personal choice is required."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-019-REFINEMENT",
+     "requiresAny": [
+      "APP-MRIGASHIRA-SEARCHING-CURIOSITY",
+      "APP-MRIGASHIRA-INGENUITY-SKILL",
+      "APP-MRIGASHIRA-HOPEFUL-ENERGY",
+      "APP-MRIGASHIRA-SEARCH-SETTLE-TENSION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-019-APPLICATION",
+     "requires": [
+      "APP-PADA-019-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-019-TENSION",
+     "requires": [
+      "APP-PADA-019-REFINEMENT",
+      "APP-PADA-019-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-019-TAKEAWAY",
+     "requires": [
+      "APP-PADA-019-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "universal charm or diplomacy",
+    "relationship outcome prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-020-MRIGASHIRA-4",
+   "coverageItem": "pada.mrigashira.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-020-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may carry Mrigashira's search beneath appearances and through emotionally complex material."
+    },
+    {
+     "claimId": "APP-PADA-020-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may follow a question into hidden details or difficult territory when a surface explanation feels incomplete."
+    },
+    {
+     "claimId": "APP-PADA-020-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The search for what lies beneath may become fixation when uncertainty itself begins generating further questions."
+    },
+    {
+     "claimId": "APP-PADA-020-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve pursuing depth while recognizing when the essential answer has already emerged."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-020-REFINEMENT",
+     "requiresAny": [
+      "APP-MRIGASHIRA-SEARCHING-CURIOSITY",
+      "APP-MRIGASHIRA-INGENUITY-SKILL",
+      "APP-MRIGASHIRA-HOPEFUL-ENERGY",
+      "APP-MRIGASHIRA-SEARCH-SETTLE-TENSION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-020-APPLICATION",
+     "requires": [
+      "APP-PADA-020-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-020-TENSION",
+     "requires": [
+      "APP-PADA-020-REFINEMENT",
+      "APP-PADA-020-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-020-TAKEAWAY",
+     "requires": [
+      "APP-PADA-020-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "manipulation, trauma or occult-power claim",
+    "career prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-021-ARDRA-1",
+   "coverageItem": "pada.ardra.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-021-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may orient Ardra's engagement with disruption toward meaning, learning and a wider frame."
+    },
+    {
+     "claimId": "APP-PADA-021-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may work through a difficult experience by studying it, questioning its meaning and placing it within a broader understanding."
+    },
+    {
+     "claimId": "APP-PADA-021-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "A larger explanation may become premature when meaning is imposed before the immediate experience has been fully acknowledged."
+    },
+    {
+     "claimId": "APP-PADA-021-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve allowing understanding to grow from the experience rather than using philosophy to move past it too quickly."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-021-REFINEMENT",
+     "requiresAny": [
+      "APP-ARDRA-DISRUPTION-INTENSITY",
+      "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY",
+      "APP-ARDRA-INTENSITY-DIRECTION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-021-APPLICATION",
+     "requires": [
+      "APP-PADA-021-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-021-TENSION",
+     "requires": [
+      "APP-PADA-021-REFINEMENT",
+      "APP-PADA-021-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-021-TAKEAWAY",
+     "requires": [
+      "APP-PADA-021-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "suffering-required or spiritual-superiority claim",
+    "appearance or marriage prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-022-ARDRA-2",
+   "coverageItem": "pada.ardra.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-022-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may direct Ardra's response to disruption through structure, sequencing and sustained practical effort."
+    },
+    {
+     "claimId": "APP-PADA-022-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "Under pressure, the person may regain steadiness by identifying what can be handled first and building a deliberate response from there."
+    },
+    {
+     "claimId": "APP-PADA-022-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Practical control may become rigid when the situation remains emotionally unsettled despite an orderly plan."
+    },
+    {
+     "claimId": "APP-PADA-022-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve using structure to contain pressure without expecting it to eliminate every difficult feeling."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-022-REFINEMENT",
+     "requiresAny": [
+      "APP-ARDRA-DISRUPTION-INTENSITY",
+      "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY",
+      "APP-ARDRA-INTENSITY-DIRECTION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-022-APPLICATION",
+     "requires": [
+      "APP-PADA-022-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-022-TENSION",
+     "requires": [
+      "APP-PADA-022-REFINEMENT",
+      "APP-PADA-022-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-022-TAKEAWAY",
+     "requires": [
+      "APP-PADA-022-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "crisis competence as destiny",
+    "age or guaranteed-success prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-023-ARDRA-3",
+   "coverageItem": "pada.ardra.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-023-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may move Ardra's response to disruption toward systems, communication and unconventional routes."
+    },
+    {
+     "claimId": "APP-PADA-023-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may adapt during change by learning a new skill, exchanging information or finding a different route through the larger pattern."
+    },
+    {
+     "claimId": "APP-PADA-023-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Focusing on the system may create distance from the personal emotion that still requires acknowledgment."
+    },
+    {
+     "claimId": "APP-PADA-023-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve changing the method while remaining present with the human effect of the disruption."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-023-REFINEMENT",
+     "requiresAny": [
+      "APP-ARDRA-DISRUPTION-INTENSITY",
+      "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY",
+      "APP-ARDRA-INTENSITY-DIRECTION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-023-APPLICATION",
+     "requires": [
+      "APP-PADA-023-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-023-TENSION",
+     "requires": [
+      "APP-PADA-023-REFINEMENT",
+      "APP-PADA-023-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-023-TAKEAWAY",
+     "requires": [
+      "APP-PADA-023-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "detachment or rebel identity",
+    "success prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-024-ARDRA-4",
+   "coverageItem": "pada.ardra.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-024-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may make Ardra's response to disruption more receptive, integrative and privately reflective."
+    },
+    {
+     "claimId": "APP-PADA-024-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may carry pressure inwardly while trying to understand its emotional meaning before speaking about it responsibly."
+    },
+    {
+     "claimId": "APP-PADA-024-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Private processing may become isolation when the person waits for complete understanding before seeking support."
+    },
+    {
+     "claimId": "APP-PADA-024-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve honoring private reflection while communicating before emotional pressure becomes too difficult to carry alone."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-024-REFINEMENT",
+     "requiresAny": [
+      "APP-ARDRA-DISRUPTION-INTENSITY",
+      "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY",
+      "APP-ARDRA-INTENSITY-DIRECTION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-024-APPLICATION",
+     "requires": [
+      "APP-PADA-024-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-024-TENSION",
+     "requires": [
+      "APP-PADA-024-REFINEMENT",
+      "APP-PADA-024-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-024-TAKEAWAY",
+     "requires": [
+      "APP-PADA-024-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "trauma, martyrdom or psychic claim",
+    "spouse or investment prediction"
+   ]
+  },
+  {
+   "modelId": "PADA-025-PUNARVASU-1",
+   "coverageItem": "pada.punarvasu.1",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-025-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may give Punarvasu's restorative current a more initiating and immediate expression."
+    },
+    {
+     "claimId": "APP-PADA-025-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may recover possibility by beginning a conversation, creative exchange or practical movement toward a renewed direction."
+    },
+    {
+     "claimId": "APP-PADA-025-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Beginning again may repeat the original pattern when action occurs before the earlier experience has been understood."
+    },
+    {
+     "claimId": "APP-PADA-025-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve using renewed energy to begin differently rather than merely beginning again."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-025-REFINEMENT",
+     "requiresAny": [
+      "APP-PUNARVASU-CALM-RESTRAINT",
+      "APP-PUNARVASU-RESTORATIVE-RETURN",
+      "APP-PUNARVASU-CONTENTMENT",
+      "APP-PUNARVASU-RETURN-WITH-AWARENESS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-025-APPLICATION",
+     "requires": [
+      "APP-PADA-025-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-025-TENSION",
+     "requires": [
+      "APP-PADA-025-REFINEMENT",
+      "APP-PADA-025-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-025-TAKEAWAY",
+     "requires": [
+      "APP-PADA-025-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "guaranteed return or recovery",
+    "automatic teamwork"
+   ]
+  },
+  {
+   "modelId": "PADA-026-PUNARVASU-2",
+   "coverageItem": "pada.punarvasu.2",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-026-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may ask Punarvasu's restorative current to become stable, repeatable and practically sustainable."
+    },
+    {
+     "claimId": "APP-PADA-026-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may regain coherence through dependable learning, writing, teaching or another practice that can be repeated over time."
+    },
+    {
+     "claimId": "APP-PADA-026-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Stability may become repetition when a familiar restorative method is preserved after it has stopped producing renewal."
+    },
+    {
+     "claimId": "APP-PADA-026-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve maintaining supportive practices while updating the form they take."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-026-REFINEMENT",
+     "requiresAny": [
+      "APP-PUNARVASU-CALM-RESTRAINT",
+      "APP-PUNARVASU-RESTORATIVE-RETURN",
+      "APP-PUNARVASU-CONTENTMENT",
+      "APP-PUNARVASU-RETURN-WITH-AWARENESS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-026-APPLICATION",
+     "requires": [
+      "APP-PADA-026-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-026-TENSION",
+     "requires": [
+      "APP-PADA-026-REFINEMENT",
+      "APP-PADA-026-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-026-TAKEAWAY",
+     "requires": [
+      "APP-PADA-026-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "emotional-detachment claim",
+    "guaranteed stability"
+   ]
+  },
+  {
+   "modelId": "PADA-027-PUNARVASU-3",
+   "coverageItem": "pada.punarvasu.3",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-PADA-027-REFINEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "This pada may route Punarvasu's restoration through language, comparison, imagination and multiple approaches."
+    },
+    {
+     "claimId": "APP-PADA-027-APPLICATION",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION_DRAFT",
+     "allowedMeaning": "The person may recover perspective by exchanging ideas and exploring more than one possible interpretation of what occurred."
+    },
+    {
+     "claimId": "APP-PADA-027-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Too many interpretations may disperse the coherence the person is trying to recover."
+    },
+    {
+     "claimId": "APP-PADA-027-TAKEAWAY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve allowing imagination to reopen possibility and then choosing the explanation that best supports grounded renewal."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-PADA-027-REFINEMENT",
+     "requiresAny": [
+      "APP-PUNARVASU-CALM-RESTRAINT",
+      "APP-PUNARVASU-RESTORATIVE-RETURN",
+      "APP-PUNARVASU-CONTENTMENT",
+      "APP-PUNARVASU-RETURN-WITH-AWARENESS"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-027-APPLICATION",
+     "requires": [
+      "APP-PADA-027-REFINEMENT"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-027-TENSION",
+     "requires": [
+      "APP-PADA-027-REFINEMENT",
+      "APP-PADA-027-APPLICATION"
+     ]
+    },
+    {
+     "claimId": "APP-PADA-027-TAKEAWAY",
+     "requires": [
+      "APP-PADA-027-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "navamsa sign name",
+    "navamsa ruler",
+    "naming syllable",
+    "source history",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing navamsa-sign personality description",
+    "guaranteed outcome",
+    "event prediction",
+    "claim that the pada overrides the parent nakshatra",
+    "psychic or prophetic imagination",
+    "automatic protection claim"
+   ]
+  }
+ ]
+}

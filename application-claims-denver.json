@@ -1,0 +1,304 @@
+{
+ "_label": "DENVER APPLICATION-CLAIMS DRAFT — universal meanings authored from the selected evidence; development only; practitioner review required",
+ "schemaVersion": "application-claims/2.1.1-draft",
+ "chartId": "coz-b84234b10ece63ed",
+ "environment": "development",
+ "productionEligible": false,
+ "writerRule": "Only applicationClaims may reach the customer-writing model. Evidence, mythology, symbols, source history, technical factors and trace-only factors remain internal.",
+ "records": [
+  {
+   "recordId": "IR-S2-MOON-HOUSE-3-APPLICATION-DRAFT",
+   "coverageItem": "graha-in-house.mo.3",
+   "status": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "supersedesForDevelopment": "X-MOON-HOUSE-3",
+   "selector": {
+    "all": [
+     {
+      "factId": "graha:mo",
+      "field": "house",
+      "equals": 3
+     }
+    ]
+   },
+   "sourceIds": [],
+   "applicationClaims": [
+    {
+     "claimId": "APP-MOON-3-EXPRESSION",
+     "purposes": [
+      "moon-through-house"
+     ],
+     "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+     "allowedMeaning": "Emotional experience may become clearer through expression, including conversation, writing or another personally meaningful way of putting thoughts into words."
+    },
+    {
+     "claimId": "APP-MOON-3-DAILY-EXCHANGE",
+     "purposes": [
+      "moon-through-house"
+     ],
+     "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+     "allowedMeaning": "Everyday exchanges and the immediate environment may have a noticeable effect on the person's state of mind."
+    },
+    {
+     "claimId": "APP-MOON-3-SELF-EFFORT",
+     "purposes": [
+      "moon-through-house"
+     ],
+     "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+     "allowedMeaning": "Confidence may grow through repeated self-directed effort: practicing a skill, expressing an idea and discovering that the person can rely on their own voice."
+    },
+    {
+     "claimId": "APP-MOON-3-SIBLING-PEER-INFLUENCE",
+     "purposes": [
+      "moon-through-house"
+     ],
+     "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
+     "allowedMeaning": "Relationships with siblings or sibling-like peers may form part of the person's emotional landscape, without the chart determining the quality or history of those relationships."
+    }
+   ],
+   "prohibitedExtensions": [
+    "claims about the person's actual sibling history",
+    "claim that a sibling relationship was close, distant, supportive, harmful or conflictual",
+    "guaranteed writing, speaking or media career",
+    "automatic courage or confidence",
+    "restlessness or nervous-system diagnosis",
+    "short-journey prediction",
+    "moral or behavioral verdict from the classical third-house passage"
+   ]
+  },
+  {
+   "recordId": "IR-S2-RQ206-MOON-VIRGO",
+   "coverageItem": "graha-in-sign.mo.virgo",
+   "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [
+    "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+    "SRC-COZ-BATCH2-GAP-MEMO"
+   ],
+   "applicationClaims": [
+    {
+     "claimId": "APP-MOON-VIRGO-MEASURED",
+     "purposes": [
+      "moon-sign-expression"
+     ],
+     "allowedMeaning": "Feelings may be expressed in a measured or initially reserved manner rather than displayed all at once."
+    },
+    {
+     "claimId": "APP-MOON-VIRGO-TRUTHFUL-SPEECH",
+     "purposes": [
+      "moon-sign-expression"
+     ],
+     "allowedMeaning": "Truthful, thoughtful and agreeable communication may be important to how the person expresses what is on their mind."
+    },
+    {
+     "claimId": "APP-MOON-VIRGO-LEARNING-SKILL",
+     "purposes": [
+      "moon-sign-expression"
+     ],
+     "allowedMeaning": "Learning, developing knowledge or refining an artistic skill may give the mind a constructive place to focus."
+    }
+   ],
+   "prohibitedExtensions": [
+    "perfectionism claim",
+    "anxiety or compulsive-analysis claim",
+    "criticism or fault-finding claim",
+    "cleanliness or health obsession claim",
+    "service or employment destiny",
+    "bodily, sexual, property or family prediction",
+    "guaranteed intelligence, talent or educational success"
+   ]
+  },
+  {
+   "modelId": "NAK-12-UTTARA_PHALGUNI",
+   "coverageItem": "nakshatra.uttara-phalguni",
+   "status": "EDITORIAL_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [
+    "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+    "SRC-FRAWLEY-SHAKTIS-ONLINE",
+    "SRC-HARNESS-NAKSHATRAS-ONLINE",
+    "SRC-COZ-BATCH3-GAP-MEMO"
+   ],
+   "applicationClaims": [
+    {
+     "claimId": "APP-UF-NAKSHATRA-CONTEXT",
+     "purposes": [
+      "nakshatra-influence"
+     ],
+     "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+     "allowedMeaning": "Uttara Phalguni is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+    },
+    {
+     "claimId": "APP-UF-RECIPROCITY",
+     "purposes": [
+      "nakshatra-influence"
+     ],
+     "classification": "AI_SYNTHESIS_FROM_SOURCES",
+     "allowedMeaning": "Mutuality and fair exchange may matter deeply; the person may feel most settled in bonds where care, effort and respect move in both directions."
+    },
+    {
+     "claimId": "APP-UF-SUSTAINING-COMMITMENT",
+     "purposes": [
+      "nakshatra-influence"
+     ],
+     "classification": "AI_SYNTHESIS_FROM_SOURCES",
+     "allowedMeaning": "The person may place emotional value on sustaining agreements and continuing to care for what has been responsibly begun."
+    },
+    {
+     "claimId": "APP-UF-LITERARY-ENJOYMENT",
+     "purposes": [
+      "nakshatra-influence"
+     ],
+     "classification": "SOURCE_PRINCIPLE_APPLICATION",
+     "allowedMeaning": "Words, learning or literary expression may be sources of enjoyment and emotional fulfillment."
+    }
+   ],
+   "compositionRequirements": [
+    "APP-UF-RECIPROCITY and APP-UF-SUSTAINING-COMMITMENT require at least one additional non-nakshatra chart factor in the reading.",
+    "APP-UF-NAKSHATRA-CONTEXT must appear before any other Uttara Phalguni interpretation."
+   ],
+   "customerExcludedLayers": [
+    "deity",
+    "bed or healing-bed symbolism",
+    "mythology",
+    "historical doctrine",
+    "source conflict explanation"
+   ],
+   "prohibitedExtensions": [
+    "guaranteed happiness or prosperity",
+    "marriage or partnership prediction",
+    "claim that every relationship is reciprocal",
+    "people-pleasing or dependency claim",
+    "status, wealth or moral verdict",
+    "presenting the modern synthesis as a classical quotation"
+   ]
+  },
+  {
+   "modelId": "PADA-048-UTTARA_PHALGUNI-4",
+   "coverageItem": "pada.uttara-phalguni.4",
+   "status": "PROVISIONAL_PROJECT_METHODOLOGY_APPLICATION_DRAFT",
+   "developmentEligible": true,
+   "productionEligible": false,
+   "sourceIds": [
+    "SRC-BRIHAT-JATAKA-IYER-1885",
+    "SRC-BPHS-SANTHANAM-ONLINE",
+    "SRC-INDASTRO-UTTARA-PHALGUNI-PADAS",
+    "SRC-COZ-BATCH4-T2-GAP-MEMO"
+   ],
+   "applicationClaims": [
+    {
+     "claimId": "APP-UF4-RECEPTIVE-MODE",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "Within the fourth pada, Uttara Phalguni's concern with reciprocity and sustained commitment may operate through a more receptive and integrative mode."
+    },
+    {
+     "claimId": "APP-UF4-IMAGINATIVE-UNDERSTANDING",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "PROJECT_METHODOLOGY_DRAFT",
+     "allowedMeaning": "Imagination or symbolic understanding may help the person recognize what another person or situation is asking of them."
+    },
+    {
+     "claimId": "APP-UF4-RESILIENT-ENGAGEMENT",
+     "purposes": [
+      "pada-refinement"
+     ],
+     "classification": "MODERN_PRACTITIONER_APPLICATION",
+     "allowedMeaning": "The person may show determination and resilience by remaining engaged with a valued commitment while it passes through change."
+    },
+    {
+     "claimId": "APP-UF4-DISCERNMENT-RECEPTIVITY-TENSION",
+     "purposes": [
+      "main-tension"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "The combined pattern may create tension between carefully evaluating what is true and remaining receptive to feelings, ambiguity or another person's needs."
+    },
+    {
+     "claimId": "APP-UF4-RECIPROCAL-BOUNDARY",
+     "purposes": [
+      "practical-takeaway"
+     ],
+     "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+     "allowedMeaning": "Development may involve choosing commitments that remain mutual, expressing needs clearly and allowing dedication to include healthy limits."
+    }
+   ],
+   "claimConditions": [
+    {
+     "claimId": "APP-UF4-RECEPTIVE-MODE",
+     "requiresAny": [
+      "APP-UF-RECIPROCITY",
+      "APP-UF-SUSTAINING-COMMITMENT"
+     ]
+    },
+    {
+     "claimId": "APP-UF4-IMAGINATIVE-UNDERSTANDING",
+     "requires": [
+      "APP-UF4-RECEPTIVE-MODE"
+     ]
+    },
+    {
+     "claimId": "APP-UF4-RESILIENT-ENGAGEMENT",
+     "requires": [
+      "APP-UF-SUSTAINING-COMMITMENT"
+     ]
+    },
+    {
+     "claimId": "APP-UF4-DISCERNMENT-RECEPTIVITY-TENSION",
+     "requires": [
+      "APP-MOON-VIRGO-TRUTHFUL-SPEECH",
+      "APP-UF4-RECEPTIVE-MODE"
+     ]
+    },
+    {
+     "claimId": "APP-UF4-RECIPROCAL-BOUNDARY",
+     "requires": [
+      "APP-MOON-3-EXPRESSION",
+      "APP-UF-RECIPROCITY",
+      "APP-UF4-DISCERNMENT-RECEPTIVITY-TENSION"
+     ]
+    }
+   ],
+   "customerExcludedLayers": [
+    "Pisces navamsa explanation",
+    "naming syllable",
+    "source-gap explanation",
+    "technical refraction methodology"
+   ],
+   "prohibitedExtensions": [
+    "free-standing Pisces personality description",
+    "psychic, mystical or prophetic claim",
+    "porous-boundaries diagnosis",
+    "secrecy or relationship-conflict prediction",
+    "martyrdom or self-sacrifice claim",
+    "guaranteed resilience or successful outcome"
+   ]
+  }
+ ],
+ "traceOnlyDirective": {
+  "factors": [
+   "Mercury as Moon dispositor",
+   "the Sun as Uttara Phalguni lord",
+   "the Sun's seventh drishti to the Moon",
+   "Mercury's seventh drishti to the Moon"
+  ],
+  "rule": "These factors must be present in the internal trace but absent from customer prose. No current application record licenses a personal interpretation of them. The Sun's repeated roles do not create a customer-facing thread without an approved multi-role synthesis rule."
+ },
+ "implementationRequirements": [
+  "Merge this overlay additively; do not alter the Lisbon or Chicago application-claims files.",
+  "Route every claim from its own purposes field; no Denver claim ID may be hard-coded into planner or verifier code.",
+  "Use approximately six purposeful paragraphs and a 300–380-word total budget; contract thin paragraphs instead of padding.",
+  "Explain nakshatra in plain language before interpreting Uttara Phalguni, and introduce the pada only after the nakshatra has been defined and interpreted.",
+  "Support both requires and requiresAny claim conditions.",
+  "Keep source history, mythology, symbols, technical placements, dispositors, nakshatra lords and drishti factors out of customer prose.",
+  "Run the chart-general acceptance suite using the actual executed-check count.",
+  "Production must emit zero customer claims and zero prose because every record in this overlay is productionEligible false."
+ ]
+}

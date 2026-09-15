@@ -1,0 +1,288 @@
+{
+  "_label": "PHASE 3 BATCH 3A — nakshatra application claims for Ashwini through Ardra; universal, development only, practitioner review required",
+  "schemaVersion": "application-claims/3.0.0-draft",
+  "scope": "Nakshatras 1–6: Ashwini, Bharani, Krittika, Rohini, Mrigashira and Ardra.",
+  "environment": "development",
+  "productionEligible": false,
+  "writerRule": "Only applicationClaims may reach the customer-writing model. Deities, symbols, mythology, source history, technical rulerships and excluded classical judgments remain internal trace.",
+  "records": [
+    {
+      "modelId": "NAK-01-ASHWINI",
+      "coverageItem": "nakshatra.ashwini",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-ASHWINI-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Ashwini is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-ASHWINI-QUICK-MOBILIZATION",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The mind may mobilize quickly when a situation calls for a practical response, correction or fresh start."
+        },
+        {
+          "claimId": "APP-ASHWINI-SKILLFUL-RESPONSE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Skill and intelligence may become most apparent when the person can respond actively rather than remain passive."
+        },
+        {
+          "claimId": "APP-ASHWINI-SPEED-DISCERNMENT",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "The wish to move quickly may sometimes need to be balanced with enough reflection to understand what the situation genuinely requires."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-ASHWINI-QUICK-MOBILIZATION requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ASHWINI-NAKSHATRA-CONTEXT must appear before every other Ashwini interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "horse imagery", "mythology", "healing-power claim", "Ketu rulership", "source history"],
+      "prohibitedExtensions": ["medical healing claim", "automatic speed or impulsiveness", "hero or rescuer identity", "guaranteed intelligence or skill", "literal horse symbolism", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-02-BHARANI",
+      "coverageItem": "nakshatra.bharani",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-BHARANI-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Bharani is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-BHARANI-RESOLVE-ENDURANCE",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may approach emotionally important matters with firm resolve and the capacity to endure pressure over time."
+        },
+        {
+          "claimId": "APP-BHARANI-RESPONSIBLE-COMPLETION",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Responsibility may carry emotional weight, particularly when the person has committed to carrying something through to completion."
+        },
+        {
+          "claimId": "APP-BHARANI-TRUTHFUL-DEXTERITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Truthfulness and practical dexterity may help the person manage demanding situations without losing sight of what matters."
+        },
+        {
+          "claimId": "APP-BHARANI-CARRYING-LIMITS",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Endurance may become burdensome when the person continues carrying a responsibility after its useful purpose has ended."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-BHARANI-RESPONSIBLE-COMPLETION requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-BHARANI-NAKSHATRA-CONTEXT must appear before every other Bharani interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "vessel or reproductive imagery", "mythology", "Venus rulership", "source history"],
+      "prohibitedExtensions": ["death, punishment or karmic judgment", "pregnancy, fertility or sexuality claim", "claim that suffering is required", "automatic contentment or endurance", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-03-KRITTIKA",
+      "coverageItem": "nakshatra.krittika",
+      "status": "EDITORIAL_APPLICATION_DRAFT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-KRITTIKA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Krittika is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-KRITTIKA-SPIRITED-INTENSITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
+          "allowedMeaning": "The emotional temperament may carry strong energy and spirited intensity."
+        },
+        {
+          "claimId": "APP-KRITTIKA-CLARIFYING-DISCERNMENT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "The mind may seek clarity by separating what is essential from what no longer belongs in the situation."
+        },
+        {
+          "claimId": "APP-KRITTIKA-SHARPNESS-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Clear discernment may become overly sharp when urgency leaves too little room for nuance or another person's perspective."
+        },
+        {
+          "claimId": "APP-KRITTIKA-PURPOSEFUL-REFINEMENT",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve using intensity to clarify and refine rather than simply reject or cut away."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-KRITTIKA-CLARIFYING-DISCERNMENT requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-KRITTIKA-SPIRITED-INTENSITY must appear with a constructive admitted claim.",
+        "APP-KRITTIKA-NAKSHATRA-CONTEXT must appear before every other Krittika interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "flame or blade imagery", "mythology", "purification doctrine", "Sun rulership", "source history"],
+      "prohibitedExtensions": ["violence, cutting or burning imagery", "sexuality or appetite claim", "harshness as a fixed trait", "moral purification claim", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-04-ROHINI",
+      "coverageItem": "nakshatra.rohini",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-ROHINI-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Rohini is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-ROHINI-STEADY-MIND",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "The person may bring steadiness of mind to what they value and wish to develop."
+        },
+        {
+          "claimId": "APP-ROHINI-PERSUASIVE-SINCERITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Sincere and persuasive communication may help the person give tangible form to an idea or intention."
+        },
+        {
+          "claimId": "APP-ROHINI-GROWTH-INTO-FORM",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Emotional energy may be drawn toward growth: making an idea, relationship or resource more stable and tangible over time."
+        },
+        {
+          "claimId": "APP-ROHINI-GROWTH-WITHOUT-COMPARISON",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "Development may involve nurturing what genuinely matters without measuring its value only against what someone else possesses or achieves."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-ROHINI-GROWTH-INTO-FORM requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ROHINI-NAKSHATRA-CONTEXT must appear before every other Rohini interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "chariot, temple or tree imagery", "mythology", "Moon rulership", "source history"],
+      "prohibitedExtensions": ["fertility or pregnancy claim", "beauty, sexuality or attractiveness claim", "wealth or abundance prediction", "possessiveness or materialism claim", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-05-MRIGASHIRA",
+      "coverageItem": "nakshatra.mrigashira",
+      "status": "EDITORIAL_APPLICATION_DRAFT",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-MRIGASHIRA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Mrigashira is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-MRIGASHIRA-SEARCHING-CURIOSITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES",
+          "allowedMeaning": "Curiosity may lead the mind to keep searching until it understands what will feel genuinely satisfying or meaningful."
+        },
+        {
+          "claimId": "APP-MRIGASHIRA-INGENUITY-SKILL",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Ingenuity and skill may help the person follow a question beyond its first or most obvious answer."
+        },
+        {
+          "claimId": "APP-MRIGASHIRA-HOPEFUL-ENERGY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "SOURCE_PRINCIPLE_APPLICATION",
+          "allowedMeaning": "Hopefulness and energy may return when the person has something worthwhile to explore or pursue."
+        },
+        {
+          "claimId": "APP-MRIGASHIRA-SEARCH-SETTLE-TENSION",
+          "purposes": ["main-tension"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT",
+          "allowedMeaning": "The wish to keep searching may sometimes make it difficult to recognize when enough understanding has already been found."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-MRIGASHIRA-SEARCHING-CURIOSITY requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-MRIGASHIRA-NAKSHATRA-CONTEXT must appear before every other Mrigashira interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "deer or antelope imagery", "mythology", "Mars rulership", "source history"],
+      "prohibitedExtensions": ["indecision or inability to commit", "romantic or sexual searching claim", "anxiety or attention diagnosis", "literal animal symbolism", "presenting modern synthesis as classical quotation"]
+    },
+    {
+      "modelId": "NAK-06-ARDRA",
+      "coverageItem": "nakshatra.ardra",
+      "status": "EDITORIAL_APPLICATION_DRAFT_CONFLICT_RESTRICTED",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-FRAWLEY-SHAKTIS-ONLINE", "SRC-HARNESS-NAKSHATRAS-ONLINE", "SRC-COZ-BATCH3-GAP-MEMO"],
+      "applicationClaims": [
+        {
+          "claimId": "APP-ARDRA-NAKSHATRA-CONTEXT",
+          "purposes": ["nakshatra-influence"],
+          "classification": "CALCULATED_STRUCTURE_CUSTOMER_CONTEXT",
+          "allowedMeaning": "Ardra is the Moon's nakshatra, one of the smaller lunar sections used to refine how the Moon's emotional qualities are expressed."
+        },
+        {
+          "claimId": "APP-ARDRA-DISRUPTION-INTENSITY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "Emotionally disruptive periods may be experienced with intensity rather than easily set aside."
+        },
+        {
+          "claimId": "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY",
+          "purposes": ["nakshatra-influence"],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_CONFLICT_RESTRICTED",
+          "allowedMeaning": "The person may develop strength through the effort of facing difficult material and working through what cannot simply be ignored."
+        },
+        {
+          "claimId": "APP-ARDRA-INTENSITY-DIRECTION",
+          "purposes": ["practical-takeaway"],
+          "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
+          "allowedMeaning": "Development may involve giving emotional intensity a constructive direction without treating turmoil as necessary for growth."
+        }
+      ],
+      "compositionRequirements": [
+        "APP-ARDRA-DISRUPTION-INTENSITY requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ARDRA-EFFORT-THROUGH-DIFFICULTY requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ARDRA-INTENSITY-DIRECTION requires at least one additional non-nakshatra chart factor in the reading.",
+        "APP-ARDRA-DISRUPTION-INTENSITY must appear with APP-ARDRA-EFFORT-THROUGH-DIFFICULTY or APP-ARDRA-INTENSITY-DIRECTION.",
+        "APP-ARDRA-NAKSHATRA-CONTEXT must appear before every other Ardra interpretation."
+      ],
+      "customerExcludedLayers": ["deity", "teardrop, storm or head imagery", "mythology", "Rahu rulership", "classical moral judgments", "source history"],
+      "prohibitedExtensions": ["deceit, treachery, vanity or harmful-conduct verdict", "trauma, grief, abuse or mental-health diagnosis", "claim that suffering or chaos is required", "destruction or storm imagery", "guaranteed renewal or transformation", "presenting modern synthesis as classical quotation"]
+    }
+  ],
+  "implementationRequirements": [
+    "Merge this overlay additively without modifying earlier application-claim overlays.",
+    "Route every claim exclusively from its purposes field; no nakshatra name or claim ID may be hard-coded into planner or writer logic.",
+    "Use the universal nakshatra introduction pattern, name the nakshatra once only and introduce the pada without repeating the nakshatra name.",
+    "Never send customerExcludedLayers, source history or technical rulerships to the writer.",
+    "Enforce every composition requirement and prohibited extension.",
+    "Log unused admitted claims as ADMITTED_NOT_USED without warning or failure.",
+    "Production must admit zero claims from this file until individual practitioner approval changes productionEligible.",
+    "For conflict-restricted records, preserve the restriction in ledger and trace and do not promote synthesized meanings as classical doctrine."
+  ]
+}
