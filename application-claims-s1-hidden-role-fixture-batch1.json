@@ -1,0 +1,1653 @@
+{
+  "_label": "SECTION 1 HIDDEN ROLE CLAIMS — FIXTURE-REQUIRED BATCH 1",
+  "schemaVersion": "1.0.0",
+  "sectionId": "s1",
+  "customerTitle": "Your Essential Nature & Guiding Planet",
+  "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+  "developmentEligible": true,
+  "productionEligible": false,
+  "scope": {
+    "included": "The 39 fixture-required Ascendant and guiding-planet nakshatra/pada routes in the 10-chart Section 1 test set.",
+    "excluded": "This is not universal coverage of all 27 nakshatras and 108 padas for both roles.",
+    "unresolved": "The remaining 22 fixture-required routes: 10 guiding-planet signs and 12 conjunction/dispositor/drishti routes."
+  },
+  "governingRules": [
+    "These are new role-specific claims derived from neutral source models; Section 2 Moon application claims are not reused.",
+    "The technical layer remains visible in internal trace but silent in customer prose.",
+    "Only Section 1 may orient the customer to rising sign, guiding planet and house; it must not repeatedly teach nakshatra or pada.",
+    "All claims remain development-only until a practitioner approves both the underlying model and its use for this role.",
+    "The writer must use ordinary language understandable across education levels."
+  ],
+  "counts": {
+    "records": 39,
+    "claims": 39,
+    "ascendantNakshatra": 10,
+    "guidingPlanetNakshatra": 9,
+    "ascendantPada": 10,
+    "guidingPlanetPada": 10
+  },
+  "records": [
+    {
+      "recordId": "IR-S1-ASC-NAK-ASHLESHA",
+      "coverageItem": "asc-nakshatra.ashlesha",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-09-ASHLESHA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-ASHLESHA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet life by noticing what is concealed, intertwined or difficult to separate before deciding how to respond."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-CHITRA",
+      "coverageItem": "asc-nakshatra.chitra",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-14-CHITRA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-CHITRA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet life by looking for a clear form, then refining the details until the situation feels coherent and workable."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-MRIGASHIRA",
+      "coverageItem": "asc-nakshatra.mrigashira",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-05-MRIGASHIRA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-MRIGASHIRA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet life with curiosity, comparing possibilities and continuing to search until something feels genuinely fitting."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-PUNARVASU",
+      "coverageItem": "asc-nakshatra.punarvasu",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-07-PUNARVASU"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-PUNARVASU-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your approach to life may include a strong ability to reorient yourself and recover a steady direction after disruption or distraction."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-PURVA_PHALGUNI",
+      "coverageItem": "asc-nakshatra.purva-phalguni",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-11-PURVA_PHALGUNI"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-PURVA_PHALGUNI-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet life with a wish to create, share or contribute something that brings genuine enjoyment and human connection."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-REVATI",
+      "coverageItem": "asc-nakshatra.revati",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-27-REVATI"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-REVATI-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet life by helping transitions move toward a thoughtful completion, especially when something vulnerable needs practical guidance."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-SHRAVANA",
+      "coverageItem": "asc-nakshatra.shravana",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-22-SHRAVANA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-SHRAVANA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may take in life by listening closely, recognizing patterns and connecting information that initially appears separate."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-SWATI",
+      "coverageItem": "asc-nakshatra.swati",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-15-SWATI"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-SWATI-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet change through adaptability and independent movement while learning what keeps you centered."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-UTTARA_ASHADHA",
+      "coverageItem": "asc-nakshatra.uttara-ashadha",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-21-UTTARA_ASHADHA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-UTTARA_ASHADHA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may approach life through commitments and principles that remain important even when immediate preferences change."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-NAK-VISHAKHA",
+      "coverageItem": "asc-nakshatra.vishakha",
+      "layer": "ascendant-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-16-VISHAKHA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-NAK-VISHAKHA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "You may meet important aims with sustained focus, cultivating what matters until it can reach a meaningful result."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-ANURADHA",
+      "coverageItem": "asc-lord-nakshatra.anuradha",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-17-ANURADHA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-ANURADHA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may work through devotion, trustworthy alliances and a sustained relationship with the values or communities you choose."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-ASHWINI",
+      "coverageItem": "asc-lord-nakshatra.ashwini",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-01-ASHWINI"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-ASHWINI-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may move quickly toward a useful response, practical repair or a fresh beginning when action is needed."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-BHARANI",
+      "coverageItem": "asc-lord-nakshatra.bharani",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-02-BHARANI"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-BHARANI-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may emphasize responsibility, containment and the ability to carry an important process through to completion."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-DHANISHTA",
+      "coverageItem": "asc-lord-nakshatra.dhanishta",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-23-DHANISHTA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-DHANISHTA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may work through rhythm, coordinated action and contribution while balancing personal aims with a larger group."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-HASTA",
+      "coverageItem": "asc-lord-nakshatra.hasta",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-13-HASTA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-HASTA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may work by grasping details, arranging them carefully and shaping a situation into something more workable."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-MRIGASHIRA",
+      "coverageItem": "asc-lord-nakshatra.mrigashira",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-05-MRIGASHIRA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-MRIGASHIRA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may work through inquiry and comparison, refining a question until the answer feels genuinely suitable."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-PUNARVASU",
+      "coverageItem": "asc-lord-nakshatra.punarvasu",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-07-PUNARVASU"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-PUNARVASU-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may repeatedly return you to whatever restores coherence and a steady sense of direction after distraction."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-SHATABHISHA",
+      "coverageItem": "asc-lord-nakshatra.shatabhisha",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-24-SHATABHISHA"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-SHATABHISHA-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may work through careful investigation, clear boundaries and patient repair within a protected space."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-NAK-SWATI",
+      "coverageItem": "asc-lord-nakshatra.swati",
+      "layer": "guiding-planet-nakshatra-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "NAK-15-SWATI"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-VIMSHOTTARI-ONLINE",
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH3-GAP-MEMO",
+        "SRC-FRAWLEY-SHAKTIS-ONLINE",
+        "SRC-HARNESS-NAKSHATRAS-ONLINE",
+        "SRC-TAITTIRIYA-BRAHMANA-BHATTA-1921",
+        "SRC-TAITTIRIYA-SAMHITA-KEITH-1914"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-NAK-SWATI-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "AI_SYNTHESIS_FROM_SOURCES_PENDING_ROLE_RULING",
+          "allowedMeaning": "Your guiding influence may encourage adaptability and independent movement while asking you to preserve an inner center."
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the nakshatra in customer prose",
+        "mention a lunar constellation number, ruler, deity, symbol or mythology",
+        "reuse a Moon-context application claim as if it described the Ascendant or guiding planet",
+        "physical, medical, sexual, caste, wealth, status, event or moral prediction",
+        "present a modern synthesis as a classical quotation"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-ASHLESHA_3",
+      "coverageItem": "asc-pada.ashlesha.3",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-035-ASHLESHA-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T2-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-ASHLESHA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-ASHLESHA_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may express itself through comparison, language and more than one possible interpretation before a response is chosen."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-ASHLESHA_3-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-ASHLESHA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-CHITRA_2",
+      "coverageItem": "asc-pada.chitra.2",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-054-CHITRA-2"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T2-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-CHITRA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-CHITRA_2-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may become especially practical, working through careful judgment, refinement and correction."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-CHITRA_2-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-CHITRA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-MRIGASHIRA_3",
+      "coverageItem": "asc-pada.mrigashira.3",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-019-MRIGASHIRA-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T1-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-MRIGASHIRA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-MRIGASHIRA_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may search for the right balance by considering reciprocity, proportion and the needs present in a relationship."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-MRIGASHIRA_3-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-MRIGASHIRA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-PUNARVASU_1",
+      "coverageItem": "asc-pada.punarvasu.1",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-025-PUNARVASU-1"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T1-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-PUNARVASU-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-PUNARVASU_1-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may restore direction by beginning again promptly once a clearer course becomes available."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-PUNARVASU_1-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-PUNARVASU-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-PURVA_PHALGUNI_4",
+      "coverageItem": "asc-pada.purva-phalguni.4",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-044-PURVA_PHALGUNI-4"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T2-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-PURVA-PHALGUNI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-PURVA_PHALGUNI_4-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may bring creative or relational concerns beneath the surface and remain engaged through complexity or change."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-PURVA_PHALGUNI_4-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-PURVA_PHALGUNI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-REVATI_2",
+      "coverageItem": "asc-pada.revati.2",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-106-REVATI-2"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T4-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-REVATI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-REVATI_2-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may carry guidance or completion through structure, responsibility, clear steps and steady follow-through."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-REVATI_2-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-REVATI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-SHRAVANA_1",
+      "coverageItem": "asc-pada.shravana.1",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-085-SHRAVANA-1"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T4-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-SHRAVANA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-SHRAVANA_1-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may turn something heard or recognized into an immediate beginning rather than leaving it only as an idea."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-SHRAVANA_1-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-SHRAVANA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-SWATI_4",
+      "coverageItem": "asc-pada.swati.4",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-060-SWATI-4"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T3-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-RAMASWAMY-SWATI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-SWATI_4-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may become more receptive and imaginative, integrating several impressions before choosing a direction."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-SWATI_4-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-SWATI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-UTTARA_ASHADHA_4",
+      "coverageItem": "asc-pada.uttara-ashadha.4",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-084-UTTARA_ASHADHA-4"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T3-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-UTTARA-ASHADHA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-UTTARA_ASHADHA_4-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may hold firmly to a principle while remaining receptive to complexity, meaning and a wider human context."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-UTTARA_ASHADHA_4-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-UTTARA_ASHADHA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-ASC-PADA-VISHAKHA_2",
+      "coverageItem": "asc-pada.vishakha.2",
+      "layer": "ascendant-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-062-VISHAKHA-2"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T3-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-VISHAKHA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-ASC-PADA-VISHAKHA_2-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "This approach may make a chosen aim more stable, repeatable and sustainable instead of relying on one burst of effort."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-ASC-PADA-VISHAKHA_2-HIDDEN",
+          "requires": [
+            "APP-S1-ASC-NAK-VISHAKHA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-ANURADHA_3",
+      "coverageItem": "asc-lord-pada.anuradha.3",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-067-ANURADHA-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T3-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-ANURADHA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-ANURADHA_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may seek balance, reciprocity and proportion within the alliances or commitments it sustains."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-ANURADHA_3-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-ANURADHA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-ASHWINI_3",
+      "coverageItem": "asc-lord-pada.ashwini.3",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-003-ASHWINI-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T1-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-ASHWINI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-ASHWINI_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may use language, comparison and several possible approaches to find the most useful response."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-ASHWINI_3-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-ASHWINI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-BHARANI_4",
+      "coverageItem": "asc-lord-pada.bharani.4",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-008-BHARANI-4"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T1-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-BHARANI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-BHARANI_4-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may look beneath appearances and remain engaged through complexity or change until a responsibility is complete."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-BHARANI_4-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-BHARANI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-DHANISHTA_1",
+      "coverageItem": "asc-lord-pada.dhanishta.1",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-089-DHANISHTA-1"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T4-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-DHANISHTA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-DHANISHTA_1-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may ask for a personally owned contribution rather than participation without a clear individual voice."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-DHANISHTA_1-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-DHANISHTA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-HASTA_3",
+      "coverageItem": "asc-lord-pada.hasta.3",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-051-HASTA-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T2-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-HASTA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-HASTA_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may shape practical solutions through communication, comparison and an exchange of ideas."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-HASTA_3-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-HASTA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-MRIGASHIRA_1",
+      "coverageItem": "asc-lord-pada.mrigashira.1",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-017-MRIGASHIRA-1"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T1-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-MRIGASHIRA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-MRIGASHIRA_1-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may seek an answer that can be expressed with personal conviction rather than borrowed from someone else."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-MRIGASHIRA_1-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-MRIGASHIRA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-PUNARVASU_3",
+      "coverageItem": "asc-lord-pada.punarvasu.3",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-027-PUNARVASU-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T1-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-PUNARVASU-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-PUNARVASU_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may restore coherence through language, comparison and the willingness to consider more than one explanation."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-PUNARVASU_3-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-PUNARVASU-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-SHATABHISHA_2",
+      "coverageItem": "asc-lord-pada.shatabhisha.2",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-094-SHATABHISHA-2"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T4-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-INDASTRO-SHATABHISHA-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-SHATABHISHA_2-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may make investigation and repair more structured through responsibility, sequence and sustained effort."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-SHATABHISHA_2-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-SHATABHISHA-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-SWATI_1",
+      "coverageItem": "asc-lord-pada.swati.1",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-057-SWATI-1"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T3-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-RAMASWAMY-SWATI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-SWATI_1-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may connect independent movement with meaning, learning and principles that provide a wider frame."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-SWATI_1-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-SWATI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    },
+    {
+      "recordId": "IR-S1-GUIDE-PADA-SWATI_3",
+      "coverageItem": "asc-lord-pada.swati.3",
+      "layer": "guiding-planet-pada-hidden",
+      "status": "EDITORIAL_DRAFT_PENDING_PRACTITIONER_ROLE_RULING",
+      "developmentEligible": true,
+      "productionEligible": false,
+      "evidenceModelIds": [
+        "PADA-059-SWATI-3"
+      ],
+      "sourceIds": [
+        "SRC-BPHS-SANTHANAM-ONLINE",
+        "SRC-BRIHAT-JATAKA-IYER-1885",
+        "SRC-COZ-BATCH4-T3-GAP-MEMO",
+        "SRC-DRIKPANCHANG-PADA-SWARS",
+        "SRC-HIMALAYAN-ACADEMY-BIRTHSTAR-SYLLABLES",
+        "SRC-RAMASWAMY-SWATI-PADAS"
+      ],
+      "applicationClaims": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-SWATI_3-HIDDEN",
+          "purposes": [
+            "hidden-synthesis-modifier"
+          ],
+          "classification": "PROJECT_METHODOLOGY_DRAFT_PENDING_ROLE_RULING",
+          "allowedMeaning": "That guidance may preserve autonomy by understanding systems, networks and unconventional routes through them."
+        }
+      ],
+      "claimConditions": [
+        {
+          "claimId": "APP-S1-GUIDE-PADA-SWATI_3-HIDDEN",
+          "requires": [
+            "APP-S1-GUIDE-NAK-SWATI-HIDDEN"
+          ]
+        }
+      ],
+      "customerDisclosure": "HIDDEN_APPLICATION_ONLY",
+      "prohibitedExtensions": [
+        "name or define the pada or navamsa sign in customer prose",
+        "mention numbering, ordinals, rulers, deities, symbols or mythology",
+        "generate the pada as a free-standing sign personality description",
+        "use the pada claim without its parent role-specific nakshatra claim",
+        "present the refraction method as settled classical doctrine"
+      ]
+    }
+  ]
+}
