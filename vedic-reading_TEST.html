@@ -680,7 +680,7 @@ function generateSections3to6(chart, reading12, firstName) {
   ].join("\n");
 
   var body = { model: model, max_tokens: 4000, system: COZ_GEN_SYSTEM, messages: [{ role: "user", content: userMsg }] };
-  try { window.COZ_VEDIC_READING_STATUS = "preparing"; window.dispatchEvent(new CustomEvent("COZ_VEDIC_READING_STATUS")); } catch (_) {}
+  window.COZ_GEN_IN_FLIGHT = true;
 
   return fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -714,7 +714,7 @@ function generateSections3to6(chart, reading12, firstName) {
     try { localStorage.setItem(cacheKey, JSON.stringify(out)); } catch (_) {}
     return out;
   }).finally(function () {
-    try { window.COZ_VEDIC_READING_STATUS = "ready"; window.dispatchEvent(new CustomEvent("COZ_VEDIC_READING_STATUS")); } catch (_) {}
+    window.COZ_GEN_IN_FLIGHT = false;
   });
 }
 
@@ -917,6 +917,14 @@ function showFromHash() {
   document.body.dataset.view = "reading";
   /* wait for generation to settle before deciding placeholder vs reading
      (direct load / reload lands here before the fetches finish) */
+  if (window.COZ_GEN_IN_FLIGHT && !loadReading()) {
+    const old = document.getElementById("vedicContent");
+    const fresh = old.cloneNode(false);
+    fresh.innerHTML = `<header class="vedic-header"><img class="vedic-logo" src="vedic-logo.png" alt="CozAlyze" width="1000" height="1055"></header>
+      <div class="vedic-divider" aria-hidden="true">${STAR_SVG}</div>
+      <section class="vedic-body"><p>Writing Sections 3 through 6 for this chart. This takes about 10 to 20 seconds.</p></section>`;
+    old.replaceWith(fresh);
+  }
   const proceed = () => {
     if (window.COZ_VEDIC_READING_UNAVAILABLE || !loadReading()) {
       if (!window.COZ_VEDIC_DEBUG) window.COZ_VEDIC_DEBUG = "Generation finished but no reading was stored (COZ_VEDIC_READING=" + typeof window.COZ_VEDIC_READING + ")";
