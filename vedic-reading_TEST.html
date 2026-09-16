@@ -369,6 +369,19 @@ body[data-view="reading"] .dash { display: none; }
 }
 body.scroll-locked { overflow: hidden; touch-action: none; }
 
+@media print {
+  /* keep a reading section whole so nothing repeats across a page break,
+     and never orphan the counter, title, label or cost line from its text */
+  .vedic-reading-content { break-inside: auto; }
+  .vedic-header, .vedic-counter, .vedic-title, .vedic-divider { break-inside: avoid; break-after: avoid; }
+  .vedic-body p, .vedic-subhead { break-inside: avoid; orphans: 3; widows: 3; }
+  .vedic-subhead { break-after: avoid; }
+  .vedic-nav, .vedic-stamp, .coz-skip, .dash, .reveal { display: none !important; }
+  .vedic-bg { position: absolute; }
+  body { background: #fff; color: #111; }
+  .vedic-body, .vedic-body p { color: #111; }
+}
+
 /* ---------- build stamp (project standing rule) ---------- */
 .vedic-stamp {
   position: fixed;
@@ -618,7 +631,7 @@ var COZ_GEN_SYSTEM = [
 "",
 "VOICE. Sound like a person speaking, not a lecture. Establish the frame once with a phrase like 'your chart suggests' and then write with natural confidence; do not hedge every sentence. Roughly 7th to 8th grade reading level: familiar words, mostly short sentences (average well under 20 words), concrete human situations. No academic psychology, no vague filler ('a quieter thread underneath'), no sentence written only to fill space.",
 "",
-"PLAIN LANGUAGE. Planets appear only as influences ('Venus's influence', 'Saturn's influence'). Never house numbers, rulerships, aspects, 'sits in', sign relationships, or any technical mechanics. Do not name any nakshatra. Never use the word 'pada'. The reader never learns where a statement comes from.",
+"PLAIN LANGUAGE. Planets appear only as influences ('Venus's influence', 'Saturn's influence'). The Sun and the Moon always take the article: write 'the Sun's influence' and 'the Moon's influence', never 'Sun's influence' or 'Moon's influence'. Never house numbers, rulerships, aspects, 'sits in', sign relationships, or any technical mechanics. Do not name any nakshatra. Never use the word 'pada'. The reader never learns where a statement comes from.",
 "",
 "GROUNDING. Every claim must trace to the chart placements given. Every important conclusion needs two distinct chart factors behind it; single-factor conclusions take lighter language. Include contradicting or softening factors so the chart is not flattened. No biography, profession, or life events are known to you; never invent them. Never guarantee events; specificity comes from the nature of a pattern, where it operates, what strengthens or complicates it. No 6+ word phrase may repeat across sections.",
 "",
@@ -668,7 +681,8 @@ function cozRepairSections(sections) {
     });
     var seen = {}, deduped = [];
     out.forEach(function (p) {
-      var k = p.replace(/\s+/g, " ").trim().slice(0, 60).toLowerCase();
+      var norm = p.replace(/\s+/g, " ").trim().toLowerCase();
+      var k = norm.length <= 80 ? norm : norm.slice(0, 60);
       if (seen[k]) return;
       seen[k] = true; deduped.push(p);
     });
@@ -677,12 +691,17 @@ function cozRepairSections(sections) {
   return sections;
 }
 
+var cozCurrentSectionId = null;
 function cozGenUsageLine() {
   var t = window.COZ_VEDIC_GEN_TRACE; if (!t) return "";
   var c = (t.estimatedCostUSD != null) ? "$" + t.estimatedCostUSD.toFixed(4) : "n/a";
   return '<p style="text-align:center;font-size:12px;color:var(--vedic-gold-muted);margin:0 0 10px">' +
     esc(t.model) + " · in " + (t.inputTokens || 0) + " · out " + (t.outputTokens || 0) + " tokens · est. " + c +
-    (t.fromCache ? " · from cache (no new charge)" : " · generated now") + "</p>";
+    (t.fromCache ? " · from cache (no new charge)" : " · generated now") +
+    (t.sectionWordCounts && t.sectionWordCounts[cozCurrentSectionId] ?
+      " · " + t.sectionWordCounts[cozCurrentSectionId].words + " words" +
+      (t.sectionWordCounts[cozCurrentSectionId].inBand ? "" :
+        " · OUT OF BAND (" + t.sectionWordCounts[cozCurrentSectionId].band + ") after retry") : "") + "</p>";
 }
 function cozGenHash(s) { var h = 0; for (var i = 0; i < s.length; i++) { h = (h * 31 + s.charCodeAt(i)) | 0; } return (h >>> 0).toString(36); }
 
@@ -713,9 +732,11 @@ function generateSections3to6(chart, reading12, firstName) {
     "Write Sections 3, 4, 5, 6 now. JSON only."
   ].join("\n");
 
-  var body = { model: model, max_tokens: 4000, system: COZ_GEN_SYSTEM, messages: [{ role: "user", content: userMsg }] };
   window.COZ_GEN_IN_FLIGHT = true;
+  return cozGenerateOnce(key, model, userMsg, false);
 
+  function cozGenerateOnce(key, model, userMsg, retrying) {
+  var body = { model: model, max_tokens: 4000, system: COZ_GEN_SYSTEM, messages: [{ role: "user", content: userMsg }] };
   return fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
@@ -743,6 +764,32 @@ function generateSections3to6(chart, reading12, firstName) {
        split a subhead that got joined to its paragraph, and drop any paragraph
        that duplicates one already in the same section. */
     sections = cozRepairSections(sections);
+    Object.keys(sections).forEach(function (id) {
+      sections[id] = sections[id].map(function (p) {
+        var s = String(p);
+        /* "Sun's influence" -> "the Sun's influence", including at the start of a
+           paragraph or sentence, without touching an existing "the Sun's ..." */
+        s = s.replace(/(^|[\s(“"'‘])(Sun|Moon)'s influence/g, function (m, pre, body) {
+          return pre + (/\bthe\s$/i.test(pre) ? "" : "the ") + body + "'s influence";
+        });
+        s = s.replace(/\bthe the\b/gi, "the");
+        /* sentence-initial "the Sun" keeps its capital */
+        s = s.replace(/(^|[.!?]\s+)the (Sun|Moon)'s influence/g, function (m, pre, body) {
+          return pre + "The " + body + "'s influence";
+        });
+        return s;
+      });
+    });
+    var lens = cozSectionLengths(sections);
+    var bad = Object.keys(lens).filter(function (k) {
+      var b = COZ_BANDS[k]; return b && b[2] === "generated" && (lens[k] < b[0] || lens[k] > b[1]);
+    });
+    if (bad.length && !retrying) {
+      /* one retry, telling the model exactly which sections missed and by how much */
+      var note = bad.map(function (k) { return k + " was " + lens[k] + " words"; }).join("; ");
+      return cozGenerateOnce(key, model, userMsg + "\n\nYour previous attempt missed the length rule: " + note +
+        ". Every section must be between 245 and 290 words. Keep the same substance and voice; tighten what ran long and develop what ran short. Return the full JSON again.", true);
+    }
     var u = data.usage || {}, inTok = u.input_tokens || 0, outTok = u.output_tokens || 0;
     var PRICE = { input: 3.00, output: 15.00 };   /* USD per million tokens, Sonnet 4.x list price */
     var cost = inTok / 1e6 * PRICE.input + outTok / 1e6 * PRICE.output;
@@ -751,9 +798,42 @@ function generateSections3to6(chart, reading12, firstName) {
       chartFacts: facts, systemPrompt: COZ_GEN_SYSTEM, userMessage: userMsg, rawResponse: text, fromCache: false } };
     try { localStorage.setItem(cacheKey, JSON.stringify(out)); } catch (_) {}
     return out;
-  }).finally(function () {
-    window.COZ_GEN_IN_FLIGHT = false;
   });
+  }
+}
+
+/* Option C (Nina review build): Sections 1-2 are assembled from matched claim
+   records and are NOT capped or trimmed; their measured band is 215-360 words.
+   Sections 3-6 are generated and held to 245-290. Every count is recorded. */
+var COZ_BANDS = {
+  "essential-nature":    [215, 360, "assembled from claim records (not capped)"],
+  "mind-intuition":      [215, 360, "assembled from claim records (not capped)"],
+  "relationships-karmic":[245, 290, "generated"],
+  "dharma-direction":    [245, 290, "generated"],
+  "rahu-ketu":           [245, 290, "generated"],
+  "essential-takeaway":  [245, 290, "generated"]
+};
+function cozWordCountReport(assembled, generated) {
+  var all = {}, report = {};
+  ["essential-nature","mind-intuition"].forEach(function (id) { all[id] = assembled[id] || []; });
+  Object.keys(generated || {}).forEach(function (id) { all[id] = generated[id]; });
+  var lens = cozSectionLengths(all);
+  Object.keys(COZ_BANDS).forEach(function (id) {
+    if (lens[id] === undefined) return;
+    var b = COZ_BANDS[id];
+    report[id] = { words: lens[id], band: b[0] + "-" + b[1], source: b[2],
+                   inBand: lens[id] >= b[0] && lens[id] <= b[1] };
+  });
+  try { console.log("[COZ WORD COUNTS]", JSON.stringify(report)); } catch (_) {}
+  return report;
+}
+function cozSectionLengths(sections) {
+  var out = {};
+  Object.keys(sections).forEach(function (id) {
+    out[id] = (sections[id] || []).filter(function (p) { return String(p).indexOf("## ") !== 0; })
+      .join(" ").trim().split(/\s+/).filter(Boolean).length;
+  });
+  return out;
 }
 
 function fetchJSON(path) {
@@ -806,6 +886,11 @@ var COZ_READING_READY = requestChartData().then(function (chart) {
     /* No hand-reviewed draft for this chart: generate Sections 3-6 as unverified
        development copy so every chart produces all six sections. */
     return generateSections3to6(chart, result.reading, firstName).then(function (gen) {
+      window.COZ_GEN_IN_FLIGHT = false;
+      gen.trace.sectionWordCounts = cozWordCountReport(result.reading, gen.sections);
+      gen.trace.outOfBand = Object.keys(gen.trace.sectionWordCounts).filter(function (k) {
+        return !gen.trace.sectionWordCounts[k].inBand && COZ_BANDS[k] && COZ_BANDS[k][2] === "generated";
+      });
       var reading = Object.assign({}, result.reading, gen.sections);
       reading._generated36 = true;
       window.COZ_VEDIC_READING = reading;
@@ -814,6 +899,7 @@ var COZ_READING_READY = requestChartData().then(function (chart) {
     });
   }).catch(function (e) {
     console.log("[EMERGE FLOW] dev-review generation failed:", e);
+    window.COZ_GEN_IN_FLIGHT = false;
     window.COZ_VEDIC_READING_UNAVAILABLE = true;
     window.COZ_VEDIC_DEBUG = "Generation error: " + (e && ((e.message || String(e)) + " @ " + (e.stack || "")));
   });
@@ -856,6 +942,7 @@ function esc(s) {
 function sectionById(id) { return vedicReadingSections.find(s => s.id === id) || vedicReadingSections[0]; }
 
 function renderSection(section) {
+  cozCurrentSectionId = section.id;
   const reading = loadReading();
   const paragraphs = Array.isArray(reading[section.id]) ? reading[section.id] : [];
   const sectionCounter = `${String(section.number).padStart(2, "0")} OF ${SECTION_TOTAL}`;

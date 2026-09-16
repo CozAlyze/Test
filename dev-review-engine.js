@@ -144,8 +144,12 @@
         t = t.replace(new RegExp("\\b" + nakName + "'s\\b", "g"), "this nakshatra's");
         t = t.replace(new RegExp("\\b" + nakName + "\\b", "g"), "this nakshatra");
       }
-      t = t.replace(/\bThis pada\b/g, "This part of it").replace(/\bthis pada\b/g, "this part of it");
-      t = t.replace(/\bThe pada\b/g, "This part of it").replace(/\bthe pada\b/g, "this part of it");
+      /* the claim records say "This pada may give/direct/carry ..."; "pada" is a
+         forbidden term and "this part of it" reads like a template, so the
+         sentence is rewritten to read as plain prose. */
+      t = t.replace(/\b(?:This|The)\s+pada\s+may\s+/g, "More precisely, your Moon's placement may ");
+      t = t.replace(/\b(?:this|the)\s+pada\s+may\s+/g, "your Moon's placement may ");
+      t = t.replace(/\b(?:This|The)\s+pada\b/g, "This placement").replace(/\b(?:this|the)\s+pada\b/g, "this placement");
       return t;
     });
 
