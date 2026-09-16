@@ -626,11 +626,13 @@ var COZ_GEN_SYSTEM = [
 "",
 "SECTION 4, Dharma, Work & Life Direction: discuss purpose, abilities, working conditions and fields directly, no lecture. Must include: what kind of contribution feels purposeful; the person's strongest useful abilities; the working conditions those abilities need; specific reasonable fields (never guaranteed careers); the main work-related challenge; a practical direction for handling it.",
 "",
-"SECTION 5, Rahu & Ketu: OPEN by explaining what the nodes are: not physical bodies, the two points where the Moon's orbit crosses the Sun's path (the eclipse alignment); Rahu (North Node) and Ketu (South Node); in Vedic tradition Ketu points to gifts already carried into this life (familiar, available without much effort) and Rahu to what is being actively grown into (less familiar, more effort, real potential); one sentence on the push-pull is allowed. Then apply the specific placements without re-teaching. Use exactly two subheads, each as its own paragraph beginning with '## ': '## Rahu — Where Life Pulls You Forward' then '## Ketu — What You Already Carry'. Do not assert a universal growth-versus-release psychology as fact. No vague predictions like 'success may come'.",
+"SECTION 5, Rahu & Ketu: OPEN by naming them in full on first reference: Rahu (North Node) and Ketu (South Node). Explain that they are not physical bodies, they are the two points where the Moon's orbit crosses the Sun's path (the eclipse alignment); in Vedic tradition Ketu points to gifts already carried into this life (familiar, available without much effort) and Rahu to what is being actively grown into (less familiar, more effort, real potential); one sentence on the push-pull is allowed. Then apply the specific placements without re-teaching. Do not assert a universal growth-versus-release psychology as fact. No vague predictions like 'success may come'.",
+"",
+"SECTION 5 SUBHEAD FORMAT, follow exactly. The rahu-ketu array must contain these five separate array entries, in this order, and the two subhead entries must each be a string containing ONLY the subhead and nothing else: (1) the opening explanation paragraph; (2) the exact string \"## Rahu \u2014 Where Life Pulls You Forward\"; (3) the Rahu paragraph; (4) the exact string \"## Ketu \u2014 What You Already Carry\"; (5) the Ketu paragraph. Never join a subhead to the paragraph that follows it in the same string.",
 "",
 "SECTION 6, Your Essential Takeaway: pure synthesis of threads already in Sections 1 through 5. No new chart factor, no new technical explanation, not a repeat of earlier sentences. End with one practical direction.",
 "",
-"LENGTH. Sections 3, 4, 5: about 220 to 320 words each. Section 6: about 150 to 220 words. Do not pad.",
+"LENGTH. Every section, 3 through 6, must land between 245 and 290 words. That includes Section 5 (count the two subheads as part of it) and Section 6. Section 6 is a full synthesis at that same length, not a short closing note: draw together the threads from Sections 1 through 5, name the central tension, and end with one practical direction. Do not pad and do not run long.",
 "",
 "OUTPUT. Return ONLY a JSON object, no prose before or after, no code fences: {\"relationships-karmic\": [paragraph strings], \"dharma-direction\": [...], \"rahu-ketu\": [...], \"essential-takeaway\": [...]}. Each array holds plain paragraph strings; in rahu-ketu, the two subhead strings begin with '## '."
 ].join("\n");
@@ -643,6 +645,38 @@ function cozGenChartFacts(chart) {
       (p.nakshatra ? ", nakshatra " + p.nakshatra + (p.pada ? " pada " + p.pada : "") : "");
   }).join("\n");
 }
+
+function cozRepairSections(sections) {
+  var SUBHEADS = ["Rahu \u2014 Where Life Pulls You Forward", "Ketu \u2014 What You Already Carry"];
+  Object.keys(sections).forEach(function (id) {
+    var out = [];
+    (sections[id] || []).forEach(function (para) {
+      var t = String(para).trim();
+      if (!t) return;
+      var split = false;
+      for (var i = 0; i < SUBHEADS.length && !split; i++) {
+        var head = SUBHEADS[i];
+        var bare = t.replace(/^##\s*/, "");
+        if (bare.indexOf(head) === 0) {
+          var rest = bare.slice(head.length).replace(/^[\s:.\u2014-]+/, "").trim();
+          out.push("## " + head);
+          if (rest) out.push(rest);
+          split = true;
+        }
+      }
+      if (!split) out.push(t);
+    });
+    var seen = {}, deduped = [];
+    out.forEach(function (p) {
+      var k = p.replace(/\s+/g, " ").trim().slice(0, 60).toLowerCase();
+      if (seen[k]) return;
+      seen[k] = true; deduped.push(p);
+    });
+    sections[id] = deduped;
+  });
+  return sections;
+}
+
 function cozGenUsageLine() {
   var t = window.COZ_VEDIC_GEN_TRACE; if (!t) return "";
   var c = (t.estimatedCostUSD != null) ? "$" + t.estimatedCostUSD.toFixed(4) : "n/a";
@@ -705,6 +739,10 @@ function generateSections3to6(chart, reading12, firstName) {
     ["relationships-karmic","dharma-direction","rahu-ketu","essential-takeaway"].forEach(function (id) {
       if (!Array.isArray(sections[id]) || !sections[id].length) throw new Error("Model output missing section: " + id);
     });
+    /* Repair pass, always applied so a model slip can never reach the page:
+       split a subhead that got joined to its paragraph, and drop any paragraph
+       that duplicates one already in the same section. */
+    sections = cozRepairSections(sections);
     var u = data.usage || {}, inTok = u.input_tokens || 0, outTok = u.output_tokens || 0;
     var PRICE = { input: 3.00, output: 15.00 };   /* USD per million tokens, Sonnet 4.x list price */
     var cost = inTok / 1e6 * PRICE.input + outTok / 1e6 * PRICE.output;

@@ -21,7 +21,7 @@
           "claimId": "APP-S1-GUIDE-SUN-ANIMATING-SELF",
           "purposes": ["guiding-planet-role"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
-          "allowedMeaning": "With the Sun ruling the Ascendant, the chart's guiding emphasis may return repeatedly to the person's animating sense of self: what feels internally vital, central and genuinely their own."
+          "allowedMeaning": "With the Sun ruling the Ascendant, the chart's guiding emphasis may return repeatedly to your animating sense of self: what feels internally vital, central and genuinely their own."
         },
         {
           "claimId": "APP-S1-GUIDE-SUN-COHERENT-DIRECTION",
@@ -33,7 +33,7 @@
           "claimId": "APP-S1-GUIDE-SUN-FIXED-IDENTITY-TENSION",
           "purposes": ["main-tension"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "A strong investment in one established self-definition may create tension when growth requires the person to understand themselves differently."
+          "allowedMeaning": "A strong investment in one established self-definition may create tension when growth requires you to understand themselves differently."
         }
       ],
       "claimConditions": [
@@ -60,13 +60,13 @@
           "claimId": "APP-S1-GUIDE-MOON-MIND-AS-GUIDE",
           "purposes": ["guiding-planet-role"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
-          "allowedMeaning": "With the Moon ruling the Ascendant, the mind and the person's changing internal response may play an especially central role in how direction is recognized."
+          "allowedMeaning": "With the Moon ruling the Ascendant, the mind and your changing internal response may play an especially central role in how direction is recognized."
         },
         {
           "claimId": "APP-S1-GUIDE-MOON-INTERNAL-CONSULTATION",
           "purposes": ["guiding-planet-application"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "Important choices may become clearer when the person notices their internal response without assuming that the first feeling must determine the final direction."
+          "allowedMeaning": "Important choices may become clearer when you notice their internal response without assuming that the first feeling must determine the final direction."
         },
         {
           "claimId": "APP-S1-GUIDE-MOON-REACTION-IDENTITY-TENSION",
@@ -147,7 +147,7 @@
           "claimId": "APP-S1-GUIDE-MERCURY-NAMING-DIRECTION",
           "purposes": ["guiding-planet-application"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "An important choice may become more workable when the person can name it precisely, discuss it or put its meaning into words."
+          "allowedMeaning": "An important choice may become more workable when you can name it precisely, discuss it or put its meaning into words."
         },
         {
           "claimId": "APP-S1-GUIDE-MERCURY-WORDS-TENSION",
@@ -180,13 +180,13 @@
           "claimId": "APP-S1-GUIDE-JUPITER-KNOWLEDGE-HAPPINESS",
           "purposes": ["guiding-planet-role"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
-          "allowedMeaning": "With Jupiter ruling the Ascendant, knowledge and the kind of understanding that contributes to happiness may become recurring guides in the person's direction."
+          "allowedMeaning": "With Jupiter ruling the Ascendant, knowledge and the kind of understanding that contributes to happiness may become recurring guides in your direction."
         },
         {
           "claimId": "APP-S1-GUIDE-JUPITER-LEARNING-DIRECTION",
           "purposes": ["guiding-planet-application"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "A path may feel more coherent when it continues to enlarge understanding rather than asking the person to stop learning in order to preserve certainty."
+          "allowedMeaning": "A path may feel more coherent when it continues to enlarge understanding rather than asking you to stop learning in order to preserve certainty."
         },
         {
           "claimId": "APP-S1-GUIDE-JUPITER-KNOWLEDGE-TENSION",
@@ -219,13 +219,13 @@
           "claimId": "APP-S1-GUIDE-VENUS-LOVE-DESIRE",
           "purposes": ["guiding-planet-role"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_LIMITED",
-          "allowedMeaning": "With Venus ruling the Ascendant, love and desire may become important guides in recognizing what the person is genuinely drawn to sustain or pursue."
+          "allowedMeaning": "With Venus ruling the Ascendant, love and desire may become important guides in recognizing what you i genuinely drawn to sustain or pursue."
         },
         {
           "claimId": "APP-S1-GUIDE-VENUS-CHOICE-ALIGNMENT",
           "purposes": ["guiding-planet-application"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "Direction may feel more personally coherent when a choice acknowledges what matters to the person rather than treating desire as irrelevant information."
+          "allowedMeaning": "Direction may feel more personally coherent when a choice acknowledges what matters to you rather than treating desire as irrelevant information."
         },
         {
           "claimId": "APP-S1-GUIDE-VENUS-DESIRE-TENSION",
@@ -258,13 +258,13 @@
           "claimId": "APP-S1-GUIDE-SATURN-SORROW-AS-REALITY",
           "purposes": ["guiding-planet-role"],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_SEVERELY_LIMITED",
-          "allowedMeaning": "With Saturn ruling the Ascendant, the person's direction may be shaped in part by how they understand and respond to experiences of sorrow or heaviness."
+          "allowedMeaning": "With Saturn ruling the Ascendant, your direction may be shaped in part by how you understand and respond to experiences of sorrow or heaviness."
         },
         {
           "claimId": "APP-S1-GUIDE-SATURN-HONEST-LIMITS",
           "purposes": ["guiding-planet-application"],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
-          "allowedMeaning": "A path may become clearer when difficulty is acknowledged honestly without being treated as the whole meaning of the person's life."
+          "allowedMeaning": "A path may become clearer when difficulty is acknowledged honestly without being treated as the whole meaning of your life."
         },
         {
           "claimId": "APP-S1-GUIDE-SATURN-HEAVINESS-TENSION",

@@ -11,7 +11,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-1","coverageItem":"asc-lord-in-house.1","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-1"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H1-SELF-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the first house, its influence may be worked out directly through your developing sense of self and the way you choose to meet life."},
+        {"claimId":"APP-S1-LORD-H1-SELF-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about your own identity and the way you meet the world, its influence may be worked out directly through your developing sense of self and the way you choose to meet life."},
         {"claimId":"APP-S1-LORD-H1-EMBODIED-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Direction may become clearer when the guiding principle is translated into something you personally practice and embody, rather than something you understand only in theory."},
         {"claimId":"APP-S1-LORD-H1-SELF-CONTAINMENT-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"A strongly self-referential direction may become limiting when every decision is measured only by its immediate effect on your own identity."}
       ],
@@ -21,7 +21,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-2","coverageItem":"asc-lord-in-house.2","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-2"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H2-VALUES-RESOURCES-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the second house, its influence may be worked out through what you value, what you preserve and how you build dependable personal resources."},
+        {"claimId":"APP-S1-LORD-H2-VALUES-RESOURCES-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about what you build, value and provide, its influence may be worked out through what you value, what you preserve and how you build dependable personal resources."},
         {"claimId":"APP-S1-LORD-H2-SPEECH-CONTINUITY","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"The way you speak about your priorities and consistently support them may give your direction greater continuity."},
         {"claimId":"APP-S1-LORD-H2-SECURITY-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Security may become an incomplete guide when preserving what you possess matters more than whether it still reflects what you value."}
       ],
@@ -31,7 +31,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-3","coverageItem":"asc-lord-in-house.3","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-3"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H3-EFFORT-EXPRESSION-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the third house, its influence may be developed through self-directed effort, communication and skills strengthened through use."},
+        {"claimId":"APP-S1-LORD-H3-EFFORT-EXPRESSION-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about learning, communication and your own effort, its influence may be developed through self-directed effort, communication and skills strengthened through use."},
         {"claimId":"APP-S1-LORD-H3-PRACTICE-BUILDS-DIRECTION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Direction may become clearer through repeated practice and through finding a form of expression that allows your own contribution to become more definite."},
         {"claimId":"APP-S1-LORD-H3-SELF-RELIANCE-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Self-directed effort may become isolating when relying on your own initiative leaves too little room for useful support, feedback or collaboration."}
       ],
@@ -41,18 +41,18 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-4","coverageItem":"asc-lord-in-house.4","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-4"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H4-INNER-FOUNDATION-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the fourth house, its influence may be grounded through home, belonging and the private inner foundation from which you meet the outer world."},
+        {"claimId":"APP-S1-LORD-H4-INNER-FOUNDATION-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about home, family and your private foundation, its influence may be grounded through home, belonging and the private inner foundation from which you meet the outer world."},
         {"claimId":"APP-S1-LORD-H4-SUPPORT-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"A dependable place, family, chosen family or another support system may help you turn the guiding principle into something you can sustain."},
         {"claimId":"APP-S1-LORD-H4-INNER-OUTER-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Direction may become difficult when maintaining outer momentum leaves no protected space in which you can settle and recognize what genuinely supports you."}
       ],
       "claimConditions":[{"claimId":"APP-S1-LORD-H4-SUPPORT-APPLICATION","requires":["APP-S1-LORD-H4-INNER-FOUNDATION-ARENA"]},{"claimId":"APP-S1-LORD-H4-INNER-OUTER-TENSION","requires":["APP-S1-LORD-H4-INNER-FOUNDATION-ARENA"]}],
-      "compositionRequirements":["A mother or maternal figure may be named only as one possible contributor to the person's model of support; the chart must not characterize that relationship as easy, difficult, present or absent."],
+      "compositionRequirements":["A mother or maternal figure may be named only as one possible contributor to your model of support; the chart must not characterize that relationship as easy, difficult, present or absent."],
       "prohibitedExtensions":["guaranteed parental happiness, family harmony, property or prosperity","mother or father relationship verdict","ancestry, vehicles, appearance or sexuality","duplication of Section 2 Moon-fourth-house prose when the guiding planet is the Moon"]
     },
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-5","coverageItem":"asc-lord-in-house.5","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-5"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H5-LEARNING-CREATION-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the fifth house, its influence may be developed through learning, discernment and the process of shaping an idea, skill or creation that carries your personal involvement."},
+        {"claimId":"APP-S1-LORD-H5-LEARNING-CREATION-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the part of your life about creativity, learning and personal expression, its influence may be developed through learning, discernment and the process of shaping an idea, skill or creation that carries your personal involvement."},
         {"claimId":"APP-S1-LORD-H5-DEVELOP-WHAT-MATTERS","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Direction may become clearer when you give sustained attention to something meaningful enough to develop rather than merely consume or admire."},
         {"claimId":"APP-S1-LORD-H5-OUTCOME-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Personal creation may lose its guiding value when recognition or a specific outcome becomes more important than the quality of attention being given to it."}
       ],
@@ -62,7 +62,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-6","coverageItem":"asc-lord-in-house.6","status":"EDITORIAL_APPLICATION_DRAFT_CONDITION_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-6"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H6-SERVICE-PROBLEM-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the sixth house, its influence may be worked out through practical service, recurring obligations and problems that require a usable response."},
+        {"claimId":"APP-S1-LORD-H6-SERVICE-PROBLEM-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the part of your life about daily work, health and being useful, its influence may be worked out through practical service, recurring obligations and problems that require a usable response."},
         {"claimId":"APP-S1-LORD-H6-METHOD-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Direction may become clearer when a demanding situation is converted into a method, boundary or routine that can be applied consistently."},
         {"claimId":"APP-S1-LORD-H6-PROBLEM-MODE-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Problem-solving may become a permanent mode of living when difficulty is treated as the only condition under which your guiding strengths are useful."}
       ],
@@ -72,7 +72,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-7","coverageItem":"asc-lord-in-house.7","status":"EDITORIAL_APPLICATION_DRAFT_CONDITION_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-7"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H7-EXCHANGE-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the seventh house, its influence may become especially visible through close one-to-one exchange, negotiation and the agreements you make with others."},
+        {"claimId":"APP-S1-LORD-H7-EXCHANGE-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the part of your life about close relationships and partnership, its influence may become especially visible through close one-to-one exchange, negotiation and the agreements you make with others."},
         {"claimId":"APP-S1-LORD-H7-MUTUAL-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Another person's perspective may help you recognize how your guiding principle functions in practice, particularly where mutual expectations must be made clear."},
         {"claimId":"APP-S1-LORD-H7-OTHER-DEFINITION-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Exchange may weaken direction when another person's response becomes the primary measure of who you should be or what you should choose."}
       ],
@@ -82,7 +82,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-8","coverageItem":"asc-lord-in-house.8","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-8"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H8-CHANGE-VULNERABILITY-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the eighth house, its influence may be worked out through experiences that require privacy, trust, vulnerability or a substantial change in how something is understood."},
+        {"claimId":"APP-S1-LORD-H8-CHANGE-VULNERABILITY-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the part of your life about deep change, trust and what is shared, its influence may be worked out through experiences that require privacy, trust, vulnerability or a substantial change in how something is understood."},
         {"claimId":"APP-S1-LORD-H8-DEPTH-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Direction may become clearer when you can remain with a complex issue long enough to distinguish what must change from what still deserves to be retained."},
         {"claimId":"APP-S1-LORD-H8-CRISIS-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Transformation may become an unnecessary demand when ordinary uncertainty is treated as proof that a complete rupture or reinvention is required."}
       ],
@@ -92,7 +92,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-9","coverageItem":"asc-lord-in-house.9","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-9"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H9-MEANING-PRINCIPLES-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the ninth house, its influence may be developed through learning, guiding principles and the larger framework through which you understand your direction."},
+        {"claimId":"APP-S1-LORD-H9-MEANING-PRINCIPLES-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about meaning, belief and the wider world, its influence may be developed through learning, guiding principles and the larger framework through which you understand your direction."},
         {"claimId":"APP-S1-LORD-H9-WORLDVIEW-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Teachers, study or sustained reflection may help you test whether a path is consistent with the principles you intend to live by."},
         {"claimId":"APP-S1-LORD-H9-CERTAINTY-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"A guiding principle may become restrictive when protecting certainty matters more than allowing experience to refine what you believe."}
       ],
@@ -102,7 +102,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-10","coverageItem":"asc-lord-in-house.10","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-10"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H10-RESPONSIBILITY-WORK-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the tenth house, its influence may be developed through consequential work, visible responsibilities and the actions for which you are prepared to be accountable."},
+        {"claimId":"APP-S1-LORD-H10-RESPONSIBILITY-WORK-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about your work in the world and what you contribute publicly, its influence may be developed through consequential work, visible responsibilities and the actions for which you are prepared to be accountable."},
         {"claimId":"APP-S1-LORD-H10-CONTRIBUTION-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Direction may become clearer when public effort is connected to a contribution you consider meaningful rather than to recognition alone."},
         {"claimId":"APP-S1-LORD-H10-STATUS-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Visible responsibility may narrow identity when achievement, title or public response becomes the only measure of whether your direction has value."}
       ],
@@ -112,7 +112,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-11","coverageItem":"asc-lord-in-house.11","status":"EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-11"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H11-GOALS-NETWORKS-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the eleventh house, its influence may be developed through longer-range goals, networks and forms of contribution that extend beyond the immediate self."},
+        {"claimId":"APP-S1-LORD-H11-GOALS-NETWORKS-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"With your guiding planet in the part of your life about friendship, community and long-term hopes, its influence may be developed through longer-range goals, networks and forms of contribution that extend beyond the immediate self."},
         {"claimId":"APP-S1-LORD-H11-COLLECTIVE-APPLICATION","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"Direction may become clearer when you understand which people, communities or shared aims can practically support what you are trying to build."},
         {"claimId":"APP-S1-LORD-H11-GAIN-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT","allowedMeaning":"A goal may lose personal meaning when measurable gain or acceptance by a wider group becomes more important than the reason the goal mattered."}
       ],
@@ -122,7 +122,7 @@
     {
       "recordId":"APPREC-S1-ASC-LORD-HOUSE-12","coverageItem":"asc-lord-in-house.12","status":"EDITORIAL_APPLICATION_DRAFT_CONDITION_RESTRICTED","developmentEligible":true,"productionEligible":false,"evidenceRecordIds":["IR-S1-ASC-LORD-HOUSE-12"],"sourceIds":["SRC-BPHS-SANTHANAM-ONLINE","SRC-COZ-S1-CORE-SYNTHESIS-MEMO"],
       "applicationClaims":[
-        {"claimId":"APP-S1-LORD-H12-PRIVATE-RELEASE-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the twelfth house, its influence may be worked out privately through retreat, release and periods in which outer demands recede enough for another direction to become visible."},
+        {"claimId":"APP-S1-LORD-H12-PRIVATE-RELEASE-ARENA","purposes":["guiding-planet-house"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"With your guiding planet in the part of your life about quiet, retreat and what is released, its influence may be worked out privately through retreat, release and periods in which outer demands recede enough for another direction to become visible."},
         {"claimId":"APP-S1-LORD-H12-RESTORATIVE-WITHDRAWAL","purposes":["guiding-planet-house-application"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Time away from constant activity may help you recognize what has completed its purpose, what can be released and what still deserves your energy."},
         {"claimId":"APP-S1-LORD-H12-WITHDRAWAL-TENSION","purposes":["main-tension"],"classification":"EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED","allowedMeaning":"Retreat may become avoidance when privacy or release replaces a decision that still requires practical engagement."}
       ],
