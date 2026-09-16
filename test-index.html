@@ -19,7 +19,9 @@ button { padding: 15px 30px; font-size: 18px; margin: 10px 0; display: block; wi
 <button onclick="setTestChart('new')">Load Unknown Chart (Aries rising, Moon Aquarius/Shatabhisha)</button>
 
 <p id="status"></p>
-<a href="vedic-reading_TEST.html?v=11" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading</a>
+<a href="vedic-reading_TEST.html?v=11" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading (Test / rollback)</a>
+<br>
+<a href="vedic-reading_NINA.html?v=1" style="color: #d4a178; font-size: 20px;">→ Open Vedic Reading (Nina-facing)</a>
 
 
 <hr style="margin:30px 0;border:0;border-top:1px solid #d4a178">
@@ -185,7 +187,7 @@ function calcChart() {
           return p.name.padEnd(10) + S[p.signNumber - 1].padEnd(12) + (p.degrees + '\u00B0' + String(p.minutes).padStart(2, '0')).padEnd(7) +
             'H' + p.house + '  ' + p.nakshatra + ' ' + p.pada;
         }).join('\n');
-      st.innerHTML = 'Chart calculated. <a href="vedic-reading_TEST.html?v=11" style="color:#d4a178">\u2192 Open Vedic Reading</a>';
+      st.innerHTML = 'Chart calculated. <a href="vedic-reading_TEST.html?v=11" style="color:#d4a178">\u2192 Open Vedic Reading (Test)</a> &nbsp;|&nbsp; <a href="vedic-reading_NINA.html?v=1" style="color:#d4a178">\u2192 Open Vedic Reading (Nina)</a>';
       document.getElementById('calcFrame').src = 'about:blank';
     } else if (d.coz === 'CHART_ERROR') {
       done = true; window.removeEventListener('message', onMsg);
