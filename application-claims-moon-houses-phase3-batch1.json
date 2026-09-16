@@ -13,26 +13,40 @@
       "developmentEligible": true,
       "productionEligible": false,
       "supersedesForDevelopment": "X-MOON-HOUSE-1",
-      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 1}]},
+      "selector": {
+        "all": [
+          {
+            "factId": "graha:mo",
+            "field": "house",
+            "equals": 1
+          }
+        ]
+      },
       "sourceIds": [],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-1-IMMEDIATE-PRESENCE",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Your changing emotional state may be closely connected with how they meet life and how others initially experience their presence."
+          "allowedMeaning": "Your changing emotional state may be closely connected with how you meet life and how others initially experience your presence."
         },
         {
           "claimId": "APP-MOON-1-SELF-AWARENESS",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Understanding personal reactions and emotional rhythms may be an important part of developing a stable sense of self."
         },
         {
           "claimId": "APP-MOON-1-RESPONSIVE-IDENTITY",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "You may sometimes need to distinguish a temporary feeling from a lasting truth about who they are."
+          "allowedMeaning": "You may sometimes need to distinguish a temporary feeling from a lasting truth about who you are."
         }
       ],
       "compositionRequirements": [
@@ -53,30 +67,46 @@
       "developmentEligible": true,
       "productionEligible": false,
       "supersedesForDevelopment": "X-MOON-HOUSE-2",
-      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 2}]},
+      "selector": {
+        "all": [
+          {
+            "factId": "graha:mo",
+            "field": "house",
+            "equals": 2
+          }
+        ]
+      },
       "sourceIds": [],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-2-SECURITY",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Emotional steadiness may be connected with a dependable sense of support, resources and continuity."
         },
         {
           "claimId": "APP-MOON-2-VOICE",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Tone of voice and the way feelings are spoken may carry particular emotional significance."
         },
         {
           "claimId": "APP-MOON-2-FAMILY-VALUES",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Family or inherited values may help shape what you associates with safety and belonging, without determining the actual family history."
         },
         {
           "claimId": "APP-MOON-2-INNER-VALUE",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve building security without allowing temporary material uncertainty to define personal worth."
         }
@@ -95,29 +125,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_MIXED_EVIDENCE",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-5-REFLECTIVE-CAPACITY",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "The mind may have a strong reflective or interpretive capacity when engaging with something personally meaningful."
         },
         {
           "claimId": "APP-MOON-5-CREATIVE-INVESTMENT",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Creative expression may become emotionally important because it gives inner experience a form that can be developed and shared."
         },
         {
           "claimId": "APP-MOON-5-JOY-AND-PLAY",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Play, personal interests or experiences of heartfelt enjoyment may help restore emotional vitality."
         },
         {
           "claimId": "APP-MOON-5-GUIDING-OTHERS",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Caring for, teaching or encouraging younger people or creative work may carry emotional meaning, without predicting parenthood."
         }
@@ -136,29 +177,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_RESTRICTED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-6-STRAIN-REACTIVITY",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "Irritation may arise more quickly when responsibilities, conflict or ongoing demands create emotional strain."
         },
         {
           "claimId": "APP-MOON-6-DAILY-RHYTHM",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Daily routines and the conditions surrounding regular work may have a noticeable effect on emotional steadiness."
         },
         {
           "claimId": "APP-MOON-6-USEFUL-CONTRIBUTION",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "A sense of making a useful contribution may support your state of mind when it does not require ignoring personal limits."
         },
         {
           "claimId": "APP-MOON-6-SUSTAINABLE-PRACTICE",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve creating sustainable routines and responding to pressure before frustration accumulates."
         }
@@ -180,29 +232,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-7-RELATIONAL-INTENSITY",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "Close relationships may be experienced with strong emotional intensity rather than emotional neutrality."
         },
         {
           "claimId": "APP-MOON-7-RELATIONAL-AWARENESS",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Your state of mind may be affected by the quality of exchange within important one-to-one relationships."
         },
         {
           "claimId": "APP-MOON-7-SELF-OTHER-BALANCE",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "You may sometimes need to separate their own emotional needs from the feelings or responses of someone close to them."
+          "allowedMeaning": "You may sometimes need to separate your own emotional needs from the feelings or responses of someone close to them."
         },
         {
           "claimId": "APP-MOON-7-DIRECT-DIALOGUE",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve naming personal needs directly while leaving room for mutual response and negotiation."
         }
@@ -222,31 +285,53 @@
       "developmentEligible": false,
       "productionEligible": false,
       "supersedesForDevelopment": "X-MOON-HOUSE-8",
-      "adoptionGate": {"blockedDate": "2026-09-11", "blockedBy": "pipeline/validate-adoption-provenance.mjs", "blockingEvidenceRecordId": "IR-S2-RQ03-MOON-EIGHTH-PSYCHOLOGY-GAP", "reason": "coverageItem graha-in-house.mo.8 matches an interpretive-records.json evidence record (IR-S2-RQ03-MOON-EIGHTH-PSYCHOLOGY-GAP) carrying conflictingDoctrine.methodologyRulingRequired=true and conflictingDoctrine.ruling=null. This application-claims record does not share that evidence record's recordId and no explicit adoption ruling authorizes its depth/hidden-perception/guarded-access content. Historical ruling: adoption-decision-s2.md row 3.", "unblockRequires": "An explicit, recorded practitioner/Jason ruling on adoption-decision-s2.md row 3 (or IR-S2-RQ03's conflictingDoctrine.ruling being set to a non-null resolution), after which developmentEligible may be restored."},
-      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 8}]},
+      "adoptionGate": {
+        "blockedDate": "2026-09-11",
+        "blockedBy": "pipeline/validate-adoption-provenance.mjs",
+        "blockingEvidenceRecordId": "IR-S2-RQ03-MOON-EIGHTH-PSYCHOLOGY-GAP",
+        "reason": "coverageItem graha-in-house.mo.8 matches an interpretive-records.json evidence record (IR-S2-RQ03-MOON-EIGHTH-PSYCHOLOGY-GAP) carrying conflictingDoctrine.methodologyRulingRequired=true and conflictingDoctrine.ruling=null. This application-claims record does not share that evidence record's recordId and no explicit adoption ruling authorizes its depth/hidden-perception/guarded-access content. Historical ruling: adoption-decision-s2.md row 3.",
+        "unblockRequires": "An explicit, recorded practitioner/Jason ruling on adoption-decision-s2.md row 3 (or IR-S2-RQ03's conflictingDoctrine.ruling being set to a non-null resolution), after which developmentEligible may be restored."
+      },
+      "selector": {
+        "all": [
+          {
+            "factId": "graha:mo",
+            "field": "house",
+            "equals": 8
+          }
+        ]
+      },
       "sourceIds": [],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-8-PRIVATE-PROCESSING",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Some emotional experiences may require privacy and time before you are ready to explain them."
         },
         {
           "claimId": "APP-MOON-8-TRUST-AND-SHARING",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Trust may influence how readily you shares emotionally significant or vulnerable material."
+          "allowedMeaning": "Trust may influence how readily you share emotionally significant or vulnerable material."
         },
         {
           "claimId": "APP-MOON-8-CHANGE-PROCESSING",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Periods of major change may prompt deep emotional processing around what can be retained and what must be allowed to change."
         },
         {
           "claimId": "APP-MOON-8-DEPTH-WITHOUT-FIXATION",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve honoring emotional depth without allowing uncertainty or past pain to become the only lens through which the present is understood."
         }
@@ -267,30 +352,46 @@
       "developmentEligible": true,
       "productionEligible": false,
       "supersedesForDevelopment": "X-MOON-HOUSE-9",
-      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 9}]},
+      "selector": {
+        "all": [
+          {
+            "factId": "graha:mo",
+            "field": "house",
+            "equals": 9
+          }
+        ]
+      },
       "sourceIds": [],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-9-MEANING",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Emotional steadiness may be supported by a sense that life has meaning, direction or a larger context."
         },
         {
           "claimId": "APP-MOON-9-BELIEF-REFLECTION",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Beliefs, ethics or spiritual questions may be processed personally and emotionally rather than remaining purely abstract ideas."
         },
         {
           "claimId": "APP-MOON-9-LEARNING-PERSPECTIVE",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
-          "allowedMeaning": "Study, teachers, travel or exposure to unfamiliar perspectives may help you reconsider what they feel and believe."
+          "allowedMeaning": "Study, teachers, travel or exposure to unfamiliar perspectives may help you reconsider what you feel and believe."
         },
         {
           "claimId": "APP-MOON-9-LIVED-TRUTH",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve allowing beliefs to mature through experience instead of demanding one permanent answer to every question."
         }
@@ -309,29 +410,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-10-PUBLIC-ACTION",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "The mind may be strongly engaged by undertaking visible responsibilities and bringing important efforts toward completion."
         },
         {
           "claimId": "APP-MOON-10-ACCOMPLISHMENT",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "Progress in meaningful work may contribute to emotional satisfaction, without guaranteeing recognition or success."
         },
         {
           "claimId": "APP-MOON-10-PUBLIC-RESPONSE",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "You may need to distinguish genuine purpose from the changing approval or expectations of the public environment."
         },
         {
           "claimId": "APP-MOON-10-INTERNAL-MEASURE",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve defining accomplishment through meaningful contribution as well as external results."
         }
@@ -351,30 +463,46 @@
       "developmentEligible": true,
       "productionEligible": false,
       "supersedesForDevelopment": "X-MOON-HOUSE-11",
-      "selector": {"all": [{"factId": "graha:mo", "field": "house", "equals": 11}]},
+      "selector": {
+        "all": [
+          {
+            "factId": "graha:mo",
+            "field": "house",
+            "equals": 11
+          }
+        ]
+      },
       "sourceIds": [],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-11-BELONGING",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Friendships, groups or communities may contribute to your sense of emotional belonging."
         },
         {
           "claimId": "APP-MOON-11-SHARED-AIMS",
-          "purposes": ["moon-through-house"],
+          "purposes": [
+            "moon-through-house"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Working toward an aspiration with other people may help you feel connected to something beyond immediate personal concerns."
         },
         {
           "claimId": "APP-MOON-11-CHANGING-CIRCLES",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Because social needs and aspirations can change, you may periodically reassess which communities still feel emotionally aligned."
         },
         {
           "claimId": "APP-MOON-11-AUTHENTIC-CONNECTION",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "EDITORIAL_DRAFT_PENDING_EVIDENCE",
           "allowedMeaning": "Development may involve choosing friendships and collective goals that support genuine connection rather than belonging at any cost."
         }

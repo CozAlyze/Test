@@ -12,29 +12,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_MIXED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-ARIES-QUICK-RESPONSE",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Emotional responses may arise quickly and directly rather than developing slowly out of view."
         },
         {
           "claimId": "APP-MOON-ARIES-RELENTING",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Even when a reaction is immediate, you may be able to soften, relent or move forward rather than remain fixed indefinitely."
         },
         {
           "claimId": "APP-MOON-ARIES-COURAGEOUS-ENGAGEMENT",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "You may meet emotionally demanding situations with courage and a willingness to act."
         },
         {
           "claimId": "APP-MOON-ARIES-MOVEMENT-TENSION",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "A need for movement or change may sometimes compete with the patience required to remain with one feeling or situation."
         }
@@ -56,29 +67,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-TAURUS-STEADINESS",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "The emotional temperament may favor steadiness and continuity over rapid or unnecessary change."
         },
         {
           "claimId": "APP-MOON-TAURUS-ENDURANCE",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "You may have the capacity to remain emotionally present with something important over time."
         },
         {
           "claimId": "APP-MOON-TAURUS-FORGIVENESS",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Forgiveness and generosity may help you restore emotional balance after disappointment."
         },
         {
           "claimId": "APP-MOON-TAURUS-STEADFAST-FRIENDSHIP",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Friendship may be approached with loyalty and a desire to remain dependable."
         }
@@ -97,23 +119,32 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-GEMINI-MENTAL-AGILITY",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "The mind may respond with agility, wit and an ability to see more than one way of expressing an idea."
         },
         {
           "claimId": "APP-MOON-GEMINI-PERSUASIVE-SPEECH",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "Speech may be engaging or persuasive, especially when you have had time to understand what they want to communicate."
+          "allowedMeaning": "Speech may be engaging or persuasive, especially when you have had time to understand what the other person wants to communicate."
         },
         {
           "claimId": "APP-MOON-GEMINI-LEARNED-ARTS",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Music, dance, language or another learned art may provide the mind with meaningful stimulation."
         }
@@ -132,29 +163,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-CANCER-GENTLE-RESPONSE",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "You may respond especially well to communication that is gentle, considerate and emotionally respectful."
         },
         {
           "claimId": "APP-MOON-CANCER-FRIENDSHIP",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Trusted friendships may contribute meaningfully to emotional ease."
         },
         {
           "claimId": "APP-MOON-CANCER-RESTORATIVE-SETTING",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "A comfortable home or restorative surroundings, particularly settings connected with nature or water, may help the mind settle."
         },
         {
           "claimId": "APP-MOON-CANCER-FLUCTUATION",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "The emotional state may move and fluctuate, making it important not to treat every passing mood as a permanent conclusion."
         }
@@ -173,31 +215,42 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_SYNTHESIS_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-LIBRA-COMPARISON",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
           "allowedMeaning": "The mind may understand a feeling by comparing perspectives and considering how different parts of a situation relate to one another."
         },
         {
           "claimId": "APP-MOON-LIBRA-FAIRNESS",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "AI_SYNTHESIS_FROM_SOURCES",
           "allowedMeaning": "Fairness and balanced exchange may influence whether a situation feels emotionally settled."
         },
         {
           "claimId": "APP-MOON-LIBRA-LEARNING",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Learning and thoughtful consideration may give the mind a constructive way to reach clarity."
         },
         {
           "claimId": "APP-MOON-LIBRA-INDECISION-TENSION",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT",
-          "allowedMeaning": "Considering several sides may support fairness, but it may also delay a decision when you continues weighing after the essential truth is already clear."
+          "allowedMeaning": "Considering several sides may support fairness, but it may also delay a decision when you continue weighing after the essential truth is already clear."
         }
       ],
       "compositionRequirements": [
@@ -217,19 +270,26 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-SCORPIO-PRIVACY",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
-          "allowedMeaning": "You may keep some feelings private until they decide that disclosure is appropriate."
+          "allowedMeaning": "You may keep some feelings private until you decide that disclosure is appropriate."
         },
         {
           "claimId": "APP-MOON-SCORPIO-SELECTIVE-DISCLOSURE",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "EDITORIAL_SYNTHESIS_DRAFT_RESTRICTED",
-          "allowedMeaning": "Emotional expression may be selective rather than immediate, particularly when you are still deciding what they wish to reveal."
+          "allowedMeaning": "Emotional expression may be selective rather than immediate, particularly when you are still deciding what you wish to reveal."
         }
       ],
       "compositionRequirements": [
@@ -249,29 +309,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_MIXED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-CAPRICORN-CLOSE-CARE",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Care for close family or trusted people may carry substantial emotional importance."
         },
         {
           "claimId": "APP-MOON-CAPRICORN-COUNSEL",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
-          "allowedMeaning": "You may be receptive to thoughtful counsel when it comes from someone whose judgment they respect."
+          "allowedMeaning": "You may be receptive to thoughtful counsel when it comes from someone whose judgment you respect."
         },
         {
           "claimId": "APP-MOON-CAPRICORN-MEMORY-AND-WORDS",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Memory, language or literary interests may give the mind a durable way to organize experience."
         },
         {
           "claimId": "APP-MOON-CAPRICORN-ENERGY-CONTRAST",
-          "purposes": ["main-tension"],
+          "purposes": [
+            "main-tension"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "Periods of strength and active engagement may alternate with times when motivation is slower to gather."
         }
@@ -293,29 +364,40 @@
       "status": "EDITORIAL_APPLICATION_DRAFT",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-SAGITTARIUS-GENEROSITY",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Generosity may be a natural way of expressing emotional goodwill."
         },
         {
           "claimId": "APP-MOON-SAGITTARIUS-MATURE-EXPRESSION",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "You may communicate with wit and increasing maturity when speaking about matters that carry meaning."
         },
         {
           "claimId": "APP-MOON-SAGITTARIUS-ENERGETIC-ACTION",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Once emotionally engaged, you may bring considerable energy to action."
         },
         {
           "claimId": "APP-MOON-SAGITTARIUS-PERSUASION-NOT-FORCE",
-          "purposes": ["practical-takeaway"],
+          "purposes": [
+            "practical-takeaway"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "You may respond more openly to reasoned persuasion than to pressure or force."
         }
@@ -334,23 +416,32 @@
       "status": "EDITORIAL_APPLICATION_DRAFT_SEVERELY_LIMITED",
       "developmentEligible": true,
       "productionEligible": false,
-      "sourceIds": ["SRC-BRIHAT-JATAKA-VIJNANANDA-1912", "SRC-COZ-BATCH2-GAP-MEMO"],
+      "sourceIds": [
+        "SRC-BRIHAT-JATAKA-VIJNANANDA-1912",
+        "SRC-COZ-BATCH2-GAP-MEMO"
+      ],
       "applicationClaims": [
         {
           "claimId": "APP-MOON-PISCES-LEARNING",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Learning may provide the mind with a meaningful source of engagement and satisfaction."
         },
         {
           "claimId": "APP-MOON-PISCES-HOME-ATTACHMENT",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION_RESTRICTED",
           "allowedMeaning": "You may become emotionally attached to the home, possessions or surroundings that carry familiarity and personal meaning."
         },
         {
           "claimId": "APP-MOON-PISCES-AESTHETIC-COMFORT",
-          "purposes": ["moon-sign-expression"],
+          "purposes": [
+            "moon-sign-expression"
+          ],
           "classification": "SOURCE_PRINCIPLE_APPLICATION",
           "allowedMeaning": "Adornment or visually pleasing surroundings may contribute to emotional comfort."
         }
