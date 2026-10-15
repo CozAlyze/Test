@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saved Comparison · CozAlyze</title>
+<!--
+  COZALYZE · SAVED COMPARE DOCUMENT · SCD1.3 (Oct 6 2026, P1 r2 + closing footer kept whole in print, local build for review)
+  SCD1.2: the two charts print from copies of their rendered content (no fixed frame height, so no blank
+  pages and no cut-off at any print width), capitalized Ascendant signs, chart titles
+  printed in the document ink, birth line as "August 20, 1977 · 9:30 PM".
+  One renderer for the saved comparison (the Compare Saved Library), same format as the Vedic and
+  Tropical saved libraries (saved-document.css, expandable sections, Expand All, Print / Save PDF):
+    saved-compare-document.html?view=charts&id=<compare record>       Your Birth Charts (landing)
+    saved-compare-document.html?view=combined&id=<compare record>     Your Combined Reading
+    saved-compare-document.html?view=ascendants&id=<compare record>   Your Ascendants
+    saved-compare-document.html?view=timing&id=<compare record>       Your Current Timing (As of ...)
+  Data: ONLY the selected Compare record (saved-compare-library.js load(), run ID + fingerprint
+  checked). Birth charts use the existing renderers (vedic-birth-chart.html / tropical-birth-chart.html
+  ?saved=1&id=<this record>&in=compare, read-only). No animation, no model request, no recalculation:
+  Current Timing is the snapshot taken when the comparison was saved. Loads no Vedic or Tropical
+  library module itself.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Demo/saved-document.css?v=1">
+<style>
+/* SCD1.0: framed birth charts, and the chaining links (gold, like the chart pages' Saved Readings) */
+.doc-frame{display:block; width:100%; border:0; min-height:30rem; background:transparent; margin-top:.6rem}
+.doc-links p{margin:0 0 .5rem}
+.doc-links a{color:var(--coz-gold); text-decoration:none}
+.doc-links .here{color:var(--coz-ink-soft)}
+.doc-charts > .doc-section{width:min(100%,56rem); margin:1rem auto 0}
+.doc-frame-print{display:none}
+@media print{ .doc-links{display:none} .doc-frame{min-height:0}
+  .doc-frame-print{display:block} .doc-frame.has-print-copy{display:none !important}
+  .doc-charts > .doc-section{break-inside:auto}   /* a chart is always taller than a page: avoid only produced an empty page in Chrome */
+  .doc-footer{break-inside:avoid; page-break-inside:avoid}   /* SCD1.3: the closing footer prints whole, never split across pages */
+  .doc-charts > .doc-section summary h2{color:#000} }   /* SCD1.2: print the chart copy, not its frame; titles in the printed document ink */
+</style>
+<script src="coz-saved.js?v=20"></script>
+<script src="saved-compare-library.js?v=1"></script>
+</head>
+<body>
+<div class="doc-shell">
+  <div class="doc-toolbar">
+    <a class="doc-button" id="backBtn" href="saved-charts.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Saved Charts
+    </a>
+    <div class="doc-actions">
+    <button type="button" class="doc-button" id="expandBtn">Expand All</button>
+    <button type="button" class="doc-button" id="printBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z"/></svg>
+      Print / Save PDF
+    </button>
+    </div>
+  </div>
+  <div id="mount"></div>
+  <p class="doc-savednote" id="savedNote"></p>
+</div>
+<script>
+"use strict";
+(function(){
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DISCLOSURE = "This AI-generated astrological content is provided for reflection and entertainment only. It is not scientific, medical, legal, financial, or professional advice.";
+  var VIEWS = [["charts","Your Birth Charts"],["combined","Your Combined Reading"],["ascendants","Your Ascendants"],["timing","Your Current Timing"]];
+  var TITLES = {}; VIEWS.forEach(function(v){ TITLES[v[0]] = v[1]; });
+  /* the fixed section previews, exactly as combined-reading.html shows them */
+  var COMBINED = [
+    ["sharedThemes","I","Shared Themes","The patterns that repeat across both charts\u2014showing where your outward expression and inner blueprint reinforce similar qualities, needs, and recurring life themes."],
+    ["differentEmphases","II","Different Emphases","Where the two systems place their attention differently\u2014revealing distinct perspectives on your personality, relationships, and direction, and how those perspectives may complement one another."],
+    ["integratedView","III","Your Integrated View","A unified interpretation that brings both perspectives together\u2014showing how your outward expression and inner blueprint may operate as parts of one more complete picture."]
+  ];
+  var ASC = [["tropical","Tropical Ascendant"],["vedic","Vedic Ascendant"],["combined","How They Work Together"]];
+  var MISSING = {
+    missing: "This part wasn't saved with this comparison.",
+    unverified: "This part couldn't be matched to this comparison, so it isn't shown.",
+    failed: "Current Timing couldn't be captured when this comparison was saved."
+  };
+
+  function el(tag,cls,text){ var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function paras(host, list){ (list || []).forEach(function(t){ t = t == null ? "" : String(t); if (!t.trim()) return; host.appendChild(t.indexOf("## ") === 0 ? el("h3",null,t.slice(3)) : el("p",null,t)); }); return host; }
+  function longDate(iso){ if (!iso) return ""; var d = new Date(iso); if (isNaN(d)) return String(iso); return MONTHS[d.getUTCMonth()] + " " + d.getUTCDate() + ", " + d.getUTCFullYear(); }
+  function section(number, title, open){
+    var d = el("details","doc-section"); if (open) d.open = true;
+    var sm = el("summary"); var h2 = el("h2");
+    if (number != null){ h2.appendChild(el("span","num",number + ".")); }
+    h2.appendChild(document.createTextNode(title));
+    sm.appendChild(h2); sm.appendChild(el("span","chev","\u203A")); d.appendChild(sm);
+    return d;
+  }
+  function note(text){ return el("p","doc-when",text); }
+  function empty(msg, heading){
+    var c = el("div","doc-empty");
+    c.appendChild(el("h2",null,heading || "This saved comparison could not be opened"));
+    var p = el("p",null,msg + " "); var a = el("a",null,"Open Saved Charts"); a.href = "saved-charts.html"; p.appendChild(a); c.appendChild(p);
+    return c;
+  }
+  function cozPrint(){
+    var framed = false; try { framed = window.top !== window; } catch (e) { framed = true; }
+    if (framed) { var u = new URL(location.href); u.searchParams.set("print", "1"); window.open(u.href, "_blank"); return; }
+    window.print();
+  }
+  function cozAutoPrint(){
+    if (!/[?&]print=1\b/.test(location.search)) return;
+    var go = function(){ setTimeout(function(){ window.print(); }, view === "charts" ? 1500 : 250); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+
+  var qp = new URLSearchParams(location.search);
+  var view = TITLES[qp.get("view")] ? qp.get("view") : "charts";
+  var mount = document.getElementById("mount");
+  document.getElementById("printBtn").addEventListener("click", cozPrint);
+  document.getElementById("expandBtn").addEventListener("click", function(){
+    var all = document.querySelectorAll("details.doc-section"), open = Array.prototype.every.call(all, function(d){ return d.open; });
+    all.forEach(function(d){ d.open = !open; });
+    this.textContent = open ? "Expand All" : "Collapse All";
+  });
+  window.addEventListener("beforeprint", function(){ document.querySelectorAll("details.doc-section").forEach(function(d){ d.dataset.wasOpen = d.open ? "1" : "0"; d.open = true; }); });
+  window.addEventListener("afterprint", function(){ document.querySelectorAll("details.doc-section").forEach(function(d){ if (d.dataset.wasOpen === "0") d.open = false; }); });
+
+  var S = window.CozSavedCompare ? window.CozSavedCompare.load() : null;
+  if (!S){ mount.appendChild(empty("It may have been removed from this device.")); return; }
+  document.title = TITLES[view] + " \u00B7 CozAlyze";
+
+  /* P1 (Oct 6 2026): birth details shown as "August 20, 1977 · 9:30 PM" (Jason's ruling). Display only;
+     stored values are unchanged, and anything not in the stored form is shown as it is. */
+  var P1_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  function p1Date(s){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || "")); return m && +m[2] >= 1 && +m[2] <= 12 ? P1_MONTHS[+m[2] - 1] + " " + (+m[3]) + ", " + m[1] : s; }
+  function p1Time(s){ return String(s || "").replace(/^0(\d:\d\d)/, "$1"); }
+  function header(host){
+    host.appendChild(el("p","doc-kicker", TITLES[view]));
+    host.appendChild(el("h1",null, S.name || "Your Comparison"));
+    var b = S.birth || {}, bits = [p1Date(b.date), p1Time(b.time), b.location].filter(Boolean);   /* SCD1.1 */
+    host.appendChild(el("p","doc-birthline", (bits.length ? bits.join("  \u2022  ") + "  \u2022  " : "") + "Tropical + Vedic"));
+  }
+  function links(host){
+    var box = el("div","doc-links");
+    box.appendChild(el("p","doc-label","Your Saved Comparison"));
+    VIEWS.forEach(function(v){
+      var p = el("p");
+      if (v[0] === view) p.appendChild(el("span","here",v[1]));
+      else { var a = el("a",null,v[1] + " \u203A"); a.href = "saved-compare-document.html?view=" + v[0] + "&id=" + encodeURIComponent(S.id); p.appendChild(a); }
+      box.appendChild(p);
+    });
+    host.appendChild(box);
+  }
+  function footer(host){
+    var foot = el("footer","doc-footer");
+    foot.appendChild(el("p",null,DISCLOSURE));
+    if (S.documentId) foot.appendChild(el("p",null,"Generated by CozAlyze \u00B7 " + S.documentId));
+    host.appendChild(foot);
+  }
+  function paper(){ var p = el("article","doc-paper"), i = el("div","doc-inner"); p.appendChild(i); mount.appendChild(p); return i; }
+
+  /* SCD1.2 print: the iPhone prints at its own layout width (about 571 px on Letter, not the 688 px a desktop
+     uses), so no frame height chosen before printing can fit every device. Instead, just before printing, each
+     open chart's rendered content is copied out of its frame into the document (inside a shadow root, styled by
+     the chart page's own stylesheets), and the frame itself is hidden for print. The copy flows at whatever
+     width the printer lays out, so it can neither be cut off nor leave blank space. Screen view is unchanged. */
+  var SCOPE_HTML = /(^|[\s,>+~(])html(?=$|[\s.#:\[,>+~)])/g, SCOPE_BODY = /(^|[\s,>+~(])body(?=$|[\s.#:\[,>+~)])/g;
+  function scopeSelector(sel){
+    return sel.split(",").map(function(part){
+      return part.replace(/:root\b/g, ":host").replace(SCOPE_HTML, "$1:host").replace(SCOPE_BODY, "$1.coz-body");
+    }).join(",");
+  }
+  function scopedCss(rules){
+    var out = [];
+    Array.prototype.forEach.call(rules || [], function(r){
+      if (r.type === 1) out.push(scopeSelector(r.selectorText) + "{" + r.style.cssText + "}");                       /* style rule */
+      else if (r.type === 4) out.push("@media " + r.media.mediaText + "{" + scopedCss(r.cssRules) + "}");              /* media rule */
+      else if (r.type === 12) out.push("@supports " + r.conditionText + "{" + scopedCss(r.cssRules) + "}");             /* supports */
+      else if (r.type !== 6) out.push(r.cssText);                                                                     /* not @page */
+    });
+    return out.join("\n");
+  }
+  function printCopy(fr){
+    var doc = fr.contentDocument; if (!doc || !doc.body) return null;
+    var host = el("div","doc-frame-print"), root = host.attachShadow({ mode: "open" });
+    var css = [];
+    Array.prototype.forEach.call(doc.styleSheets, function(ss){ var rules; try { rules = ss.cssRules; } catch (e) { return; } css.push(scopedCss(rules)); });
+    var st = document.createElement("style"); st.textContent = ":host{display:block}\n" + css.join("\n"); root.appendChild(st);
+    var bodyCopy = document.createElement("div"); bodyCopy.className = "coz-body " + doc.body.className;
+    var htmlCls = doc.documentElement.className; if (htmlCls) host.className += " " + htmlCls;
+    Array.prototype.forEach.call(doc.body.childNodes, function(n){ if (n.nodeName !== "SCRIPT") bodyCopy.appendChild(n.cloneNode(true)); });
+    root.appendChild(bodyCopy);
+    return host;
+  }
+  if (view === "charts"){
+    var top = paper(); header(top);
+    var wrap = el("div","doc-charts"); mount.appendChild(wrap);
+    [["tropical","Tropical Birth Chart","tropical-birth-chart.html"],["vedic","Vedic Birth Chart","vedic-birth-chart.html"]].forEach(function(c, i){
+      var d = section(null, c[1], i === 0); wrap.appendChild(d);
+      if (S.charts[c[0]].state !== "ok"){ d.appendChild(note(MISSING[S.charts[c[0]].state] || MISSING.missing)); return; }
+      var fr = el("iframe","doc-frame"); fr.title = c[1]; fr.setAttribute("scrolling","no");
+      fr.src = c[2] + "?saved=1&id=" + encodeURIComponent(S.id) + "&in=compare";
+      d.appendChild(fr);
+      function size(){ if (fr.classList.contains("has-print-copy")) return; try {   /* SCD1.2: no screen re-sizing while the copy prints */ var b = fr.contentDocument && fr.contentDocument.body; if (b && b.scrollHeight) fr.style.height = Math.ceil(b.scrollHeight) + "px"; } catch (e) {} }
+      fr.addEventListener("load", function(){
+        size();
+        try { var ro = new ResizeObserver(size); ro.observe(fr.contentDocument.body); } catch (e) {}
+        try { fr.contentDocument.addEventListener("click", function(){ setTimeout(size, 60); setTimeout(size, 300); }, true); } catch (e) {}
+      });
+      d.addEventListener("toggle", function(){ if (d.open) { size(); setTimeout(size, 120); } });
+      /* SCD1.2: before printing, an open chart prints from a copy of its rendered content (see printCopy) */
+      var copy = null;
+      window.addEventListener("beforeprint", function(){
+        try {
+          if (copy) { copy.remove(); copy = null; } fr.classList.remove("has-print-copy");
+          if (!d.open) return;
+          copy = printCopy(fr);
+          if (copy) { fr.parentNode.insertBefore(copy, fr.nextSibling); fr.classList.add("has-print-copy"); }
+        } catch (e) { if (copy) { copy.remove(); copy = null; } fr.classList.remove("has-print-copy"); }    /* on any error the frame prints as before */
+      });
+      window.addEventListener("afterprint", function(){ if (copy) { copy.remove(); copy = null; } fr.classList.remove("has-print-copy"); size(); });
+    });
+    var bottom = paper(); links(bottom); footer(bottom);
+  }
+  else if (view === "combined"){
+    var inner = paper(); header(inner);
+    if (S.combined.state !== "ok") inner.appendChild(note(MISSING[S.combined.state]));
+    else COMBINED.forEach(function(c, i){
+      var d = section(c[1], c[2], i === 0), body = el("div","doc-copy");
+      body.appendChild(el("p","doc-when",c[3]));
+      paras(body, S.combined.data[c[0]]);
+      d.appendChild(body); inner.appendChild(d);
+    });
+    inner.appendChild(note("These themes describe possible patterns\u2014not fixed outcomes."));
+    links(inner); footer(inner);
+  }
+  else if (view === "ascendants"){
+    var inner2 = paper(); header(inner2);
+    ASC.forEach(function(a, i){
+      var r = S.ascendants[a[0]], d = section(null, a[1], i === 0), body = el("div","doc-copy");
+      if (r.state !== "ok") body.appendChild(note(MISSING[r.state]));
+      else {
+        if (r.sign) body.appendChild(el("p","doc-big", r.sign.split("+").map(function(x){ return x.charAt(0).toUpperCase() + x.slice(1); }).join(" + ")));   /* SCD1.1 */
+        if (r.data.preview) body.appendChild(el("p","doc-when", r.data.preview));
+        paras(body, r.data.paragraphs);
+      }
+      d.appendChild(body); inner2.appendChild(d);
+    });
+    links(inner2); footer(inner2);
+  }
+  else if (view === "timing"){
+    var inner3 = paper(); header(inner3);
+    if (S.timing.state !== "ok"){
+      inner3.appendChild(note(MISSING[S.timing.state]));
+      if (S.timing.state === "failed" && S.timing.reason && /[?&]debug=1\b/.test(location.search)) inner3.appendChild(note("Reason: " + S.timing.reason));
+    } else {
+      var T = S.timing.data, asOf = new Date(T.asOf);
+      inner3.appendChild(el("p","doc-label","As of " + asOf.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}) + ", " + asOf.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})));
+      if (T.tag && T.tag.length) inner3.appendChild(el("p","doc-when", T.tag.join("  \u2022  ")));
+      (T.sections || []).forEach(function(s, i){
+        var d = section(null, s.title, i === 0), body = el("div","doc-copy");
+        if (s.subtitle) body.appendChild(el("p","doc-when", s.subtitle));
+        paras(body, s.paras); d.appendChild(body); inner3.appendChild(d);
+      });
+      var m = section(null, "How This Was Calculated", false), mb = el("div","doc-copy");
+      (T.methodology || []).forEach(function(g){
+        mb.appendChild(el("h3",null,g.heading));
+        (g.rows || []).forEach(function(r){
+          var p = el("p"); p.appendChild(el("strong",null,r[0] + ". "));
+          String(r[1]).split("\n").forEach(function(line, k){ if (k) p.appendChild(el("br")); p.appendChild(document.createTextNode(line)); });
+          mb.appendChild(p);
+        });
+      });
+      mb.appendChild(el("p",null,"This is a saved snapshot. It shows the timing as of the date above and does not update."));
+      m.appendChild(mb); inner3.appendChild(m);
+      inner3.appendChild(note("These are themes that may be present, not predictions of what will happen."));
+    }
+    links(inner3); footer(inner3);
+  }
+
+  var savedAt = S.rec.updatedAt || S.rec.savedAt;
+  document.getElementById("savedNote").textContent = "These are your saved results. No animation. No rewrite." + (savedAt ? " \u00B7 Saved " + longDate(savedAt) : "");
+  cozAutoPrint();
+})();
+</script>
+</body>
+</html>

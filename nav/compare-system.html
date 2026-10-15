@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Reading · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Montserrat:wght@300;400;500&family=EB+Garamond:ital@1&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/Demo/compare-timing-reading-top.jpg?v=1">
+<style>
+/* COZALYZE · COMPARE · ONE SYSTEM, CHART FIRST · CSY1.6 (Oct 2 2026, local build for review)
+   CSY1.6 (Jason's visual call): with no complete saved reading the whole tab row is hidden, not just
+   READING; the page title says where the customer is. Title wrapping unchanged (his call: keep).
+   CSY1.5:
+   CSY1.5 (Chat Option A, approved for preview): Compare includes the birth charts, not a six-section
+   reading, so the page is titled Your Vedic / Tropical Birth Chart and opens on BIRTH CHART.
+   The READING tab exists only when CSL1.1 reports "complete" (a separately saved reading for this
+   exact run ID + fingerprint), shown through the existing Saved renderer. Missing, unfinished or
+   unverified: no READING tab and no message. An old #reading link without a complete match shows
+   the Birth Chart (hash replaced, no extra history entry). Chart identity check, scroll fix,
+   same-tab Print and Back routing unchanged. Nothing generated, stored or changed in any package.
+   CSY1.4 and earlier, below.
+   CSY1.4 (device test, page jumped back to the top while scrolling): html,body{overflow-x:hidden}
+   made the BODY a second scroll area (overflow-y computes to auto), a known iOS Safari trap where
+   the page scrolls inside body and snaps back when content height changes. Now html keeps
+   overflow-x:hidden and body uses overflow-x:clip (no scroll area), so only the window scrolls.
+   ?debug=1 panel kept for the device check, now also showing body scrollTop.
+   CSY1.3d (diagnostic only): with ?debug=1 a small live panel logs page scroll position, sudden
+   jumps back toward the top, every frame height write (old, new, what triggered it), frame loads
+   and the framed page's own scroll. Without ?debug=1 behavior is identical to CSY1.3.
+   CSY1.3 (device test): Print / Save PDF inside a tab opens the print page in THIS tab instead of a
+   new Safari tab, so Safari's Back returns to this page on the same tab.
+   CSY1.3 (device test): the Birth Chart tab frames the chart page only when the chart stored on
+   this device carries THIS chart's run ID + fingerprint (Sep 18 pairing rule). The chart pages read
+   the latest stored chart with no run check, so a previous person's chart could appear here.
+   Otherwise a status line is shown (wording pending Jason). Nothing is calculated or generated.
+   CSY1.2 (device test): the framed page can no longer scroll by itself, its full-screen minimum
+   heights are released inside the frame, and the frame resizes immediately on any content change
+   (plus a steady 0.5 s check). Fixes swipes getting stuck on iPhone while a section opened.
+   CSY1.1 (Chat): inactive tab brighter (.8); opens on READING; when there is no complete saved
+   reading, a second line points to the Birth Chart tab.
+   compare-system.html?sys=vedic | ?sys=tropical, opened from Your Birth Charts.
+   Tabs: BIRTH CHART | READING (#chart / #reading, so Back and refresh keep the tab).
+   BIRTH CHART shows the existing chart page for the chart now on this device
+   (vedic-birth-chart.html / tropical-birth-chart.html ?from=compare) inside the page.
+   READING shows the customer's SAVED six-section reading for the same run ID + birth fingerprint
+   (compare-saved-links.js) through the existing Saved document page
+   (saved-vedic-document.html / saved-tropical-document.html ?view=reading&id=...), so the text is the
+   saved text, rendered by the same page as Saved. No saved match: the .status line says why.
+   Nothing is generated. Neither chart page nor any Saved page is changed on disk; inside this page only,
+   their own Back button and footer nav are hidden so navigation stays on the Compare page.
+   Shell, type, divider, pager and nav: Your Birth Charts (BCH1.1) styles, reused as-is. */
+
+:root{ --cream:#EEE7D8; --gold:#D6B98C; --gold-soft:#B89A6E; --navy:rgb(0,2,8);
+  --head:"Cinzel",Georgia,serif; --sans:"Montserrat","Helvetica Neue",Arial,sans-serif; --body:"EB Garamond",Georgia,serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--cream);-webkit-text-size-adjust:100%}
+html{overflow-x:hidden}
+body{overflow-x:clip}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.page{position:relative;width:100%;max-width:640px;margin:0 auto;container-type:inline-size;text-align:center;
+  background:url("/Demo/compare-timing-reading-top.jpg?v=1") center top/100% auto no-repeat, url("/Demo/compare-timing-reading-mid.png?v=1") center top/100% 1px repeat-y, var(--navy)}
+.page,.page *{--k:calc(100cqw / 932);--K:calc(100cqw / 1206)}
+.content{padding-top:calc(350 * var(--K));min-height:calc(1500 * var(--K));padding-bottom:calc(40 * var(--K))}
+.content *{min-width:0}
+h1{font-family:var(--head);font-weight:500;font-size:max(24px,calc(66 * var(--k)));line-height:1.02;letter-spacing:.02em;color:var(--cream);
+  text-shadow:0 calc(3 * var(--k)) calc(10 * var(--k)) rgba(0,0,0,.65);padding:0 calc(40 * var(--k))}
+.full{font-family:var(--head);font-weight:400;font-size:max(17px,calc(44 * var(--k)));line-height:1.1;color:var(--cream);margin-top:calc(14 * var(--k))}
+.sys{font-family:var(--sans);font-weight:400;font-size:max(12px,calc(24 * var(--k)));letter-spacing:.04em;margin-top:calc(18 * var(--k));padding:0 calc(40 * var(--k))}
+.theme{font-family:var(--sans);font-weight:400;font-size:max(10.5px,calc(19 * var(--k)));line-height:1.62;letter-spacing:.2em;color:var(--gold);
+  margin-top:calc(26 * var(--k));padding:0 calc(50 * var(--k));overflow-wrap:anywhere}
+.theme span{white-space:nowrap}
+.status{font-family:var(--sans);font-weight:300;font-size:max(15px,calc(28 * var(--k)));line-height:1.5;color:var(--cream);margin:calc(40 * var(--k)) calc(110 * var(--k)) 0}
+.div{height:calc(28 * var(--k));margin:calc(38 * var(--k)) calc(90 * var(--k)) 0;display:flex;align-items:center}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--gold-soft);opacity:.85}
+.div svg{width:calc(24 * var(--k));height:calc(24 * var(--k));margin:0 calc(6 * var(--k));color:var(--gold);flex:none}
+.sec{padding:0 calc(90 * var(--k))}
+.acc-btn{appearance:none;-webkit-appearance:none;background:none;border:0;cursor:pointer;width:100%;min-height:44px;
+  display:flex;align-items:center;gap:calc(24 * var(--k));text-align:left;color:inherit;padding:calc(26 * var(--k)) 0 calc(8 * var(--k));
+  -webkit-tap-highlight-color:transparent}
+.acc-btn:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+.acc-btn .txt{flex:1;min-width:0}
+.acc-btn .t{display:block;font-family:var(--head);font-weight:500;font-size:max(16px,calc(38 * var(--k)));letter-spacing:.06em;line-height:1.15;color:var(--gold);overflow-wrap:anywhere}
+.acc-btn .sub{display:block;font-family:var(--sans);font-weight:300;font-size:max(13px,calc(25 * var(--k)));line-height:1.4;letter-spacing:.015em;color:var(--cream);margin-top:calc(8 * var(--k))}
+.acc-btn svg{width:max(18px,calc(34 * var(--k)));height:max(18px,calc(34 * var(--k)));flex:none;color:var(--gold);transition:transform .45s ease}
+.acc-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease}
+.acc.open{grid-template-rows:1fr}
+.acc-in{overflow:hidden;visibility:hidden;transition:visibility 0s .45s}
+.acc.open .acc-in{visibility:visible;transition:visibility 0s 0s}
+.body{text-align:left;padding:calc(18 * var(--k)) 0 calc(6 * var(--k))}
+.body p{font-family:var(--sans);font-weight:300;font-size:max(15px,calc(30 * var(--k)));line-height:1.6;color:var(--cream);overflow-wrap:anywhere}
+.body p+p{margin-top:.95em}
+.method{margin-top:calc(46 * var(--k))}
+.mlink{appearance:none;-webkit-appearance:none;background:none;border:0;cursor:pointer;min-height:44px;padding:0 12px;
+  font-family:var(--body);font-style:italic;font-size:clamp(15px,4.2vw,18px);color:var(--gold);-webkit-tap-highlight-color:transparent}
+.mlink:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+.note{font-family:var(--body);font-style:italic;font-size:clamp(15px,4.2vw,18px);color:var(--cream);opacity:.85;margin:calc(10 * var(--k)) calc(90 * var(--k)) 0}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:calc(46 * var(--k)) calc(90 * var(--k)) 0}
+.pager a{font-family:var(--head);font-weight:500;font-size:max(11.5px,calc(22 * var(--k)));letter-spacing:.18em;color:var(--gold);text-decoration:none;
+  padding:10px 4px;min-height:44px;display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent}
+.pager a:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+.art-bottom{position:relative;height:calc(282 * var(--K));background:url("/Demo/compare-timing-reading-bottom.jpg?v=1") center top/100% auto no-repeat}
+.nav a{position:absolute;top:calc(172 * var(--K));height:calc(80 * var(--K));min-height:44px;display:block;-webkit-tap-highlight-color:transparent}
+.nav .home{left:calc(127 * var(--K));width:calc(240 * var(--K))}
+.nav .saved{left:calc(470 * var(--K));width:calc(225 * var(--K))}
+.nav .acct{left:calc(830 * var(--K));width:calc(219 * var(--K))}
+.nav a:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+
+.door{display:flex;align-items:center;justify-content:center;min-height:44px;margin:0 calc(90 * var(--k));padding:calc(30 * var(--k)) 0;
+  font-family:var(--head);font-weight:500;font-size:max(16px,calc(38 * var(--k)));letter-spacing:.06em;color:var(--gold);text-decoration:none;
+  -webkit-tap-highlight-color:transparent;overflow-wrap:anywhere}
+.door:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+.stamp{position:fixed;right:6px;bottom:2px;z-index:2;font:8px/1 var(--sans);letter-spacing:.08em;color:rgba(204,164,102,.45);pointer-events:none}
+.tabs{display:flex;justify-content:center;gap:calc(70 * var(--k));margin:calc(26 * var(--k)) calc(90 * var(--k)) 0}
+.tabs a{font-family:var(--head);font-weight:500;font-size:max(13px,calc(28 * var(--k)));letter-spacing:.18em;color:var(--gold);text-decoration:none;
+  padding:10px 4px;min-height:44px;display:inline-flex;align-items:center;opacity:.8;-webkit-tap-highlight-color:transparent}
+.tabs a[aria-selected="true"]{opacity:1;color:var(--cream)}
+.tabs a[hidden],.tabs[hidden]{display:none}
+.tabs a:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+.panel{margin:calc(30 * var(--k)) calc(20 * var(--k)) 0}
+.panel iframe{display:block;width:100%;border:0;min-height:60vh;background:transparent}
+</style>
+<!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
+<script src="coz-saved.js?v=20"></script>
+<script src="compare-saved-links.js?v=1"></script>
+</head>
+<body>
+<main class="page">
+ <div class="content">
+  <h1 id="title">Your Reading</h1>
+  <p class="sys" id="sysline"></p>
+  <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
+  <nav class="tabs" role="tablist" aria-label="Chart or reading">
+    <a href="#chart" role="tab" id="tabChart" aria-selected="false">BIRTH CHART</a>
+    <a href="#reading" role="tab" id="tabReading" aria-selected="false">READING</a>
+  </nav>
+  <div class="panel" id="panel"></div>
+  <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
+  <nav class="pager" aria-label="Page navigation">
+    <a href="compare-birth-charts.html">&lsaquo; YOUR BIRTH CHARTS</a>
+    <a href="compare-reading.html">COMPARE &rsaquo;</a>
+  </nav>
+ </div>
+ <div class="art-bottom">
+  <nav class="nav" aria-label="Main">
+    <a class="home" href="compare-reading.html" aria-label="Home"></a>
+    <a class="saved" href="#" aria-label="Saved"></a>
+    <a class="acct" href="#" aria-label="Profile"></a>
+  </nav>
+ </div>
+</main>
+<div class="stamp">COMPARE · CSY1.6 · NAV TEST N2.0</div>
+<script>
+(function(){
+  var SYS = { vedic: { title: "Your Vedic Birth Chart", line: "Vedic (Sidereal)", chart: "vedic-birth-chart.html?from=compare", key: "cozChartJSON", label: "Vedic" },
+              tropical: { title: "Your Tropical Birth Chart", line: "Tropical (Western)", chart: "tropical-birth-chart.html?from=compare", key: "cozTropicalChartJSON", label: "Tropical" } };
+  /* CSY1.3: the stored chart must belong to the chart now on this device (run ID + fingerprint) */
+  function chartIsThisRun(key){
+    try {
+      var bd = JSON.parse(localStorage.getItem("emergeBirthData") || "null"), c = JSON.parse(localStorage.getItem(key) || "null");
+      var r = c && c.run;
+      return !!(bd && bd.runId && bd.fingerprint && r && r.runId === bd.runId && r.fingerprint === bd.fingerprint);
+    } catch (e) { return false; }
+  }
+  var sys = new URLSearchParams(location.search).get("sys");
+  if (!SYS[sys]) { location.replace("compare-birth-charts.html"); return; }
+  var S = SYS[sys], panel = document.getElementById("panel");
+  document.getElementById("title").textContent = S.title;
+  document.getElementById("sysline").textContent = S.line;
+  document.title = S.title + " \u00B7 CozAlyze";
+  /* CSY1.3d: diagnostic panel, ?debug=1 only */
+  var DBG = /[?&]debug=1\b/.test(location.search), dlog = [], dstate = { loads: 0, writes: 0, jumps: 0, lastY: 0, inner: 0, h: 0 };
+  function dnote(t){ if (!DBG) return; dlog.unshift((performance.now() / 1000).toFixed(1) + "s " + t); dlog.length = Math.min(dlog.length, 14); dpaint(); }
+  function dpaint(){
+    if (!DBG) return;
+    var el = document.getElementById("cozDbg");
+    if (!el) { el = document.createElement("pre"); el.id = "cozDbg";
+      el.style.cssText = "position:fixed;left:4px;top:4px;z-index:99999;max-width:62vw;margin:0;padding:6px;font:10px/1.3 ui-monospace,monospace;color:#0f0;background:rgba(0,0,0,.82);white-space:pre-wrap;pointer-events:none";
+      document.body.appendChild(el); }
+    el.textContent = "CSY1.6  scrollY " + Math.round(window.scrollY) + "  bodyY " + Math.round(document.body.scrollTop) + "  docH " + document.documentElement.scrollHeight +
+      "\nframeH " + dstate.h + "  writes " + dstate.writes + "  loads " + dstate.loads + "  jumps " + dstate.jumps + "  innerY " + dstate.inner +
+      "\n" + dlog.join("\n");
+  }
+  if (DBG) {
+    document.addEventListener("scroll", function(e){ if (e.target === document.body) dnote("BODY SCROLLED " + Math.round(document.body.scrollTop)); }, true);
+    window.addEventListener("scroll", function(){
+      var y = window.scrollY; if (dstate.lastY - y > 150) { dstate.jumps++; dnote("JUMP " + Math.round(dstate.lastY) + "->" + Math.round(y) + " docH " + document.documentElement.scrollHeight); }
+      dstate.lastY = y; dpaint();
+    }, { passive: true });
+    window.addEventListener("hashchange", function(){ dnote("hashchange " + location.hash); });
+    window.addEventListener("resize", function(){ dnote("viewport " + window.innerWidth + "x" + window.innerHeight); });
+    window.addEventListener("storage", function(ev){ dnote("storage " + (ev.key || "null")); });
+    document.addEventListener("DOMContentLoaded", dpaint);
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+  /* the embedded page keeps its own look; only its Back button and footer nav are hidden here,
+     and any link it still has opens at this page's level, never inside the frame */
+  function fit(fr){
+    var d; try { d = fr.contentDocument; } catch (e) { return; }
+    if (!d || !d.documentElement) return;
+    if (!d.getElementById("cozCompareEmbed")) {
+      var st = d.createElement("style"); st.id = "cozCompareEmbed";
+      /* CSY1.2: the embedded page never scrolls on its own (iOS gave swipes to it while the frame was
+         catching up), and its full-screen minimum heights are released so the frame fits the content */
+      st.textContent = "#backBtn,#cozFoot{display:none !important} html,body{background:transparent !important}" +
+        " html,body{height:auto !important;min-height:0 !important;overflow:hidden !important;overscroll-behavior:none !important}" +
+        " .doc-shell,.report-shell{min-height:0 !important}";
+      (d.head || d.documentElement).appendChild(st);
+      d.addEventListener("click", function (e) {
+        var a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
+        var h = a.getAttribute("href"); if (!h || h.charAt(0) === "#") return;
+        e.preventDefault(); location.href = a.href;
+      }, true);
+      /* CSY1.3: the embedded page's own print opened a new Safari tab with no way back here;
+         open its print view in this tab instead, so Back returns to this page */
+      d.addEventListener("click", function (e) {
+        var b = e.target.closest && e.target.closest("#printBtn"); if (!b) return;
+        e.preventDefault(); e.stopImmediatePropagation();
+        var u = new URL(fr.contentWindow.location.href); u.searchParams.set("print", "1");
+        location.href = u.href;
+      }, true);
+    }
+    /* CSY1.2: resize the moment the content changes (section opened or closed, chart drawn, image
+       loaded), again after the opening motion settles, and on a light steady check as a safety net */
+    if (DBG) { try { d.defaultView.addEventListener("scroll", function(){ dstate.inner = Math.round(d.defaultView.scrollY); dnote("innerScroll " + dstate.inner); }, { passive: true }); } catch (e) {} }
+    var last = 0, size = function(why){ try {
+      /* measured from the body, not the page, so the frame can shrink again when a section closes */
+      var b = d.body; if (!b) return;
+      var cs = d.defaultView.getComputedStyle(b);
+      var h = Math.ceil(b.scrollHeight + (parseFloat(cs.marginTop) || 0) + (parseFloat(cs.marginBottom) || 0));
+      if (h && h !== last) { if (DBG) { dstate.writes++; dstate.h = h; dnote("H " + last + "->" + h + " " + (typeof why === "string" ? why : "ro") + " y" + Math.round(window.scrollY)); } last = h; fr.style.height = h + "px"; }
+    } catch (e) {} };
+    var soon = function(e){ var w = e && e.type ? e.type : "mut"; size(w); setTimeout(function(){ size(w + "+60"); }, 60); setTimeout(function(){ size(w + "+250"); }, 250); setTimeout(function(){ size(w + "+600"); }, 600); };
+    size("fit");
+    try { var ro = new ResizeObserver(function(){ size("ro"); }); ro.observe(d.documentElement); if (d.body) ro.observe(d.body); } catch (e) {}
+    try { new MutationObserver(function(){ soon(); }).observe(d.body || d.documentElement, { childList: true, subtree: true, attributes: true, characterData: true }); } catch (e) {}
+    ["click", "toggle", "transitionend", "load"].forEach(function (ev) { d.addEventListener(ev, soon, true); });
+    if (fr._cozPoll) clearInterval(fr._cozPoll);
+    fr._cozPoll = setInterval(function(){ if (!fr.isConnected) return clearInterval(fr._cozPoll); size("poll"); }, 500);
+  }
+  function frame(src){
+    panel.innerHTML = "";
+    var fr = document.createElement("iframe"); fr.title = S.title; fr.src = src; fr.setAttribute("scrolling", "no");
+    fr.addEventListener("load", function(){ if (DBG) { dstate.loads++; dnote("frame load " + src.split("?")[0]); } fit(fr); });
+    panel.appendChild(fr);
+  }
+  /* CSY1.5: a READING tab only for a complete, identity-matched saved reading */
+  function savedReading(){
+    var r = null; try { r = window.CozCompareSaved && window.CozCompareSaved.status()[sys]; } catch (e) {}
+    return r && r.state === "complete" && r.href ? r : null;
+  }
+  function show(tab){
+    var rd = savedReading(), tabR = document.getElementById("tabReading");
+    tabR.hidden = !rd;
+    document.querySelector(".tabs").hidden = !rd;                      /* CSY1.6: no lone tab */
+    if (tab === "reading" && !rd) {                                   /* old #reading link, no complete match */
+      try { history.replaceState(null, "", location.pathname + location.search + "#chart"); } catch (e) {}
+      tab = "chart";
+    }
+    document.getElementById("tabChart").setAttribute("aria-selected", tab === "chart" ? "true" : "false");
+    tabR.setAttribute("aria-selected", tab === "reading" ? "true" : "false");
+    if (tab === "chart") {
+      if (chartIsThisRun(S.key)) return frame(S.chart);
+      panel.innerHTML = '<p class="status" data-state="chart-missing">Your ' + S.label + ' birth chart isn\u2019t available for this chart on this device.</p>';
+      return;
+    }
+    return frame(rd.href + "&from=compare");
+  }
+  function route(){ show(location.hash === "#reading" ? "reading" : "chart"); }   /* CSY1.5: Birth Chart first */
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+</body>
+</html>

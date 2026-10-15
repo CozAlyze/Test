@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Ascendants · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/Demo/ascendants-bg.jpg?v=3">
+<style>
+/* YOUR ASCENDANTS · A1.5
+   A1.5: the How They Work Together panel opens the combined reading
+   (ascendant-reading.html?sys=combined). No visual change.
+   Background = Jason's baked art, used verbatim (ascendants-bg.jpg, 1185x2576).
+   All positions are written in the art's own pixels and scaled by --k, so every
+   overlay stays locked to the baked frames on any screen width.
+   The art is drawn in three bands cut at the middle of the gaps between boxes,
+   so an opened analysis can push the rest of the page down without touching a pixel. */
+:root{
+  --blue:#A9CDF2; --blue-accent:#8FB8E6; --blue-glow:rgba(96,156,232,.75);
+  --gold:#E3C79C; --gold-accent:#D2AF86; --gold-glow:rgba(214,164,96,.6);
+  --cream:#EBE5D0; --champ:#D9C7A6;
+  --gap:rgb(1,11,26);
+  --serif:"Cormorant Garamond",Georgia,serif;
+  --sans:"Montserrat","Helvetica Neue",Arial,sans-serif;
+  --glyph:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2","DejaVu Sans",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--gap);color:var(--cream);-webkit-text-size-adjust:100%}
+.page{width:100%;max-width:600px;margin:0 auto;container-type:inline-size}
+.band{position:relative;width:100%;--k:calc(100cqw / 1185);
+  background-image:url("/Demo/ascendants-bg.jpg?v=3");background-repeat:no-repeat;
+  background-size:100cqw auto}
+.band.a{height:calc(1206 * var(--k));background-position:0 0}
+.band.b{height:calc(533 * var(--k));background-position:0 calc(-1206 * var(--k))}
+.band.c{height:calc(837 * var(--k));background-position:0 calc(-1739 * var(--k))}
+.abs{position:absolute}
+
+/* heading */
+.head{left:0;right:0;top:calc(350 * var(--k));height:calc(340 * var(--k));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;--k:calc(100cqw / 1185)}
+.h1{font-family:var(--serif);font-weight:500;font-variant:small-caps;letter-spacing:.04em;
+  font-size:calc(96 * var(--k));line-height:1;color:var(--cream)}
+.h2{font-family:var(--serif);font-weight:500;font-size:calc(40 * var(--k));line-height:1.2;
+  margin-top:calc(14 * var(--k));color:var(--cream);letter-spacing:.02em}
+.theme{display:flex;align-items:center;gap:calc(26 * var(--k));margin-top:calc(34 * var(--k));
+  font-family:var(--sans);font-weight:500;font-size:calc(25 * var(--k));letter-spacing:.34em;
+  color:var(--gold-accent);white-space:nowrap}
+.theme::before,.theme::after{content:"";width:calc(70 * var(--k));height:1px;background:currentColor;opacity:.7}
+.theme span{margin-right:-.34em}
+
+/* glyphs */
+.glyph{display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);
+  width:calc(240 * var(--k));height:calc(240 * var(--k));font-family:var(--glyph);line-height:1}
+.glyph.w{left:calc(275 * var(--k));top:calc(934 * var(--k));font-size:calc(150 * var(--k));
+  color:var(--blue);text-shadow:0 0 calc(10 * var(--k)) var(--blue-glow),0 0 calc(28 * var(--k)) var(--blue-glow)}
+.glyph.v{left:calc(275 * var(--k));top:calc(252 * var(--k));font-size:calc(140 * var(--k));
+  color:var(--gold);text-shadow:0 0 calc(10 * var(--k)) var(--gold-glow),0 0 calc(26 * var(--k)) var(--gold-glow)}
+
+/* text column inside boxes one and two */
+.col{left:calc(482 * var(--k));width:calc(600 * var(--k));display:flex;flex-direction:column;justify-content:center}
+.col.w{top:calc(746 * var(--k));height:calc(396 * var(--k))}
+.col.v{top:calc(78 * var(--k));height:calc(390 * var(--k))}
+.eyebrow{font-family:var(--sans);font-weight:500;font-size:calc(25 * var(--k));letter-spacing:.3em;line-height:1.2}
+.sign{font-family:var(--serif);font-weight:500;font-variant:small-caps;font-size:calc(68 * var(--k));
+  line-height:1;letter-spacing:.03em;color:var(--cream);margin-top:calc(12 * var(--k))}
+.prev{font-family:var(--sans);font-weight:400;font-size:calc(31.5 * var(--k));line-height:1.42;
+  color:var(--cream);margin-top:calc(14 * var(--k))}
+.rule{height:1px;margin-top:calc(20 * var(--k));opacity:.55}
+.tog{appearance:none;-webkit-appearance:none;background:none;border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;width:100%;
+  padding:calc(16 * var(--k)) 0 calc(4 * var(--k));font-family:var(--sans);font-weight:400;
+  font-size:calc(28 * var(--k));letter-spacing:.07em;color:var(--cream);text-align:left;
+  -webkit-tap-highlight-color:transparent}
+.tog svg{width:calc(34 * var(--k));height:calc(34 * var(--k));flex:none}
+.w .eyebrow,.w .tog svg{color:var(--blue-accent)} .w .rule{background:var(--blue-accent)}
+.v .eyebrow,.v .tog svg{color:var(--gold-accent)} .v .rule{background:var(--gold-accent)}
+
+/* box three */
+.comb{left:calc(112 * var(--k));width:calc(951 * var(--k));top:calc(64 * var(--k));height:calc(262 * var(--k));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.comb .ttl{display:flex;align-items:center;gap:calc(24 * var(--k));font-family:var(--sans);font-weight:500;
+  font-size:calc(27 * var(--k));letter-spacing:.34em;color:var(--champ);white-space:nowrap}
+.comb .ttl::before,.comb .ttl::after{content:"";width:calc(60 * var(--k));height:1px;background:currentColor;opacity:.7}
+.comb .ttl span{margin-right:-.34em}
+.comb .star{font-size:calc(22 * var(--k));color:var(--champ);margin-top:calc(8 * var(--k));line-height:1;opacity:.9}
+.comb p{font-family:var(--sans);font-weight:400;font-size:calc(31.5 * var(--k));line-height:1.42;color:var(--cream);margin-top:calc(10 * var(--k))}
+
+/* baked bottom navigation: tap areas over the art */
+.nav a{position:absolute;top:calc(737 * var(--k));height:calc(72 * var(--k));display:block;-webkit-tap-highlight-color:transparent}
+.nav .home{left:calc(127 * var(--k));width:calc(230 * var(--k))}
+.nav .saved{left:calc(470 * var(--k));width:calc(210 * var(--k))}
+.nav .acct{left:calc(820 * var(--k));width:calc(210 * var(--k))}
+
+.comb.tap{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.stamp{position:fixed;right:6px;bottom:2px;font:8px/1 var(--sans);letter-spacing:.08em;color:rgba(204,164,102,.45);pointer-events:none;z-index:9}
+</style>
+<!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
+<script src="coz-saved.js?v=20"></script>
+</head>
+<body>
+<main class="page">
+
+  <section class="band a">
+    <header class="abs head">
+      <h1 class="h1">Your Ascendants</h1>
+      <div class="h2">Western (Tropical) + Vedic (Sidereal)</div>
+      <div class="theme"><span>HOW YOU MEET THE WORLD</span></div>
+    </header>
+    <div class="abs glyph w" id="wGlyph" aria-hidden="true"></div>
+    <div class="abs col w">
+      <div class="eyebrow">WESTERN ASCENDANT</div>
+      <div class="sign" id="wSign"></div>
+      <p class="prev" id="wPrev"></p>
+      <div class="rule"></div>
+      <button class="tog" id="wTog" type="button">
+        <span>Read Full Analysis</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg>
+      </button>
+    </div>
+  </section>
+
+
+  <section class="band b">
+    <div class="abs glyph v" id="vGlyph" aria-hidden="true"></div>
+    <div class="abs col v">
+      <div class="eyebrow">VEDIC ASCENDANT</div>
+      <div class="sign" id="vSign"></div>
+      <p class="prev" id="vPrev"></p>
+      <div class="rule"></div>
+      <button class="tog" id="vTog" type="button">
+        <span>Read Full Analysis</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 9l7 7 7-7"/></svg>
+      </button>
+    </div>
+  </section>
+
+
+  <section class="band c">
+    <div class="abs comb" id="comb">
+      <div class="ttl"><span>HOW THEY WORK TOGETHER</span></div>
+      <div class="star">&#10022;</div>
+      <p id="cPrev"></p>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <a class="home" href="compare-reading.html" aria-label="Home"></a>
+      <a class="saved" href="#" data-nav="saved" aria-label="Saved"></a>
+      <a class="acct" href="#" data-nav="account" aria-label="Account"></a>
+    </nav>
+  </section>
+
+</main>
+<div class="stamp">ASCENDANTS · A1.6 · NAV TEST N2.0</div>
+
+<script src="dev-review-engine.js?v=8"></script>
+<script src="ascendant-library.js?v=5"></script>
+<script>
+/* ===== COPY BANKS (fixed copy, draft pending Jason's practitioner approval) =====
+   Western = the outer world: how you step in and how others experience you.
+   Vedic   = the Lagna: where the chart begins, its guiding planet, what life asks of you.
+   No sign numbers anywhere. */
+var SIGN_ORDER = ["aries","taurus","gemini","cancer","leo","virgo","libra","scorpio","sagittarius","capricorn","aquarius","pisces"];
+var GLYPH = {aries:"\u2648",taurus:"\u2649",gemini:"\u264A",cancer:"\u264B",leo:"\u264C",virgo:"\u264D",libra:"\u264E",scorpio:"\u264F",sagittarius:"\u2650",capricorn:"\u2651",aquarius:"\u2652",pisces:"\u2653"};
+
+/* Combined synthesis. Key = western|vedic. With the present ayanamsa the Vedic rising is
+   the same sign or the sign before the Western one, so these 24 pairs cover real charts. */
+var COMBINED = {
+ "aries|aries":"Both Ascendants fall in Aries, so the boldness people see matches the courage that guides you inside. What they meet is real. Your task is to aim that single drive with care.",
+ "aries|pisces":"People meet your Aries side first, quick, direct, and brave. Inside, Pisces guides you through feeling and intuition. Your fire is real, but your quiet sensitivity decides where it goes.",
+ "taurus|taurus":"Both Ascendants fall in Taurus, so the calm people see matches the steady values that guide you inside. You are what you appear to be. Your strength grows when you let change in.",
+ "taurus|aries":"People meet your Taurus side first, calm, patient, and grounded. Inside, Aries keeps pushing you to act and take risks. Your steady surface holds a braver engine than most people guess.",
+ "gemini|gemini":"Both Ascendants fall in Gemini, so the curious, talkative side people see matches the mind that guides you inside. Your life turns on learning and connection. Depth is your growing edge.",
+ "gemini|taurus":"People meet your Gemini side first, curious, lively, and quick. Inside, Taurus wants what is real and lasting. Your ideas move fast, but your deeper self keeps asking what is worth keeping.",
+ "cancer|cancer":"Both Ascendants fall in Cancer, so the care people see matches the feeling that guides you inside. You lead with the heart in every way. Let yourself receive what you give.",
+ "cancer|gemini":"People meet your Cancer side first, warm, protective, and caring. Inside, Gemini keeps you curious and thinking. You feel your way into people, then quietly work to understand them.",
+ "leo|leo":"Both Ascendants fall in Leo, so the warmth people see matches the heart that guides you inside. You are meant to live out loud. Your gift grows when you shine without keeping score.",
+ "leo|cancer":"People meet your Leo side first, warm, confident, and generous. Inside, Cancer guides you through feeling and a need for safety. Your bright presence protects a very tender heart.",
+ "virgo|virgo":"Both Ascendants fall in Virgo, so the careful, capable side people see matches the need for order that guides you inside. Useful work steadies you. Gentleness with yourself is your growing edge.",
+ "virgo|leo":"People meet your Virgo side first, modest, careful, and helpful. Inside, Leo wants to lead and live from the heart. Behind the quiet competence is a bigger light waiting to be shown.",
+ "libra|libra":"Both Ascendants fall in Libra, so the grace people see matches the sense of fairness that guides you inside. Balance is your whole path. Keep a place for your own voice in it.",
+ "libra|virgo":"People meet your Libra side first, gracious, fair, and easy to be around. Inside, Virgo keeps checking what needs fixing. Your charm rests on a careful, practical mind that notices everything.",
+ "scorpio|scorpio":"Both Ascendants fall in Scorpio, so the intensity people sense matches the depth that guides you inside. Little about you is on the surface. Your growth comes through letting go.",
+ "scorpio|libra":"People meet your Scorpio side first, intense, private, and perceptive. Inside, Libra longs for balance and fair connection. Your guarded surface protects a deep wish for peace and partnership.",
+ "sagittarius|sagittarius":"Both Ascendants fall in Sagittarius, so the optimism people see matches the search for meaning that guides you inside. Your life is a journey toward truth. Keep listening along the way.",
+ "sagittarius|scorpio":"People meet your Sagittarius side first, open, hopeful, and frank. Inside, Scorpio feels things deeply and keeps its own counsel. Your easy humor often carries far more depth than it shows.",
+ "capricorn|capricorn":"Both Ascendants fall in Capricorn, so the composure people see matches the sense of duty that guides you inside. You build your life with care. Rest is part of the work too.",
+ "capricorn|sagittarius":"People meet your Capricorn side first, composed, serious, and capable. Inside, Sagittarius looks for meaning and freedom. Your hard work is really fueled by what you believe in.",
+ "aquarius|aquarius":"Both Ascendants fall in Aquarius, so the independence people see matches the principles that guide you inside. You are meant to see differently. Let that vision include closeness too.",
+ "aquarius|capricorn":"People meet your Aquarius side first, original, friendly, and independent. Inside, Capricorn takes duty and effort seriously. Your new ideas carry real weight because you are willing to build them.",
+ "pisces|pisces":"Both Ascendants fall in Pisces, so the gentleness people see matches the intuition that guides you inside. You live by feeling. Protecting your energy lets you keep giving.",
+ "pisces|aquarius":"People meet your Pisces side first, gentle, kind, and imaginative. Inside, Aquarius stands a little apart and thinks about the whole. Your softness is guided by a clear sense of what is fair."
+};
+function combinedText(w,v){
+  var k=w+"|"+v; if(COMBINED[k]) return COMBINED[k];
+  var W=cap(w), V=cap(v);
+  return "People meet your "+W+" side first, the way you show up and take action. Inside, "+V+" guides what truly matters to you. Together they describe both how you move through life and why.";
+}
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+
+/* ===== DATA (A1.4) =====
+   Signs come ONLY from the validated chart-run pair (COZ_ASC.ensurePair): both
+   engines, same run ID, same birth fingerprint. Previews and full readings come
+   from the Ascendant generator, once per run and system, cached. */
+(function(){
+  var A=window.COZ_ASC;
+  var $=function(id){return document.getElementById(id);};
+  ["w","v"].forEach(function(pre){ $(pre+"Tog").style.visibility="hidden"; $(pre+"Prev").textContent="Preparing your Ascendant\u2026"; });
+  $("cPrev").textContent="";
+  /* came back from a full reading without Safari's page cache: put the reader where they were */
+  try{ var y=parseFloat(sessionStorage.getItem("cozAscScroll")); if(y>0){ sessionStorage.removeItem("cozAscScroll"); requestAnimationFrame(function(){ window.scrollTo(0,y); }); } }catch(e){}
+
+  A.ensurePair().then(function(res){
+    if(!res.ok){
+      console.log("[COZ ASC] pair refused:", res.reason);
+      $("wPrev").textContent=""; $("vPrev").textContent="";
+      $("cPrev").textContent=A.PAIR_FAIL;
+      return;
+    }
+    var w=res.pair.tropical.sign, v=res.pair.vedic.sign;
+    [["w",w,"tropical","western"],["v",v,"vedic","vedic"]].forEach(function(x){
+      var pre=x[0], sign=x[1], sys=x[2], page=x[3];
+      $(pre+"Glyph").textContent=GLYPH[sign]+"\uFE0E";
+      $(pre+"Glyph").setAttribute("aria-label",cap(sign)+" zodiac glyph");
+      $(pre+"Sign").textContent=cap(sign)+" Rising";
+      var tog=$(pre+"Tog");
+      tog.addEventListener("click",function(){
+        try{ sessionStorage.setItem("cozAscScroll", String(window.scrollY)); }catch(e){}
+        location.href="ascendant-reading.html?sys="+page;
+      });
+      A.getReading(sys,res).then(function(rec){
+        $(pre+"Prev").textContent=rec.preview;
+        tog.style.visibility="visible";
+      }).catch(function(e){
+        console.log("[COZ ASC] "+sys+" reading:", e&&e.message);
+        $(pre+"Prev").textContent=(e&&e.message)||"DEV: reading unavailable";
+      });
+    });
+    $("cPrev").textContent=combinedText(w,v);
+    /* A1.5: How They Work Together opens its own full reading. Generation starts now,
+       in parallel with the two cards, so it is usually ready by the time it is tapped. */
+    A.getReading("combined",res).catch(function(e){ console.log("[COZ ASC] combined reading:", e&&e.message); });
+    var comb=$("comb");
+    comb.classList.add("tap");
+    comb.setAttribute("role","button"); comb.setAttribute("tabindex","0");
+    comb.setAttribute("aria-label","How They Work Together, read full analysis");
+    function openComb(){
+      try{ sessionStorage.setItem("cozAscScroll", String(window.scrollY)); }catch(e){}
+      location.href="ascendant-reading.html?sys=combined";
+    }
+    comb.addEventListener("click",openComb);
+    comb.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openComb(); } });
+  });
+})();
+</script>
+</body>
+</html>

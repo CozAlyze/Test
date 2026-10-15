@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000f26">
+<title>Your Combined Reading · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   COZALYZE · COMPARE · COMBINED READING · C3.6 · early generation
+   Paid dashboard + reveal + six reading sections in ONE document
+   (standing rule: no iframe, no page navigation between them).
+   Design tokens and structure follow the supplied spec verbatim.
+   ============================================================ */
+:root {
+  --vedic-navy: #000f26;
+  --vedic-gold: #d4a178;
+  --vedic-gold-muted: rgba(212, 161, 120, 0.65);
+  --vedic-ivory: #e5d4c5;
+  --vedic-ivory-muted: rgba(229, 212, 197, 0.88);
+  --display-font: "Cormorant Garamond", Georgia, serif;
+  --body-font: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --side-pad: 28px;
+  --dash-zoom: 1;            /* C1.3: opens showing the WHOLE frame like the Vedic and Tropical dashboards, then eases to --dash-zoom-in */
+  --dash-zoom-in: 1.34;   /* pulled back from 1.5 so the title clears the edges; ~1.06 on the art itself */
+  --reveal-zoom: 1.23;    /* the clip zooms itself in over its first second, so the stage eases back to cover-fit */
+}
+@media (max-width: 374px) { :root { --side-pad: 20px; } }
+
+* { box-sizing: border-box; }
+html { background: var(--vedic-navy); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--vedic-navy);
+  color: var(--vedic-ivory);
+  font-family: var(--body-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fixed background layer: iOS ignores background-attachment on body,
+   so the image lives on its own fixed layer behind the scrolling content. */
+.vedic-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--vedic-navy);
+  background-image: url("/Demo/compare-moon-bg.png?v=11");   /* his sun-and-moon medallion backdrop for the Combined reading */
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.vedic-reading-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  padding:
+    calc(env(safe-area-inset-top) + 24px)
+    var(--side-pad)
+    calc(env(safe-area-inset-bottom) + 24px);
+}
+
+.vedic-reading-content {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  animation: vedicFadeIn 240ms ease-out;
+}
+@keyframes vedicFadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vedic-reading-content { animation: none; }
+  .stage { transition: none; }
+}
+
+/* ---------- header ---------- */
+.vedic-back-button {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: calc(var(--side-pad) - 10px);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vedic-gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.vedic-back-button svg { width: 30px; height: 20px; display: block; }
+.vedic-back-button:focus-visible { outline: 1px solid var(--vedic-gold-muted); outline-offset: 4px; border-radius: 4px; }
+
+.vedic-header {
+  text-align: center;
+  padding-top: 6px;
+}
+/* His logo lockup (emblem + CozAlyze wordmark) as one image, white keyed out.
+   Width is set so the wordmark reads at the spec's 28–30px display size. */
+.vedic-logo {
+  display: block;
+  width: 140px;
+  height: auto;
+  margin: 0 auto;
+}
+.vedic-eyebrow {
+  font-family: var(--body-font);
+  font-size: clamp(13px, 3.5vw, 14.5px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--vedic-ivory-muted);
+  margin: 12px 0 0;
+  padding-left: 0.28em; /* optical centre with the trailing tracking */
+}
+.vedic-counter {
+  font-family: var(--display-font);
+  font-size: clamp(27px, 7.2vw, 31px);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums;
+  color: var(--vedic-gold);
+  margin: 40px 0 0;
+}
+
+/* ---------- ornamental divider ---------- */
+.vedic-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: min(100%, 420px);
+  margin: 14px auto;
+  color: var(--vedic-gold);
+}
+.vedic-divider::before,
+.vedic-divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--vedic-gold-muted);
+}
+.vedic-divider svg { width: 16px; height: 16px; flex: 0 0 auto; display: block; }
+
+/* ---------- title ---------- */
+.vedic-title {
+  font-family: var(--display-font);
+  font-size: clamp(2.6rem, 11.5vw, 3.4rem);
+  font-weight: 500;
+  line-height: 0.98;
+  color: var(--vedic-gold);
+  text-align: center;
+  text-wrap: balance;
+  margin: 10px 0;
+}
+.vedic-title--long {
+  font-size: clamp(2.35rem, 10vw, 2.9rem);
+}
+
+/* ---------- body ---------- */
+.vedic-body {
+  font-family: var(--body-font);
+  font-size: clamp(1.25rem, 5.4vw, 1.4rem);
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--vedic-ivory);
+  margin-top: 24px;
+}
+.vedic-body p { margin: 0 0 1.35em; }
+/* PROVISIONAL layout for the three parts of a Combined section: reuses the existing
+   eyebrow and divider styles only, no new visual elements, until the compare reading is designed. */
+.vedic-body .vedic-part-label { text-align: center; margin: 0 0 1.1em; color: var(--vedic-gold); font-size: clamp(12px, 3.2vw, 13.5px); }
+.vedic-body .vedic-divider--part { margin: 0.4em auto 1.4em; }
+.vedic-body p:last-child { margin-bottom: 0; }
+
+/* ---------- bottom navigation ---------- */
+.vedic-nav { margin-top: 34px; }
+.vedic-nav-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--vedic-gold);
+}
+.vedic-nav-rule::before,
+.vedic-nav-rule::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--vedic-gold-muted);
+}
+.vedic-nav-rule svg { width: 14px; height: 14px; flex: 0 0 auto; display: block; }
+.vedic-nav-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-top: 6px;
+}
+.vedic-nav a,
+.vedic-nav button {
+  font-family: var(--body-font);
+  font-size: clamp(16px, 4.3vw, 18px);
+  font-weight: 400;
+  color: var(--vedic-gold);
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+.vedic-nav a:focus-visible,
+.vedic-nav button:focus-visible { outline: 1px solid var(--vedic-gold-muted); outline-offset: 4px; border-radius: 4px; }
+.vedic-nav .vedic-nav-next { text-align: right; justify-content: flex-end; }
+.vedic-nav svg:not(.vedic-nav-rule svg) { width: 24px; height: 15px; flex: 0 0 auto; }
+
+/* ============================================================
+   PAID DASHBOARD  (his art = frame 0 of the reveal clip, so the
+   dashboard and the video's first frame are pixel-identical)
+   ============================================================ */
+body[data-view="dashboard"] .vedic-reading-page,
+body[data-view="dashboard"] .vedic-bg { display: none; }
+body[data-view="reading"] .dash { display: none; }
+
+.dash {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: #000;   /* this clip's first frame carries a black border */
+  overflow: hidden;
+}
+/* one shared stage: contain-fit box with the clip's exact aspect, centred */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 1084 / 1908;
+  width: min(100vw, calc(100svh * 1084 / 1908));   /* contain-fit: the whole art */
+  /* --dash-zoom 1 = whole art; above 1 the stage scales up around its centre and
+     crops evenly. Done with transform so iOS animates it smoothly. */
+  transform: translate(-50%, -50%) scale(var(--dash-zoom, 1));
+  transition: transform 1400ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
+}
+html.reveal-zooming .stage {
+  transition: transform 900ms linear;   /* counter-zoom while the clip zooms itself in */
+  container-type: inline-size;
+  overflow: hidden;
+}
+.stage-art,
+.stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: var(--vedic-navy);
+}
+.stage video { background: transparent; }   /* the art under it shows until the first frame paints */
+.hot {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: transparent;
+  font-size: 0;
+}
+.hot:focus-visible { outline: 1px solid var(--vedic-gold-muted); outline-offset: 2px; border-radius: 8px; }
+.hot[disabled] { cursor: default; }
+/* live ascendant: shown ONLY when the sign is not the sample Leo baked into the art */
+.asc-patch, .asc-glyph, .asc-label { position: absolute; display: none; pointer-events: none; }
+.stage[data-asc-live="1"] .asc-patch,
+.stage[data-asc-live="1"] .asc-glyph,
+.stage[data-asc-live="1"] .asc-label { display: block; }
+/* geometry measured on the 1084-wide letterboxed frame, all in cqw:
+   baked Leo glyph ring centred (303,1240), ring outer radius ~34; no sign label on this art */
+.asc-patch-glyph {
+  left: 25.55cqw; top: 111.99cqw;
+  width: 4.8cqw; height: 4.8cqw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(5,17,33) 0 66%, rgba(5,17,33,0) 100%);
+}
+.asc-patch-text { display: none !important; }
+.asc-label { display: none !important; }
+.asc-glyph {
+  left: 25.55cqw; top: 111.99cqw;
+  width: 4.8cqw; height: 4.8cqw;
+  font: 400 3.1cqw/4.8cqw "Cormorant Garamond", "Apple Symbols", "Segoe UI Symbol", serif;
+  text-align: center;
+  color: #d9b48a;
+}
+.dash-preparing .hot-reading { opacity: 0.45; }
+
+/* ============================================================
+   REVEAL OVERLAY  (video plays once, then everything disappears
+   and the reading emerges)
+   ============================================================ */
+.reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  overflow: hidden;
+  display: none;
+}
+.reveal.is-on { display: block; }
+.reveal .asc-patch, .reveal .asc-glyph, .reveal .asc-label { transition: opacity 320ms ease-out; }
+.reveal.asc-off .asc-patch, .reveal.asc-off .asc-glyph, .reveal.asc-off .asc-label { opacity: 0; }
+.reveal-curtain {
+  position: absolute;
+  inset: 0;
+  background: var(--vedic-navy);
+  opacity: 0;
+  transition: opacity 480ms ease-in;
+  pointer-events: none;
+}
+.reveal.is-closing .reveal-curtain { opacity: 1; }
+.reveal-back {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: 18px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--vedic-gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.reveal-back svg { width: 30px; height: 20px; display: block; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+body.scroll-locked { overflow: hidden; touch-action: none; }
+
+/* ---------- build stamp (project standing rule) ---------- */
+.vedic-stamp {
+  position: fixed;
+  right: 8px;
+  bottom: calc(env(safe-area-inset-bottom) + 4px);
+  z-index: 2;
+  font: 9px/1 var(--body-font);
+  letter-spacing: 0.08em;
+  color: rgba(212, 161, 120, 0.35);
+  pointer-events: none;
+}
+/* ---------- dashboard pinch zoom (Sep 1): the landing eases to --dash-zoom-in, which
+   pushes the bottom nav pill below the screen; two fingers now zoom the art between
+   the whole frame (1) and the landing (--dash-zoom-in) so Home, Saved and Account can
+   always be reached. Native browser zoom stays off. ---------- */
+.dash { touch-action: none; }
+.dash.pinching .stage { transition: none; }
+
+/* one-finger pan (Sep 1): when the dashboard is zoomed in, dragging moves the art up
+   and down within its edges so the bottom nav pill can be pulled into view */
+.stage { transform: translate(-50%, calc(-50% + var(--dash-pan, 0px))) scale(var(--dash-zoom, 1)); }
+.dash.panning .stage { transition: none; }
+@keyframes cozPageIn { from { opacity: 0; } to { opacity: 1; } }
+body[data-view="reading"] .vedic-reading-page { animation: none; }
+.reveal-curtain { transition: opacity 1400ms ease-in-out; }
+
+/* through the sun (Sep 1 ruling): after the burst the camera keeps going, the sun
+   fills the screen with light and the reading emerges out of it */
+/* the sun sits at 40.7% of the clip height (measured on the last frame): the drive scales about it */
+.reveal.is-through .stage { transform-origin: 50% 40.7%; transition: transform 3200ms cubic-bezier(0.42, 0, 0.9, 0.35), transform-origin 0s;
+  /* the sun is carried to the exact screen centre while the stage grows about it */
+  transform: translate(-50%, calc(-50% + 9.3%)) scale(calc(var(--dash-zoom, 1) * 5.5)); }
+.reveal.is-through .reveal-curtain { background: radial-gradient(circle at 50% 50%, #fff6df 0%, #f1d9a6 45%, #e4b978 100%); transition: opacity 1400ms ease-in; }
+#cozLight { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 50% 42%, #fff6df 0%, #f1d9a6 45%, #e4b978 100%); transition: opacity 1800ms ease-out; }
+#cozLight.on { opacity: 1; transition: none; }
+/* text zoom (Sep 1 ruling): wherever there is reading text, two fingers scale it up
+   to 2x and back; the text reflows, nothing else on the page zooms */
+#vedicContent, #asqContent .wrap { zoom: var(--coz-text-zoom, 1); }
+
+/* Sep 20: the reveal stage un-zooms from the dashboard's 1.3 to 1 while the gold
+   light covers the screen, so the flight plays full size instead of cropped. */
+#revealStage, #tropicalRevealStage, #compareRevealStage,
+.reveal .stage {
+  transform: translate(-50%, calc(-50% + var(--dash-pan, 0px))) scale(var(--reveal-zoom, var(--dash-zoom, 1)));
+  transition: transform 1300ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+  /* NAV TEST N2.0: Skip's subtle gold text (tropical-reading.html, Sep 1 ruling), carried here for Save Chart only */
+  .coz-skip { position:fixed; top:calc(env(safe-area-inset-top) + 16px); right:18px; z-index:9999;
+    font-family:-apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; font-size:11px; letter-spacing:0.16em;
+    text-transform:uppercase; color:rgba(201,161,94,0.55); background:transparent; border:0; padding:10px 6px;
+    opacity:0; pointer-events:none; transition:opacity 0.9s ease; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .coz-skip:active { color:rgba(233,215,174,0.9); }
+  /* NAV TEST N2.0: Save Chart, its own control (the bookmark no longer saves). Same gold text as Skip,
+     same corner. Shown on the dashboard; never during the reveal, or while Skip is
+     showing. Placement is Jason's call. */
+  body[data-view="dashboard"] .coz-save { opacity:1; pointer-events:auto; }
+  body.scroll-locked .coz-save, body.asq-locked .coz-save,
+  body:has(.coz-skip.asq.on) .coz-save { opacity:0 !important; pointer-events:none !important; }
+</style>
+<!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
+<script src="coz-saved.js?v=20"></script>
+</head>
+<body data-view="dashboard">
+<button type="button" class="coz-skip coz-save" data-coz-save aria-label="Save this chart">Save Chart</button>
+
+<div class="vedic-bg" aria-hidden="true"></div>
+
+<!-- ===== PAID DASHBOARD ===== -->
+<div class="dash" id="dash" aria-label="Compare Your Charts dashboard">
+  <div class="stage" id="dashStage">
+    <img class="stage-art" src="/Demo/compare-dash.jpg?v=10" alt="" width="1084" height="1908">
+    <div class="asc-patch asc-patch-glyph" aria-hidden="true"></div>
+    <div class="asc-patch asc-patch-text" aria-hidden="true"></div>
+    <div class="asc-glyph" aria-hidden="true"></div>
+    <div class="asc-label" aria-hidden="true"></div>
+
+    <button class="hot hot-reading" id="hotReading" type="button" style="left:23.99%;top:57.23%;width:53.04%;height:4.19%" aria-label="Your Combined Reading">Your Combined Reading</button>
+    <button class="hot" type="button" data-dash="ascendant"  style="left:23.99%;top:62.63%;width:53.04%;height:4.45%" aria-label="Your Ascendants">Your Ascendants</button>
+    <button class="hot" type="button" data-dash="timing" data-href="compare-current-timing.html" style="left:23.99%;top:69.18%;width:53.04%;height:4.45%" aria-label="Your Current Timing">Your Current Timing</button>
+    <button class="hot" type="button" data-dash="birth-charts" data-href="compare-birth-charts.html" style="left:23.99%;top:75.21%;width:53.04%;height:4.45%" aria-label="Your Birth Charts">Your Birth Charts</button>
+    <button class="hot" type="button" data-dash="home"    style="left:18.91%;top:86.74%;width:20.11%;height:3.14%" aria-label="Home">Home</button>
+    <button class="hot" type="button" data-dash="saved"   style="left:39.02%;top:86.74%;width:20.11%;height:3.14%" aria-label="Saved">Saved</button>
+    <button class="hot" type="button" data-dash="account" style="left:59.13%;top:86.74%;width:20.11%;height:3.14%" aria-label="Account">Account</button>
+  </div>
+</div>
+
+<!-- ===== REVEAL ===== -->
+<div class="reveal" id="reveal" role="dialog" aria-label="Opening your Combined reading">
+  <div class="stage" id="revealStage">
+    <img class="stage-art" src="/Demo/compare-dash.jpg?v=10" alt="" width="1084" height="1908">
+    <video id="revealVideo" src="/Demo/compare-reading-reveal-full.mp4?v=1080" muted playsinline preload="auto" aria-hidden="true"></video>
+    <div class="asc-patch asc-patch-glyph" aria-hidden="true"></div>
+    <div class="asc-patch asc-patch-text" aria-hidden="true"></div>
+    <div class="asc-glyph" aria-hidden="true"></div>
+    <div class="asc-label" aria-hidden="true"></div>
+  </div>
+  <div class="reveal-curtain" aria-hidden="true"></div>
+  <button class="reveal-back" id="revealBack" type="button" aria-label="Return to your Compare dashboard">
+    <svg viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M29 10H2M9 3 2 10l7 7"/></svg>
+  </button>
+  <span class="sr-only" aria-live="polite" id="revealLive"></span>
+</div>
+
+<main class="vedic-reading-page" id="vedicPage">
+  <button class="vedic-back-button" id="vedicBack" type="button" aria-label="Back to your Compare dashboard">
+    <svg viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M29 10H2M9 3 2 10l7 7"/>
+    </svg>
+  </button>
+  <div class="vedic-reading-content" id="vedicContent"></div>
+</main>
+
+<div class="vedic-stamp" aria-hidden="true">COMBINED READING · C3.6 · NAV TEST N2.0</div>
+
+<script>
+/* ============================================================
+   SECTION DATA (spec, verbatim)
+   ============================================================ */
+const vedicReadingSections = [
+  { id: "at-your-core",            number: 1, title: "At Your Core",              nextLabel: "Love, Desire & Creativity" },
+  { id: "love-desire-creativity",  number: 2, title: "Love, Desire & Creativity", nextLabel: "Work, Money & Expression" },
+  { id: "work-money-expression",   number: 3, title: "Work, Money & Expression",  nextLabel: "Wisdom, Purpose & Legacy" },
+  { id: "wisdom-purpose-legacy",   number: 4, title: "Wisdom, Purpose & Legacy",  nextLabel: "Challenges & Resilience" },
+  { id: "challenges-resilience",   number: 5, title: "Challenges & Resilience",   nextLabel: "Your Integrated Takeaway" },
+  { id: "integrated-takeaway",     number: 6, title: "Your Integrated Takeaway",  nextLabel: null }
+];
+const SECTION_TOTAL = String(vedicReadingSections.length).padStart(2, "0");
+
+/* ============================================================
+   READING SOURCE
+   The server-side generator supplies the reading in the spec's JSON
+   contract ({ system, title, subtitle, sections:[{id, number, title,
+   body[], sourceFactors[]}] }) as window.COZ_COMPARE_READING or stored
+   in localStorage "cozCompareReading". A flat { "<section id>": [...] }
+   shape is also accepted. sourceFactors are never rendered.
+   Anything carrying fixture: true is refused as customer content.
+   ============================================================ */
+/* ============================================================
+   >>> PLACEHOLDER / FIXTURE CONTENT. NOT A CUSTOMER READING. <<<
+   The Combined (compare) reading has not been specified yet. These
+   short paragraphs exist only so the six-page flow can be walked.
+   They are refused as customer content (fixture: true) and will be
+   replaced by the combined generator's output once that spec exists.
+   ============================================================ */
+const COZ_COMPARE_SAMPLE_READING = {
+  fixture: true, sample: true, customer: null,
+  system: "compare", title: "Your Combined Reading", subtitle: "Tropical + Vedic. One Complete View.",
+  sections: [
+    { id:"at-your-core", number:1, title:"At Your Core", sourceFactors:["placeholder"],
+      tropicalPerspective:["Placeholder. The Tropical view of central identity: how you meet the world, the manner others recognise, the outward temperament drawn from the Sun, Moon, Ascendant and chart ruler."],
+      vedicPerspective:["Placeholder. The Vedic view of the self underneath: what the Lagna and its lord, the Moon and their Nakshatras suggest about inner orientation and the patterns that repeat."],
+      completeView:["Placeholder. Where the two agree, the reading may treat it as a settled feature. Where they differ, it may describe a range: the self that shows and the self that runs underneath, operating together in one person."] },
+    { id:"love-desire-creativity", number:2, title:"Love, Desire & Creativity", sourceFactors:["placeholder"],
+      tropicalPerspective:["Placeholder. Attraction, romantic behaviour and creative instinct as the Tropical chart describes them."],
+      vedicPerspective:["Placeholder. Relationship and creative themes as the Vedic fifth, seventh and eighth houses, their lords and the Moon describe them."],
+      completeView:["Placeholder. Reinforcement, complement or contrast between the two, and how they may operate together."] },
+    { id:"work-money-expression", number:3, title:"Work, Money & Expression", sourceFactors:["placeholder"],
+      tropicalPerspective:["Placeholder. Communication, work style and public identity from the Tropical chart."],
+      vedicPerspective:["Placeholder. Resources, effort and voice from the Vedic second, third, sixth and tenth houses and their lords."],
+      completeView:["Placeholder. The public role and the underlying calling, read together."] },
+    { id:"wisdom-purpose-legacy", number:4, title:"Wisdom, Purpose & Legacy", sourceFactors:["placeholder"],
+      tropicalPerspective:["Placeholder. Beliefs, growth direction and the nodes as the Tropical chart frames them."],
+      vedicPerspective:["Placeholder. Dharma houses, Rahu and Ketu, and the developmental themes the Vedic chart points toward."],
+      completeView:["Placeholder. Two readings of one theme, and what they suggest together."] },
+    { id:"challenges-resilience", number:5, title:"Challenges & Resilience", sourceFactors:["placeholder"],
+      tropicalPerspective:["Placeholder. Recurring pressures and supports as the Tropical chart describes them."],
+      vedicPerspective:["Placeholder. Saturn, Mars and the nodes, the sixth, eighth and twelfth houses and their lords, as the Vedic chart describes them."],
+      completeView:["Placeholder. What tends to show on the surface, what tends to run underneath, and the supports both systems find."] },
+    { id:"integrated-takeaway", number:6, title:"Your Integrated Takeaway", sourceFactors:["placeholder"],
+      body:["Placeholder. A single synthesis using only the strongest patterns already established above: the themes both systems share, and the one place they most usefully disagree. No new placements, no new conclusions."] }
+  ]
+};
+
+/* Combined reading contract: each section carries three parts,
+   tropicalPerspective[], vedicPerspective[], completeView[] (paragraph arrays).
+   A plain body[] is also accepted and rendered as one run of paragraphs. */
+const PART_LABELS = [["tropicalPerspective", "Tropical Perspective"], ["vedicPerspective", "Vedic Perspective"], ["completeView", "Complete View"]];
+function readingFromContract(obj) {
+  if (!obj || typeof obj !== "object") return null;
+  if (Array.isArray(obj.sections)) {
+    const map = {};
+    obj.sections.forEach(sec => {
+      if (!sec || !sec.id) return;
+      if (PART_LABELS.some(([k]) => Array.isArray(sec[k]))) map[sec.id] = { parts: PART_LABELS.filter(([k]) => Array.isArray(sec[k])).map(([k, label]) => ({ label, paragraphs: sec[k] })) };
+      else if (Array.isArray(sec.body)) map[sec.id] = sec.body;
+    });
+    return map;
+  }
+  return obj;
+}
+function isCustomerReading(obj) { return !!obj && typeof obj === "object" && obj.fixture !== true && obj.sample !== true; }
+
+function loadReading() {
+  if (isCustomerReading(window.COZ_COMPARE_READING)) return readingFromContract(window.COZ_COMPARE_READING);
+  try {
+    const stored = JSON.parse(localStorage.getItem("cozCompareReading") || "null");
+    if (isCustomerReading(stored)) return readingFromContract(stored);
+  } catch (e) {}
+  return readingFromContract(COZ_COMPARE_SAMPLE_READING);   // SAMPLE / FIXTURE, last resort only
+}
+
+/* ============================================================
+   NAVIGATION TARGETS
+   The dashboard lives in THIS document at #/dashboard, so going
+   back never leaves the page.
+   ============================================================ */
+const params = new URLSearchParams(location.search);
+const DASHBOARD_HREF = "#/dashboard";
+/* C2.1: Your Combined Reading now opens the Your Ascendants page. The old
+   placeholder mockup sections are retired; any old #/section link is sent there too.
+   QA sign values (?w= / ?v=) are passed through when present. */
+function readingPageHref() {
+  const q = new URLSearchParams();
+  if (params.get("w")) q.set("w", params.get("w"));
+  if (params.get("v")) q.set("v", params.get("v"));
+  const s = q.toString();
+  return "combined-reading.html";   /* C2.5: the sun reveal lands on Your Combined Reading */
+}
+
+function goDashboard() {
+  if (idFromHash() === "dashboard") showFromHash(); else location.hash = DASHBOARD_HREF;
+}
+
+function finishReading() {
+  try { localStorage.setItem("cozCompareReadingComplete", new Date().toISOString()); } catch (e) {}
+  try { window.dispatchEvent(new CustomEvent("COZ_COMPARE_READING_COMPLETE")); } catch (e) {}
+  goDashboard();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg>';
+const ARROW_L = '<svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 7H2M7 2 2 7l5 5"/></svg>';
+const ARROW_R = '<svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 7h19M15 2l5 5-5 5"/></svg>';
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function sectionById(id) { return vedicReadingSections.find(s => s.id === id) || vedicReadingSections[0]; }
+
+function renderSection(section) {
+  const reading = loadReading();
+  const entry = reading[section.id];
+  const paragraphs = Array.isArray(entry) ? entry : [];
+  const parts = entry && Array.isArray(entry.parts) ? entry.parts : null;
+  const sectionCounter = `${String(section.number).padStart(2, "0")} OF ${SECTION_TOTAL}`;
+  const titleClass = section.title.length > 22 ? "vedic-title vedic-title--long" : "vedic-title";
+  const next = section.nextLabel ? vedicReadingSections[section.number] : null;
+
+  const nextControl = next
+    ? `<a class="vedic-nav-next" href="#/${next.id}" data-next="${next.id}">Next: ${esc(section.nextLabel)} ${ARROW_R}</a>`
+    : `<button class="vedic-nav-next" type="button" id="vedicFinish">Finish Reading ${ARROW_R}</button>`;
+
+  const html = `
+    <header class="vedic-header">
+      <img class="vedic-logo" src="/Demo/vedic-logo.png" alt="CozAlyze" width="1000" height="1055">
+      <p class="vedic-eyebrow">Your Combined Reading</p>
+      <p class="vedic-counter">${sectionCounter}</p>
+    </header>
+    <div class="vedic-divider" aria-hidden="true">${STAR_SVG}</div>
+    <h1 class="${titleClass}">${esc(section.title)}</h1>
+    <div class="vedic-divider" aria-hidden="true">${STAR_SVG}</div>
+    <section class="vedic-body">
+      ${parts
+        ? parts.map((part, i) => `${i ? `<div class="vedic-divider vedic-divider--part" aria-hidden="true">${STAR_SVG}</div>` : ""}<p class="vedic-eyebrow vedic-part-label">${esc(part.label)}</p>${part.paragraphs.map(p => `<p>${esc(p)}</p>`).join("")}`).join("")
+        : paragraphs.map(p => `<p>${esc(p)}</p>`).join("")}
+    </section>
+    <nav class="vedic-nav" aria-label="Reading navigation">
+      <div class="vedic-nav-rule" aria-hidden="true">${STAR_SVG}</div>
+      <div class="vedic-nav-links">
+        <a href="#/dashboard" id="vedicNavBack">${ARROW_L} Back to Your Reading</a>
+        ${nextControl}
+      </div>
+    </nav>`;
+
+  const old = document.getElementById("vedicContent");
+  const fresh = old.cloneNode(false);      // fresh node so the fade re-runs on every section
+  fresh.innerHTML = html;
+  old.replaceWith(fresh);
+
+  document.title = `${section.title} · Your Combined Reading · CozAlyze`;
+
+  const finish = document.getElementById("vedicFinish");
+  if (finish) finish.addEventListener("click", finishReading);
+}
+
+/* ============================================================
+   HISTORY / ROUTING  (#/<section id>)
+   ============================================================ */
+function idFromHash() {
+  const m = location.hash.match(/^#\/?([a-z0-9-]+)/i);
+  return m ? m[1] : null;
+}
+
+/* Sep 22 (item 5): once per page, ask index.html (the living page underneath) to start
+   preparing the Combined Reading now, so it is usually ready by the time the reveal ends.
+   Nothing here loads the generator; a page opened outside index.html simply skips this. */
+let pregenAsked = false;
+function askPregen() {
+  if (pregenAsked) return; pregenAsked = true;
+  try { if (window.parent !== window) window.parent.postMessage({ coz: "COZ_COMBINED_PREGEN" }, "*"); } catch (e) {}
+}
+function showDashboard() {
+  document.body.dataset.view = "dashboard";
+  askPregen();
+  document.documentElement.classList.remove("reveal-zooming");
+  if (window.__dashZoomed) document.documentElement.style.setProperty("--dash-zoom", getComputedStyle(document.documentElement).getPropertyValue("--dash-zoom-in").trim() || "1.34");
+  document.title = "Your Combined Reading · CozAlyze";
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function showFromHash() {
+  const id = idFromHash();
+  if (!id || id === "dashboard") {
+    if (id !== "dashboard") history.replaceState({ id: "dashboard" }, "", "#/dashboard");
+    showDashboard();
+    return;
+  }
+  location.replace(readingPageHref()); return;   /* C2.1: old mockup retired */
+  const section = sectionById(id);
+  if (id !== section.id) {
+    history.replaceState({ id: section.id }, "", `#/${section.id}`);
+  }
+  document.body.dataset.view = "reading";
+  renderSection(section);
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+document.getElementById("vedicBack").addEventListener("click", goDashboard);
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const SAMPLE_SIGN_IN_ART = "Leo";   // baked into compare-dash.jpg and the clip's first frames
+const SIGN_GLYPH = { Aries:"\u2648", Taurus:"\u2649", Gemini:"\u264A", Cancer:"\u264B", Leo:"\u264C", Virgo:"\u264D",
+  Libra:"\u264E", Scorpio:"\u264F", Sagittarius:"\u2650", Capricorn:"\u2651", Aquarius:"\u2652", Pisces:"\u2653" };
+
+function resolveAscendant() {
+  /* C2.2: the validated chart-run pair first, so this glyph agrees with the Ascendants page */
+  try {
+    const bd = JSON.parse(localStorage.getItem("emergeBirthData") || "null");
+    const pr = JSON.parse(localStorage.getItem("cozAscendantPair") || "null");
+    if (bd && pr && bd.runId && pr.runId === bd.runId && pr.fingerprint === bd.fingerprint) {
+      const t = String(pr.tropical.sign); return t.charAt(0).toUpperCase() + t.slice(1);
+    }
+  } catch (e) {}
+  const pick = v => { if (!v) return null; v = String(v).trim(); v = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(); return SIGNS.includes(v) ? v : null; };
+  // The Ascendants button shows ONE glyph. This page uses the TROPICAL ascendant for it
+  // (?asc=, window.EMERGE_ASCENDANT_TROPICAL, stored emergeAscendantTropical). Two ascendants
+  // exist for the compare product; which one the icon shows is a design call, easy to switch here.
+  return pick(params.get("asc")) || pick(window.EMERGE_ASCENDANT_TROPICAL) || pick((() => { try { return localStorage.getItem("emergeAscendantTropical"); } catch (e) { return null; } })()) || SAMPLE_SIGN_IN_ART;
+}
+
+function paintAscendant(stage, sign) {
+  const live = sign !== SAMPLE_SIGN_IN_ART;
+  stage.dataset.ascLive = live ? "1" : "0";
+  stage.querySelector(".asc-glyph").textContent = live ? SIGN_GLYPH[sign] + "\uFE0E" : "";
+  stage.querySelector(".asc-label").textContent = sign;
+}
+
+/* Entrance: the whole art is shown first, then it eases in slightly so the type reads larger.
+   Once per page load; the reveal's stage shares the variable so the clip matches. */
+function dashZoomIn() {
+  const target = getComputedStyle(document.documentElement).getPropertyValue("--dash-zoom-in").trim() || "1.12";
+  const go = () => { window.__dashZoomed = true; document.documentElement.style.setProperty("--dash-zoom", target); };
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { go(); return; }
+  /* Sep 21 (item 4): index.html shows this page's frame only on the page's load event,
+     so the ease-in is timed from that moment (not from the art image alone). Otherwise,
+     on this heavier page, the ease-in could run while the frame was still hidden and the
+     dashboard appeared already zoomed. */
+  const start = () => setTimeout(go, 1900);   /* the frame fades in first, so the whole art is seen before the ease-in */
+  if (document.readyState === "complete") start(); else window.addEventListener("load", start, { once: true });
+}
+dashZoomIn();
+
+const ASC_SIGN = resolveAscendant();
+paintAscendant(document.getElementById("dashStage"), ASC_SIGN);
+paintAscendant(document.getElementById("revealStage"), ASC_SIGN);
+document.querySelector('[data-dash="ascendant"]').setAttribute("aria-label", `Your Ascendants, ${ASC_SIGN}`);
+
+/* Reading readiness. The engine sets window.COZ_COMPARE_READING_STATUS = "preparing"
+   while it works; anything else counts as ready. The reading is never regenerated
+   here, this page only reads what the engine stored. */
+function readingReady() { return window.COZ_COMPARE_READING_STATUS !== "preparing"; }
+function syncReadyState() {
+  const ready = readingReady();
+  const b = document.getElementById("hotReading");
+  b.disabled = !ready;
+  b.setAttribute("aria-label", ready ? "Your Combined Reading" : "Preparing Your Reading…");
+  document.getElementById("dash").classList.toggle("dash-preparing", !ready);
+}
+syncReadyState();
+window.addEventListener("COZ_COMPARE_READING_STATUS", syncReadyState);
+
+/* Other dashboard doors: not built yet. Each fires an event and follows a
+   data-href if one is set later, nothing else. Entitlement check hook for the
+   payment system goes here too, once one exists (never a URL parameter). */
+document.querySelectorAll(".hot[data-dash]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.dash;
+    try { window.dispatchEvent(new CustomEvent("COZ_CDASH_" + id.toUpperCase().replace(/-/g, "_"), { detail: { ascendant: ASC_SIGN } })); } catch (e) {}
+    if (btn.dataset.href) location.href = btn.dataset.href;
+  });
+});
+
+/* ============================================================
+   REVEAL  (tap → lock → play once → curtain → Page 01)
+   ============================================================ */
+const revealEl = document.getElementById("reveal");
+const revealVideo = document.getElementById("revealVideo");
+let revealActive = false, revealDone = false, revealTimers = [];
+/* warm the clip while the dashboard is up so the turn can start the moment it is tapped */
+try { revealVideo.load(); } catch (e) {}
+
+function lockScroll(on) { document.body.classList.toggle("scroll-locked", on); }
+
+function startReveal() {
+  if (revealActive || !readingReady()) return;
+  revealActive = true; revealDone = false;
+  document.getElementById("hotReading").disabled = true;
+  lockScroll(true);
+  try { window.dispatchEvent(new CustomEvent("COZ_COMPARE_REVEAL_START", { detail: { ascendant: ASC_SIGN } })); } catch (e) {}
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) { finishReveal(true); return; }
+
+  revealEl.classList.remove("is-closing", "asc-off");
+  revealEl.classList.add("is-on");
+  // the clip zooms from its letterboxed first frame to full frame over ~1s; ease the stage back to cover-fit in step
+  document.documentElement.classList.add("reveal-zooming");
+  setTimeout(() => document.documentElement.style.setProperty("--dash-zoom", getComputedStyle(document.documentElement).getPropertyValue("--reveal-zoom").trim() || "1.23"), 120);
+  document.getElementById("revealLive").textContent = "Opening your Combined reading";
+
+  // if the clip cannot even start (no network, blocked), move on rather than trap anyone
+  revealTimers.push(setTimeout(() => { if (!revealStarted) finishReveal(false); }, 7000));
+
+  revealStarted = false;
+  try { revealVideo.currentTime = 0; } catch (e) {}
+  const p = revealVideo.play();
+  if (p && p.catch) p.catch(() => finishReveal(false));
+}
+
+/* timers that depend on the clip actually running start only once it is playing */
+let revealStarted = false;
+revealVideo.addEventListener("playing", () => {
+  if (revealStarted || !revealActive) return;
+  revealStarted = true;
+  // the live ascendant overlay stays while the buttons are still on screen, then lets go before the burst
+  revealTimers.push(setTimeout(() => revealEl.classList.add("asc-off"), 1900));
+  /* Sep 1 ruling: ONE motion. The drive into the sun begins while the burst is still
+     blooming, the light takes the screen while the stage is still growing, the page
+     lands under the light and the light clears. No hold anywhere. */
+  revealTimers.push(setTimeout(() => revealEl.classList.add("is-through"), 1500));
+  /* Sep 20: the reveal, the drive through the sun, the light and the space flight are now ONE clip
+     (/Demo/compare-reading-reveal-full.mp4). The page just plays it and lands when it ends. */
+  // hard cap a little past the clip's 2.5s so a stalled clip never traps anyone
+  revealTimers.push(setTimeout(() => finishReveal(false), 47000));   /* stall guard only: the clip runs 44.5s */
+});
+
+function finishReveal(immediate) {
+  if (!revealActive || revealDone) return;   // ignore clip events while the reveal is not running
+  revealDone = true;
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  const land = () => {
+    location.href = readingPageHref();          // C2.5: opens Your Combined Reading
+    revealEl.classList.remove("is-on", "is-closing", "asc-off");
+    try { revealVideo.pause(); } catch (e) {}
+    lockScroll(false);
+    revealActive = false;
+    syncReadyState();
+  };
+  if (immediate === true) { land(); return; }
+  /* Sep 1 ruling: through the sun. Hold on the burst, then the camera drives into it, the light
+     fills the screen, the page lands underneath and the light clears to reveal the reading. */
+  if (immediate === "through"){
+    try { window.__cozLightIn(); } catch (e) {}
+    land();
+    return;
+  }
+  /* stall or error before the drive began: plain curtain */
+  revealEl.classList.add("is-closing");
+  setTimeout(land, 900);
+}
+
+function cancelReveal() {
+  if (!revealActive || revealDone) return;
+  revealDone = true;
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  document.documentElement.classList.remove("reveal-zooming");
+  document.documentElement.style.setProperty("--dash-zoom", getComputedStyle(document.documentElement).getPropertyValue("--dash-zoom-in").trim() || "1.34");
+  try { revealVideo.pause(); revealVideo.currentTime = 0; } catch (e) {}
+  revealEl.classList.remove("is-on", "is-closing", "is-through", "asc-off");
+  lockScroll(false);
+  revealActive = false;
+  syncReadyState();
+}
+
+/* C2.5 (his ruling, Sep 19): the chart-opening sunburst belongs to the FIRST tab.
+   Your Combined Reading plays it and lands on combined-reading.html.
+   Your Ascendants opens its page directly, no reveal. */
+document.getElementById("hotReading").addEventListener("click", startReveal);
+document.querySelector('[data-dash="ascendant"]').addEventListener("click", function () {
+  location.href = "your-ascendants.html";
+});
+document.getElementById("revealBack").addEventListener("click", cancelReveal);
+revealVideo.addEventListener("ended", () => finishReveal(true));   /* the clip ends on open space, the reading is already underneath */
+revealVideo.addEventListener("error", () => finishReveal(false));
+
+/* Section links are plain hash links: every section is its own history entry,
+   so the phone's back gesture steps through them, and back past Page 01 lands on the dashboard. */
+window.addEventListener("hashchange", showFromHash);
+/* C2.1: coming Back from Your Ascendants restores this page from Safari's cache with the
+   light still up, so clear the reveal and show the dashboard again */
+window.addEventListener("pageshow", e => {
+  if (!e.persisted) return;
+  revealTimers.forEach(clearTimeout); revealTimers = [];
+  revealActive = false; revealDone = false;
+  revealEl.classList.remove("is-on", "is-closing", "asc-off", "is-through");
+  try { window.__cozLightOut(); } catch (err) {}
+  lockScroll(false);
+  syncReadyState();
+  showDashboard();
+});
+showFromHash();
+/* ---------- dashboard pinch zoom (Sep 1) ---------- */
+(function(){
+  const dash = document.getElementById("dash"), root = document.documentElement;
+  let active = false, startD = 0, startZ = 1, maxZ = 1.3;
+  const cur = () => parseFloat(getComputedStyle(root).getPropertyValue("--dash-zoom")) || 1;
+  const dist = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  dash.addEventListener("touchstart", e => {
+    if (e.touches.length !== 2) return;
+    active = true; startD = dist(e) || 1; startZ = cur();
+    maxZ = parseFloat(getComputedStyle(root).getPropertyValue("--dash-zoom-in")) || 1.3;
+    dash.classList.add("pinching"); window.__dashZoomed = true;
+  }, { passive:true });
+  dash.addEventListener("touchmove", e => {
+    if (!active || e.touches.length !== 2) return;
+    e.preventDefault();
+    const z = Math.min(maxZ, Math.max(1, startZ * (dist(e) / startD)));
+    root.style.setProperty("--dash-zoom", z.toFixed(3));
+  }, { passive:false });
+  const end = () => { if (!active) return; active = false; dash.classList.remove("pinching"); };
+  dash.addEventListener("touchend", end); dash.addEventListener("touchcancel", end);
+})();
+
+/* ---------- reveal sound (Sep 1): the reading tap fires the app's harmony cue through
+   the living frame's engine and re-asserts the bed, the same way the old Vedic page did ---------- */
+document.getElementById("hotReading").addEventListener("click", function(){
+  try {
+    const snd = (window.parent !== window) ? window.parent.EMERGE_SOUND : null;
+    if (snd){ snd.loop("ambient"); snd.play("harmony"); }
+  } catch(_){}
+});
+
+
+/* zoom lock (Sep 1): iOS lets a two-finger pinch zoom the whole page even with
+   user-scalable=no, and that zoom survives a reload, which is what threw the globe
+   off on the second run. Native page zoom is refused here; the dashboards keep
+   their own two-finger art zoom. */
+(function(){
+  ['gesturestart','gesturechange','gestureend'].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); }, { passive:false }); });
+  document.addEventListener('touchmove', function(e){ if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive:false });
+})();
+
+/* ---------- one-finger pan on the zoomed dashboard (Sep 1) ---------- */
+(function(){
+  const dash = document.getElementById("dash"), stage = document.getElementById("dashStage"), root = document.documentElement;
+  let panning = false, startY = 0, startPan = 0, moved = false;
+  const zoom = () => parseFloat(getComputedStyle(root).getPropertyValue("--dash-zoom")) || 1;
+  const pan = () => parseFloat(getComputedStyle(root).getPropertyValue("--dash-pan")) || 0;
+  const limit = () => Math.max(0, (stage.offsetHeight * zoom() - window.innerHeight) / 2);
+  dash.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1 || zoom() <= 1.001) return;
+    panning = true; moved = false; startY = e.touches[0].clientY; startPan = pan();
+  }, { passive:true });
+  dash.addEventListener("touchmove", e => {
+    if (!panning || e.touches.length !== 1) return;
+    const dy = e.touches[0].clientY - startY;
+    if (Math.abs(dy) > 6) moved = true;
+    if (!moved) return;
+    e.preventDefault(); dash.classList.add("panning");
+    const L = limit(); const y = Math.max(-L, Math.min(L, startPan + dy));
+    root.style.setProperty("--dash-pan", y.toFixed(1) + "px");
+  }, { passive:false });
+  const end = () => { panning = false; dash.classList.remove("panning"); };
+  dash.addEventListener("touchend", end); dash.addEventListener("touchcancel", end);
+  /* a real drag must not count as a tap on the hotspot underneath */
+  dash.addEventListener("click", e => { if (moved){ e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+})();
+
+
+/* ---------- through the sun + text zoom (Sep 1) ---------- */
+(function(){
+  const light = document.createElement("div"); light.id = "cozLight"; document.body.appendChild(light);
+  window.__cozLightIn  = () => { light.classList.add("on"); };
+  window.__cozLightOut = () => { requestAnimationFrame(() => requestAnimationFrame(() => light.classList.remove("on"))); };
+})();
+(function(){
+  const root = document.documentElement;
+  let active = false, startD = 0, startZ = 1;
+  const inText = () => document.body.dataset.view === "reading" || document.body.dataset.view === "ascendant";
+  const cur = () => parseFloat(getComputedStyle(root).getPropertyValue("--coz-text-zoom")) || 1;
+  const dist = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  document.addEventListener("touchstart", e => { if (!inText() || e.touches.length !== 2) return; active = true; startD = dist(e) || 1; startZ = cur(); }, { passive:true });
+  document.addEventListener("touchmove", e => {
+    if (!active || e.touches.length !== 2) return;
+    e.preventDefault();
+    const z = Math.min(2, Math.max(1, startZ * (dist(e) / startD)));
+    root.style.setProperty("--coz-text-zoom", z.toFixed(3));
+  }, { passive:false });
+  const end = () => { active = false; };
+  document.addEventListener("touchend", end); document.addEventListener("touchcancel", end);
+})();
+
+
+/* Sep 20: un-zoom the reveal stage during the gold light (3.6s in), restore on exit. */
+(function () {
+  var st = document.querySelector(".reveal .stage");
+  if (!st) return;
+  var t = null;
+  var vid = document.querySelector(".reveal video");
+  if (!vid) return;
+  function unzoom() {
+    var w = st.offsetWidth, h = st.offsetHeight;
+    if (!w || !h) return;
+    var cover = Math.max(window.innerWidth / w, window.innerHeight / h);
+    if (!isFinite(cover) || cover < 1) cover = 1;
+    cover = Math.min(cover, 1.3);
+    st.style.setProperty("--reveal-zoom", cover.toFixed(4));
+  }
+  function reset() { clearTimeout(t); st.style.removeProperty("--reveal-zoom"); }
+  vid.addEventListener("playing", function () { clearTimeout(t); t = setTimeout(unzoom, 3600); });
+  vid.addEventListener("ended", reset);
+  vid.addEventListener("error", reset);
+  vid.addEventListener("pause", function () { if (vid.currentTime === 0) reset(); });
+})();
+</script>
+</body>
+</html>

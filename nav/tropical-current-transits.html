@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Current Transits · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/Demo/tropical-transits-bg.jpg?v=1">
+<style>
+/* COZALYZE · TROPICAL · YOUR CURRENT TRANSITS · TT1.1
+   One continuous page (his Sep 24 layout, supersedes the two-page draft):
+   his baked artwork (tropical-transits-bg.jpg, 850x1850) at full width, the live
+   logo (/Demo/vedic-logo.png) and title above the wheel, nothing over the wheel.
+   TT1.1 (his device review): nothing over the water either. Every calculated line
+   and reading paragraph starts below the water (art row 1380), and the three
+   reading sections are drop-downs, closed when the page opens, one open at a time,
+   the same rows as How This Was Calculated.
+   Past the artwork the page continues in the artwork's own bottom colour.
+   Calculation: compare-current-timing.js loadTropical() (same policy, selection,
+   solver and Tropical bank as Compare), recalculated every time the page opens.
+   The wording is a development draft pending Western review. */
+:root{ --water:#000006; --cream:#EEE7D8; --gold:#D6B98C; --gold-soft:#B89A6E;
+  --head:"Cinzel",Georgia,serif; --body:"EB Garamond",Georgia,serif; --asq-nav-h:64px; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--water);color:var(--cream);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{font-family:var(--body)}
+.page{position:relative;width:100%;max-width:640px;margin:0 auto;container-type:inline-size;
+  background:url("/Demo/tropical-transits-bg.jpg?v=1") center top/100% auto no-repeat,var(--water)}
+.art{min-height:calc(100cqw * 1850 / 850);padding-bottom:calc(var(--asq-nav-h) + 56px + env(safe-area-inset-bottom))}
+
+/* above the wheel: the wheel's top point sits at art row 372 */
+.hero{height:calc(100cqw * 1380 / 850);padding-top:calc(3.6cqw + env(safe-area-inset-top));text-align:center}
+.logo{display:block;width:21cqw;height:auto;margin:0 auto}
+h1{font-family:var(--head);font-weight:500;font-size:max(21px,6.2cqw);line-height:1.08;letter-spacing:.05em;color:var(--cream);
+  margin-top:1.6cqw;padding:0 6cqw;text-shadow:0 2px 10px rgba(0,0,0,.75)}
+
+/* everything below the wheel, in the water */
+.content{padding:0 7cqw;text-shadow:0 1px 3px rgba(0,0,6,.95),0 0 14px rgba(0,0,6,.7)}
+.asof{text-align:center;font-style:italic;font-size:clamp(15px,4.2cqw,18px);color:var(--gold);letter-spacing:.02em}
+.summary{text-align:center;font-size:clamp(19px,5.4cqw,23px);line-height:1.5;color:var(--cream);margin:.55em auto 0;max-width:34em}
+.status{text-align:center;font-style:italic;font-size:clamp(17px,4.8cqw,20px);line-height:1.5;color:var(--cream);opacity:.9}
+h2{font:inherit}
+.sec-body{padding:2px 2px 26px}
+.sec-body p{font-size:clamp(18px,4.95cqw,21px);line-height:1.62;color:var(--cream);margin-top:.85em}
+.sec-body > p:first-child{margin-top:.2em}
+.contact{margin-top:28px;padding-top:24px;border-top:1px solid rgba(184,154,110,.28)}
+.contact:first-child{margin-top:4px;border-top:0;padding-top:0}
+h3{font-family:var(--head);font-weight:500;font-size:clamp(16px,4.5cqw,19.5px);letter-spacing:.04em;line-height:1.3;color:var(--cream)}
+.meta{font-style:italic;font-size:clamp(15.5px,4.3cqw,18px);line-height:1.4;color:var(--gold);margin-top:.35em}
+.contact .meta + p{margin-top:.7em}
+
+/* drop-down rows: the three reading sections and How This Was Calculated, all closed at first */
+.drops{margin-top:36px;border-bottom:1px solid rgba(184,154,110,.4)}
+.drop{border-top:1px solid rgba(184,154,110,.4)}
+.acc-btn{appearance:none;-webkit-appearance:none;background:none;border:0;cursor:pointer;width:100%;min-height:52px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;color:var(--gold);font-family:var(--head);font-weight:500;font-size:clamp(15.5px,4.3cqw,18px);letter-spacing:.05em;
+  text-align:left;padding:12px 2px;-webkit-tap-highlight-color:transparent;text-shadow:inherit}
+.acc-btn:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+.acc-btn svg{width:18px;height:18px;flex:none;transition:transform .4s ease}
+.acc-btn[aria-expanded="true"] svg{transform:rotate(180deg)}
+.acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s ease}
+.acc.open{grid-template-rows:1fr}
+.acc-in{overflow:hidden;visibility:hidden;transition:visibility 0s .4s}
+.acc.open .acc-in{visibility:visible;transition:visibility 0s 0s}
+.drop dl{padding:2px 2px 20px}
+.drop dt{font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.08em;color:var(--gold-soft);margin-top:14px}
+.drop dd{font-size:17px;line-height:1.5;color:var(--cream);overflow-wrap:anywhere;margin-top:2px}
+
+.note{text-align:center;font-style:italic;font-size:clamp(15.5px,4.3cqw,18px);line-height:1.5;color:var(--cream);opacity:.85;margin-top:26px}
+.pager{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;margin-top:30px}
+.pager a{font-family:var(--head);font-weight:500;font-size:clamp(12.5px,3.5cqw,15px);letter-spacing:.06em;color:var(--gold);text-decoration:none;
+  min-height:44px;display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent}
+.pager a:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+.stamp{margin-top:26px;text-align:right;font:8px/1 var(--body);letter-spacing:.08em;color:rgba(204,164,102,.45);text-shadow:none}
+
+/* the normal Tropical reading footer (tropical-reading.html #cozFoot, v20.1), always shown here */
+#cozFoot{position:fixed;left:0;right:0;bottom:0;z-index:40;padding-bottom:env(safe-area-inset-bottom);background:rgba(8,11,17,.86);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid rgba(201,161,94,.18)}
+#cozFoot .coz-foot-tag{text-align:center;font-family:'EB Garamond',serif;font-style:italic;font-size:13px;letter-spacing:.04em;color:#8b8272;padding:11px 20px 3px}
+#cozFoot .coz-foot-links{display:flex;height:var(--asq-nav-h,64px)}
+#cozFoot a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-decoration:none;color:#8b8272;font-size:10.5px;
+  letter-spacing:.06em;font-family:'EB Garamond',serif;-webkit-tap-highlight-color:transparent}
+#cozFoot a svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+#cozFoot a:active{color:#c9a15e}
+#cozFoot a:focus-visible{outline:1px solid #c9a15e;outline-offset:-4px}
+@media (prefers-reduced-motion:reduce){.acc,.acc-btn svg,.acc-in{transition:none}}
+</style>
+<script src="coz-saved.js?v=20"></script>
+<script src="saved-tropical-library.js?v=2"></script>
+</head>
+<body>
+<main class="page">
+ <div class="art">
+  <header class="hero">
+    <img class="logo" src="/Demo/vedic-logo.png" alt="CozAlyze" width="1000" height="1055">
+    <h1>Your Current Transits</h1>
+  </header>
+  <div class="content">
+    <p class="status" id="status">Calculating your current transits&hellip;</p>
+    <div id="reading"></div>
+    <nav class="pager" aria-label="Reading navigation">
+      <a href="tropical-reading.html">&lsaquo; Back to Your Tropical Reading</a>
+      <a href="tropical-birth-chart.html">Next: Your Birth Chart &rsaquo;</a>
+    </nav>
+    <div class="stamp" aria-hidden="true">CURRENT TRANSITS · TT1.1 · NAV TEST N2.0</div>
+  </div>
+ </div>
+</main>
+<div id="cozFoot">
+  <div class="coz-foot-tag">CozAlyze helps you see it all</div>
+  <div class="coz-foot-links">
+    <a href="tropical-reading.html"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>Home</a>
+    <a href="#" data-foot="saved"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Saved</a>
+    <a href="#" data-foot="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.4 3.9-5 7-5s5.8 1.6 7 5"/></svg>Account</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script src="ascendant-library.js?v=4"></script>
+<script src="compare-current-timing.js?v=4"></script>
+<script>
+(function(){
+  'use strict';
+  var TM = window.COZ_TIMING;
+  var $ = function(id){ return document.getElementById(id); };
+  var CHEV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg>';
+  var NOTE = 'These are themes that may be present\u2014not predictions of what will happen.';
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function cap(s){ return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function asOf(d){
+    return 'As of ' + d.toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }) + ', ' +
+           d.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' });
+  }
+  function stamp(t){ return new Date(t).toLocaleString('en-US', { dateStyle:'medium', timeStyle:'short' }); }
+
+  function blocksHTML(blocks){
+    var html = '', open = false;
+    blocks.forEach(function(b){
+      if (b.type === 'h3'){ if (open) html += '</div>'; html += '<div class="contact"><h3>' + esc(b.text) + '</h3>'; open = true; }
+      else if (b.type === 'meta') html += '<p class="meta">' + esc(b.text) + '</p>';
+      else html += '<p>' + esc(b.text) + '</p>';
+    });
+    return html + (open ? '</div>' : '');
+  }
+
+  function methodology(d){
+    var t = d.tropical, P = d.policy, st = t.settings || {}, cl = t.client || {};
+    function rows(list){ return '<dl>' + list.filter(function(r){ return r[1]; }).map(function(r){ return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]).replace(/\n/g, '<br>') + '</dd>'; }).join('') + '</dl>'; }
+    var shown = d.fast.concat(d.slow ? [d.slow] : []);
+    var active = shown.length ? shown.map(function(h){
+      var w = h.window;
+      return h.planet + ' ' + h.aspect + ' natal ' + h.target + ', orb ' + h.orb.toFixed(2) + '\u00B0, ' + cap(h.status) +
+        '\nIn orb ' + (w.openStart ? 'before ' : '') + stamp(w.entry) + ' to ' + (w.openEnd ? 'after ' : '') + stamp(w.exit) +
+        (w.passes.length ? '\nExact ' + w.passes.map(stamp).join('; ') : (w.closest ? '\nNot exact in this window; closest ' + stamp(w.closest.t) + ', ' + w.closest.f.toFixed(2) + '\u00B0 from exact' : ''));
+    }).join('\n') : 'None within the current orbs';
+    var houses = st.resolvedHouseSystem ? st.resolvedHouseSystem + (st.usedHouseFallback ? ' (fallback from ' + st.requestedHouseSystem + ')' : '') : null;
+    return rows([
+      ['Zodiac', st.zodiac || 'Tropical'],
+      ['Calculated', stamp(d.now) + '. Transits are recalculated each time this page opens.'],
+      ['Natal chart', [cl.birthDate, cl.birthTime, cl.locationLabel].filter(Boolean).join(', ')],
+      ['Natal houses', houses],
+      ['Transiting planets', P.fastPlanets.join(', ') + ' (faster); ' + P.slowPlanets.join(', ') + ' (slower)' + (P.moonIncluded ? '; the Moon' : '. The Moon is not included.')],
+      ['Natal points', P.natalTargets.join(', ') + '. The nodes are ' + (st.nodeType || P.nodeType) + ' nodes.'],
+      ['Aspects and orbs', P.aspects.map(function(a){ return cap(a.type) + ' ' + a.angle + '\u00B0, orb ' + a.orb + '\u00B0'; }).join('\n')],
+      ['Angles and nodes', Object.keys(P.pointOrbCap).map(function(k){ return k + ' ' + P.pointOrbCap[k] + '\u00B0'; }).join(', ') + ' maximum orb'],
+      ['Selection', 'Only contacts already within orb, nothing announced ahead. The closest contact each planet makes is considered; up to ' + P.slots.fast +
+        ' faster and ' + P.slots.slow + ' slower planet are shown, smallest orb first. An unused place stays empty.'],
+      ['Active transits', active],
+      ['Exact', 'An exact pass is the moment the aspect angle is actually reached. The status reads Exact while the orb is within ' + P.exactThresholdDegrees +
+        '\u00B0. Active dates are solved from the planet\u2019s actual motion, including retrograde periods.'],
+      ['Interpretation', 'The calculations and selection rules are the same ones used for Compare Current Timing. The interpretive wording is a development draft awaiting review by a Western astrologer. It has not been professionally reviewed.'],
+      ['Artwork', 'The wheel at the top of this page is decorative artwork. It does not show your calculated positions.']
+    ]);
+  }
+
+  function drop(id, title, inner){
+    return '<section class="drop" id="' + id + '"><h2><button class="acc-btn" type="button" id="btn-' + id + '" aria-expanded="false" aria-controls="acc-' + id + '">' +
+      '<span>' + esc(title) + '</span>' + CHEV + '</button></h2>' +
+      '<div class="acc" id="acc-' + id + '" role="region" aria-labelledby="btn-' + id + '"><div class="acc-in">' + inner + '</div></div></section>';
+  }
+
+  function render(d){
+    var tx = d.text, html = '';
+    html += '<p class="asof">' + esc(asOf(d.now)) + '</p>';
+    html += tx.summary.map(function(p){ return '<p class="summary">' + esc(p) + '</p>'; }).join('');
+    html += '<div class="drops">';
+    tx.sections.forEach(function(s){ html += drop(s.id, s.title, '<div class="sec-body">' + blocksHTML(s.blocks) + '</div>'); });
+    html += drop('method', 'How This Was Calculated', methodology(d)) + '</div>' +
+      '<p class="note">' + esc(NOTE) + '</p>';
+    $('reading').innerHTML = html;
+    $('status').hidden = true;
+    /* all closed when the page opens; one open at a time (the Compare reading's accordion behaviour) */
+    var buttons = [].slice.call(document.querySelectorAll('.drop .acc-btn'));
+    function setOpen(b, open){ b.setAttribute('aria-expanded', open ? 'true' : 'false'); $(b.getAttribute('aria-controls')).classList.toggle('open', open); }
+    buttons.forEach(function(b){
+      b.addEventListener('click', function(){
+        var opening = b.getAttribute('aria-expanded') !== 'true';
+        buttons.forEach(function(o){ if (o !== b) setOpen(o, false); });
+        setOpen(b, opening);
+      });
+    });
+  }
+
+  /* NAV TEST N2.0: coz-saved.js CS1.9-T handles the footer first: Saved opens the Saved Charts list (no save)
+     and Account opens account.html. This older event-only listener no longer receives those taps. */
+  document.querySelectorAll('#cozFoot a[data-foot="account"]').forEach(function(a){
+    a.addEventListener('click', function(ev){ ev.preventDefault(); try { window.dispatchEvent(new CustomEvent('COZ_TDASH_ACCOUNT')); } catch (e) {} });
+  });
+
+  if (!TM || !TM.loadTropical){ $('status').textContent = 'We couldn\u2019t load your transits for this chart. Please return and run your chart again.'; return; }
+  /* let the page paint its first screen before the solver runs */
+  setTimeout(function(){
+    TM.loadTropical().then(function(d){
+      if (!d.ok){
+        $('status').textContent = TM.FAIL_TROPICAL;
+        if (window.console) console.warn('[TROPICAL TRANSITS] fail-closed: ' + d.reason);
+        return;
+      }
+      render(d);
+    });
+  }, 60);
+})();
+</script>
+</body>
+</html>

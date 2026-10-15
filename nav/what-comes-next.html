@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What Comes Next · CozAlyze</title>
+<!--
+  COZALYZE · WHAT COMES NEXT · WCN1.3
+  Reached from current-life-cycle.html, current-season.html and key-time-windows.html.
+
+  SCOPE. This page covers the next MAHADASHA only. Key Time Windows already
+  carries the previous, current and upcoming Antardasha, so repeating any
+  subperiod here would say the same thing twice. The page states when the
+  current chapter wraps up, which chapter follows, how long it runs, and what
+  it tends to emphasise.
+
+  Deliberately short. One paragraph plus the two-line frame, in the region the
+  handoff scoped at 90 to 140 words.
+
+  The next Mahadasha lord's natal house, nakshatra and pada shape the wording
+  without being named, the same way Key Time Windows does it. No placement
+  jargon reaches the customer.
+
+  Neither chapter is presented as better or worse than the other, and nothing
+  is asserted as certain to happen.
+
+  Same assets as the other two readings: Jason's moon background, his panel
+  frame corners, the shared tokens.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --vedic-navy:#000f26; --vedic-gold:#d4a178; --vedic-gold-muted:rgba(212,161,120,.65);
+  --vedic-ivory:#e5d4c5; --vedic-ivory-muted:rgba(229,212,197,.88);
+  --display-font:"Cormorant Garamond",Georgia,serif;
+  --body-font:"Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --asq-gold:#c9a15e; --asq-nav-h:64px; --side-pad:22px;
+}
+@media (max-width:374px){:root{--side-pad:17px}}
+*{box-sizing:border-box}
+html{background:var(--vedic-navy);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--vedic-navy);color:var(--vedic-ivory);font-family:var(--body-font);-webkit-font-smoothing:antialiased}
+
+.wcn-sky{position:fixed;inset:0;z-index:0;background-image:url("/Demo/season-moon-bg.png");
+  background-size:cover;background-position:center top}
+.wcn-sky::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,15,38,0) 0%,rgba(0,15,38,.26) 40%,rgba(0,15,38,.70) 100%)}
+.wcn-head{position:relative;z-index:1;padding:18px 0 2px;text-align:center}
+.vedic-logo{display:block;width:64px;height:auto;margin:0 auto}
+
+.wcn-wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:8px var(--side-pad) calc(var(--asq-nav-h) + 74px)}
+
+.wcn-panel{position:relative;background:#00152a;border:1.5px solid #b67d4d;border-radius:20px;
+  padding:34px 24px 32px;box-shadow:inset 0 0 0 4px #00152a, inset 0 0 0 5px rgba(182,125,77,.55)}
+.wcn-panel .orn{position:absolute;width:46px;height:46px;pointer-events:none;
+  background-image:url("/Demo/reading-panel-corners.png");background-size:92px 92px}
+.wcn-panel .orn.tl{top:11px;left:11px;background-position:0 0}
+.wcn-panel .orn.tr{top:11px;right:11px;background-position:-46px 0}
+.wcn-panel .orn.bl{bottom:11px;left:11px;background-position:0 -46px}
+.wcn-panel .orn.br{bottom:11px;right:11px;background-position:-46px -46px}
+@media (max-width:380px){
+  .wcn-panel{padding:30px 18px 28px}
+  .wcn-panel .orn{width:38px;height:38px;background-size:76px 76px}
+  .wcn-panel .orn.tr{background-position:-38px 0}
+  .wcn-panel .orn.bl{background-position:0 -38px}
+  .wcn-panel .orn.br{background-position:-38px -38px}
+}
+
+.wcn-eyebrow{text-align:center;font-family:var(--display-font);font-style:italic;
+  font-size:clamp(18.5px,5vw,21.5px);color:var(--vedic-gold);letter-spacing:.02em;margin:0 0 4px}
+h1.wcn-h1{text-align:center;font-family:var(--display-font);font-weight:500;
+  font-size:clamp(26.5px,6.9vw,32px);line-height:1.2;color:#fff;margin:0 0 6px;letter-spacing:.012em}
+
+.wcn-rule{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px auto;max-width:360px}
+.wcn-rule i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--vedic-gold-muted),transparent)}
+.wcn-rule b{width:6px;height:6px;border-radius:50%;background:var(--vedic-gold);opacity:.9}
+
+.wcn-lord{text-align:center;font-family:var(--display-font);font-weight:500;
+  font-size:clamp(30px,8vw,38px);letter-spacing:.05em;color:#fff;margin:0 0 6px;text-transform:uppercase}
+.wcn-medallion{text-align:center;margin:0 0 12px}
+.coz-medallion{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;
+  color:var(--vedic-gold);border:1.5px solid var(--vedic-gold);
+  background:radial-gradient(circle at 50% 38%, rgba(212,161,120,.15), rgba(0,15,38,.7) 72%)}
+.coz-medallion .coz-glyph{font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2",var(--display-font),serif;
+  line-height:1;color:currentColor;transform:translateY(-.02em)}
+.wcn-when{text-align:center;font-family:var(--body-font);
+  font-size:clamp(15.5px,4.2vw,17px);letter-spacing:.05em;color:var(--vedic-ivory);margin:0 0 4px}
+.wcn-span{text-align:center;font-family:var(--body-font);
+  font-size:clamp(14px,3.8vw,15.4px);letter-spacing:.05em;color:var(--vedic-gold);margin:0}
+
+.wcn-body p{font-family:var(--body-font);font-size:clamp(17px,4.6vw,18.5px);
+  line-height:1.78;color:var(--vedic-ivory);margin:0 0 16px}
+.wcn-lede{text-align:center;font-family:var(--display-font);
+  font-size:clamp(19.5px,5.2vw,22.5px);line-height:1.48;color:var(--vedic-gold);margin:0 0 4px}
+
+.wcn-disclaimer{text-align:center;font-family:var(--body-font);
+  font-size:clamp(15px,4vw,16.4px);line-height:1.66;color:var(--vedic-ivory-muted);margin:6px 0 0}
+
+.wcn-explore{margin:26px 0 0}
+.wcn-explore h2{font-family:var(--display-font);font-size:clamp(18.5px,4.9vw,20.5px);
+  color:var(--vedic-gold);font-weight:500;margin:0 0 10px;letter-spacing:.015em}
+.wcn-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  border:0;border-top:1px solid rgba(212,161,120,.22);background:none;color:var(--vedic-ivory);
+  text-align:left;padding:14px 2px;font-family:var(--display-font);
+  font-size:clamp(18.5px,5vw,20.5px);cursor:pointer;text-decoration:none;
+  -webkit-tap-highlight-color:transparent}
+.wcn-row:last-of-type{border-bottom:1px solid rgba(212,161,120,.22)}
+.wcn-row .chev{color:var(--vedic-gold-muted);font-size:17px}
+.wcn-nav{display:flex;justify-content:space-between;gap:14px;margin:20px 0 0;padding:0 24px 34px}
+.wcn-nav a{font-family:var(--body-font);font-size:14.8px;letter-spacing:.03em;color:var(--vedic-gold);text-decoration:none}
+
+.wcn-empty{padding:28px 22px;text-align:center}
+.wcn-empty h2{font-family:var(--display-font);font-weight:600;font-size:clamp(21px,5.6vw,25px);color:#fff;margin:0 0 10px}
+.wcn-empty p{font-family:var(--body-font);font-size:15px;line-height:1.66;color:var(--vedic-ivory-muted);margin:0}
+
+#cozFoot{position:fixed;left:0;right:0;bottom:0;z-index:40;padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(8,11,17,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(201,161,94,.18)}
+#cozFoot .coz-foot-tag{text-align:center;font-family:'EB Garamond',serif;font-style:italic;
+  font-size:13px;letter-spacing:.04em;color:#8b8272;padding:11px 20px 3px}
+#cozFoot .coz-foot-links{display:flex;height:var(--asq-nav-h)}
+#cozFoot a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  text-decoration:none;color:#8b8272;font-size:10.5px;letter-spacing:.06em;font-family:'EB Garamond',serif;
+  -webkit-tap-highlight-color:transparent}
+#cozFoot a svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+#cozFoot a:active{color:var(--asq-gold)}
+
+.wcn-stamp{position:fixed;left:6px;bottom:calc(var(--asq-nav-h) + 30px);z-index:50;
+  font:10px/1 "SF Mono",Menlo,monospace;color:rgba(229,212,197,.22);pointer-events:none}
+@media print{.wcn-sky,#cozFoot,.wcn-stamp{display:none !important}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+<script src="coz-saved.js?v=20"></script>
+ <script src="saved-vedic-library.js?v=1"></script>.
+</head>
+<body>
+
+<div class="wcn-sky" aria-hidden="true"></div>
+<header class="wcn-head">
+  <img class="vedic-logo" src="/Demo/vedic-logo.png" alt="" width="1000" height="1055" aria-hidden="true">
+</header>
+
+<main class="wcn-wrap"><div class="wcn-panel">
+  <span class="orn tl" aria-hidden="true"></span><span class="orn tr" aria-hidden="true"></span>
+  <span class="orn bl" aria-hidden="true"></span><span class="orn br" aria-hidden="true"></span>
+  <div id="wcnPanel"></div>
+</div></main>
+
+<div id="cozFoot">
+  <div class="coz-foot-tag">CozAlyze helps you see it all</div>
+  <div class="coz-foot-links">
+    <a href="vedic-reading.html"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>Home</a>
+    <a href="#" data-foot="saved"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Saved</a>
+    <a href="#" data-foot="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.4 3.9-5 7-5s5.8 1.6 7 5"/></svg>Account</a>
+  </div>
+</div>
+
+<div class="wcn-stamp" aria-hidden="true">WHAT COMES NEXT · WCN1.3 · NAV TEST N2.0</div>
+
+<script src="coz-graha.js"></script>
+<script>
+(function () {
+  'use strict';
+  var G = window.COZ_GRAHA;
+  var panel = document.getElementById('wcnPanel');
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    });
+  }
+
+  var DISCLAIMER = 'These are themes that may be present during this period, not predictions of what will happen.';
+
+  /* House layer: what the incoming chapter tends to concern. Never named. */
+  var AREA = {
+    1:'yourself, your direction, and how you meet the world',
+    2:'your resources, your values, and what you gather around you',
+    3:'your own effort, the people closest to your daily life, and how you communicate',
+    4:'home, family, and what gives you a settled foundation',
+    5:'creativity, learning, and what you enjoy expressing',
+    6:'work, routine, and the steady resolving of practical demands',
+    7:'partnership, agreements, and one-to-one relationship',
+    8:'obstacles, sudden change, and what is held privately',
+    9:'meaning, belief, study, and the longer view',
+    10:'your work in the world, your visibility, and the direction you are taking',
+    11:'community, networks, and longer-range hopes',
+    12:'rest, inner life, and what is quietly set down'
+  };
+
+  var NAK = {
+    'Ashwini':'a quick, initiating quality','Bharani':'a pattern of carrying things through to their conclusion',
+    'Krittika':'a clarifying quality','Rohini':'a steady, cultivating quality','Mrigashira':'a searching quality',
+    'Ardra':'a quality of necessary upheaval','Punarvasu':'a pattern of renewal and return',
+    'Pushya':'a nourishing, steadying quality','Ashlesha':'a close-held, perceptive quality',
+    'Magha':'an awareness of lineage and inheritance','P.Phalguni':'a pull toward ease and shared enjoyment',
+    'U.Phalguni':'a preference for dependable arrangements','Hasta':'a practical, skilled quality',
+    'Chitra':'an eye for form and craft','Swati':'an independent, self-directed quality',
+    'Vishakha':'a focused, goal-directed quality','Anuradha':'a loyal, cooperative quality',
+    'Jyeshtha':'a protective, senior quality','Mula':'an instinct to reach the root of things',
+    'P.Ashadha':'an invigorating quality','U.Ashadha':'a persistent quality oriented toward lasting results',
+    'Shravana':'a listening, gathering quality','Dhanishta':'a rhythmic, capable quality',
+    'Shatabhisha':'a private, investigative quality','P.Bhadrapada':'an intense quality willing to sit with difficulty',
+    'U.Bhadrapada':'a deep, settling quality','Revati':'a pattern of completion and carrying forward what still matters'
+  };
+  var NAK_ALIAS = {'Purva Phalguni':'P.Phalguni','Uttara Phalguni':'U.Phalguni','Purva Ashadha':'P.Ashadha',
+    'Uttara Ashadha':'U.Ashadha','Purva Bhadrapada':'P.Bhadrapada','Uttara Bhadrapada':'U.Bhadrapada'};
+  function nakText(n){ if(!n) return null; return NAK[n]||NAK[NAK_ALIAS[n]]||null; }
+
+  /* Pada, as a manner clause. Never labelled. */
+  var PADA = {
+    1:'a pull to begin rather than wait',
+    2:'a preference for what can actually be built and kept',
+    3:'a willingness to hold more than one possibility at a time',
+    4:'an ear for what feels settled rather than merely correct'
+  };
+
+  /* What the incoming chapter tends to ask of someone, by house. Second
+     paragraph material: how the emphasis is likely to be met, not what will
+     happen. */
+  var ASKS = {
+    1:'how much of your direction you are willing to set yourself',
+    2:'what you actually value, as distinct from what you have accumulated',
+    3:'how directly you are willing to say what you mean',
+    4:'what a settled life would have to include to be worth settling into',
+    5:'what you would make or express if nobody were keeping score',
+    6:'how much you can carry well, rather than how much you can carry',
+    7:'what you want from the people closest to you, and what you offer in return',
+    8:'what you have been leaving unexamined',
+    9:'which of your convictions still belong to you',
+    10:'what you want your work to stand for',
+    11:'which of your longer hopes are still yours',
+    12:'how much rest you are actually willing to take'
+  };
+
+  /* Where the two lords meet, when the incoming lord shares a house with the
+     outgoing one. Verified co-location only, never inferred. */
+  function sameHouseAs(lordA, lordB) {
+    var a = G.planet(chart, lordA), b = G.planet(chart, lordB);
+    return (a && b && a.house === b.house) ? a.house : 0;
+  }
+
+  function failClosed(reason){
+    panel.innerHTML =
+      '<div class="wcn-empty"><h2>This part of your life cycle is not ready yet</h2>' +
+      '<p>Your chart is saved to this device when your reading is prepared. Open your reading first, then return here.</p></div>';
+    if (window.console) console.warn('[WHAT COMES NEXT] fail-closed: ' + reason);
+  }
+
+  var chart = G.readChart();
+  if (!chart) { failClosed('no cozChartJSON on this device'); return; }
+  var lc = chart.lifeCycle;
+  if (!lc || !lc.mahadasha) { failClosed('timing data incomplete'); return; }
+
+  var md = lc.mahadasha;
+  var nx = lc.nextMahadasha;
+  if (!nx || !nx.lord) { failClosed('no next Mahadasha in timing data (exporter predates WCN1.3)'); return; }
+
+  var p = G.planet(chart, nx.lord);
+  if (!p || !(p.house >= 1 && p.house <= 12)) { failClosed('next Mahadasha lord lacks a verified house'); return; }
+
+  var M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  function longDate(iso){ var d = new Date(iso); return M[d.getUTCMonth()] + ' ' + d.getUTCFullYear(); }
+
+  var startMs = new Date(nx.startTimestamp).getTime();
+  var endMs   = new Date(nx.endTimestamp).getTime();
+  var years   = Math.round((endMs - startMs) / 86400000 / 365.25);
+  var away    = (startMs - Date.now()) / 86400000 / 365.25;
+
+  var nk = nakText(p.nakshatra);
+  var pd = PADA[p.pada];
+
+  /* Second paragraph: what the chapter is likely to ask, how it meets the one
+     ending, and who else occupies that part of the chart. All from verified
+     placements, none of them named. */
+  var shared = sameHouseAs(nx.lord, md.lord);
+  var mates = G.coTenants(chart, nx.lord);
+  var second =
+    'A chapter of this length tends to work slowly, and this one is likely to keep returning to ' +
+    esc(ASKS[p.house]) + '. ' +
+    (shared
+      ? 'It also picks up the same part of your chart the ' + esc(md.lord) +
+        ' chapter has been working on, so the handover may feel less like a change of subject than a change of approach to it. '
+      : 'It moves the emphasis to a different part of your chart than the ' + esc(md.lord) +
+        ' chapter has been occupying, so the change may be more noticeable than the date alone suggests. ') +
+    (mates.length
+      ? 'That area of your chart is shared with ' +
+        esc(mates.length === 1 ? mates[0] : mates.slice(0,-1).join(', ') + ' and ' + mates[mates.length-1]) +
+        ', which may give the period more than one thread at a time.'
+      : 'What that emphasis becomes will depend as much on what you are carrying into it as on the period itself.');
+
+  /* How far off the change is, stated plainly rather than implied. */
+  var horizon = away > 8
+    ? 'That is some years away yet. It is worth knowing as the shape of the horizon rather than as anything to act on now, and much can change in the chapters between here and there.'
+    : (away > 3
+        ? 'That is still a few years off, but it is the direction this chapter has been moving toward, and the later windows of your current cycle tend to start leaning that way before the handover itself.'
+        : 'That change is close enough to be worth having in view. Endings of a chapter often carry some of the next one\u2019s flavour before the date arrives.');
+
+  panel.innerHTML =
+    '<p class="wcn-eyebrow">Your Current Life Cycle</p>' +
+    '<h1 class="wcn-h1">What Comes Next</h1>' +
+    '<div class="wcn-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+
+    '<p class="wcn-lede">Your ' + esc(md.lord) + ' chapter wraps up in ' + esc(longDate(md.endTimestamp)) + '.</p>' +
+    '<div class="wcn-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+
+    '<p class="wcn-lord">' + esc(nx.lord) + '</p>' +
+    '<div class="wcn-medallion">' + G.medallion(nx.lord, 72) + '</div>' +
+    '<p class="wcn-when">' + esc(longDate(nx.startTimestamp)) + ' \u2013 ' + esc(longDate(nx.endTimestamp)) + '</p>' +
+    '<p class="wcn-span">about ' + years + ' years</p>' +
+
+    '<div class="wcn-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+
+    '<div class="wcn-body">' +
+      '<p>Your next chapter is governed by ' + esc(nx.lord) + ', which brings ' + esc(G.THEMES[nx.lord]) +
+      ' into longer-term focus. In your chart that emphasis is likely to gather around ' + esc(AREA[p.house]) + '.' +
+      (nk ? ' There is ' + esc(nk) + ' running through it' + (pd ? ', and ' + esc(pd) : '') + '.' : '') + '</p>' +
+      '<p>' + second + '</p>' +
+      '<p>' + horizon + '</p>' +
+    '</div>' +
+
+    '<div class="wcn-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+    '<p class="wcn-disclaimer">' + DISCLAIMER + '</p>' +
+
+    '<div class="wcn-explore">' +
+      '<div class="wcn-nav"><a href="current-life-cycle.html">\u2190 Back to Life Cycle Overview</a><a href="vedic-birth-chart.html">Next: Your Birth Chart \u2192</a></div>' +
+    '</div>';
+
+  if (window.console) {
+    var words = panel.querySelector('.wcn-body').textContent.trim().split(/\s+/).length;
+    console.log('[WHAT COMES NEXT] mode=' + lc.mode + ' year=' + lc.yearLengthDays + 'd status=' + lc.validationStatus);
+    console.log('[WHAT COMES NEXT] current MD ' + md.lord + ' ends ' + md.endTimestamp.slice(0,10) +
+                ' | next MD ' + nx.lord + ' h' + p.house + ' ' + p.nakshatra +
+                ' ' + nx.startTimestamp.slice(0,10) + '\u2192' + nx.endTimestamp.slice(0,10) +
+                ' | ' + away.toFixed(1) + 'y away | body words=' + words);
+    console.log('[WHAT COMES NEXT] scope: next Mahadasha only. Antardasha is covered by Key Time Windows.');
+  }
+})();
+</script>
+</body>
+</html>

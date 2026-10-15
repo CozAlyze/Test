@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Current Life Cycle · CozAlyze</title>
+<!--
+  COZALYZE · CURRENT LIFE CYCLE · LC2.4
+  Reached from vedic-reading.html (the "Your Current Life Cycle" door).
+
+  LC2.0 replaces the CSS-composed layout of LC1.0. The artwork is now a single
+  baked composite supplied by Jason (mahadasha-life-cycle-bg.jpg, 1185 x 2576,
+  aspect 0.46001). This page draws NO visual elements of its own: no frame, no
+  panels, no dividers, no timeline graphics. It positions live text over the
+  artwork at percentage coordinates measured from that file, the same technique
+  vedic-reading.html already uses for its dashboard doors.
+
+  Baked into the artwork: logo, "CozAlyze", "Your Current Life Cycle", the
+  divider, "Vimshottari Dasha", "You Are Here", the timeline bar and its marks,
+  the season panel with its ornament, the tagline, the bottom navigation bar.
+
+  Supplied live from cozChartJSON.lifeCycle: Mahadasha lord, its glyph, the
+  Mahadasha year range, the three subperiod names, the Antardasha date range,
+  the season pair and the season summary.
+
+  TIMELINE NOTE: the marks are painted into the artwork at fixed positions
+  (27.2%, 49.8%, 71.3% of width). This page cannot move them, so the labels
+  show the ORDER of the three subperiods, not elapsed position within them.
+  LC1.0 placed marks by real timestamp; that is given up for the finished art.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vedic-gold: #d4a178;
+  --vedic-ivory: #f2e7db;
+  --display-font: "Cormorant Garamond", Georgia, serif;
+  --body-font: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; background: #000; color: var(--vedic-ivory);
+  font-family: var(--body-font); -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* The stage IS the artwork. Its aspect ratio holds the overlay coordinates
+   true at any width, and cqw units tie every type size to the artwork so
+   nothing drifts out of its painted slot. */
+.lc-stage {
+  position: relative;
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  aspect-ratio: 1185 / 2576;
+  background-image: url("/Demo/mahadasha-life-cycle-bg.jpg");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  container-type: inline-size;
+  overflow: hidden;
+}
+@media (min-width: 520px) {
+  .lc-stage { max-width: 480px; }
+}
+
+.f { position: absolute; left: 0; right: 0; text-align: center; line-height: 1; }
+
+.lc-lord {
+  top: 24.2%;
+  font-family: var(--display-font); font-weight: 500;
+  font-size: 9.2cqw; letter-spacing: .055em; color: #fff;
+  text-transform: uppercase; white-space: nowrap;
+}
+.lc-medallion { top: 28.5%; }
+.lc-medallion span {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 15.2cqw; height: 15.2cqw; border-radius: 50%;
+  color: var(--vedic-gold);
+  border: .32cqw solid var(--vedic-gold);
+  background: radial-gradient(circle at 50% 36%, rgba(212,161,120,.20), rgba(4,14,32,.80) 74%);
+  box-shadow: 0 0 2.2cqw rgba(212,161,120,.30);
+}
+.lc-medallion .coz-glyph {
+  font-family: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2", var(--display-font), serif;
+  font-size: 8.4cqw; line-height: 1; color: currentColor;
+  transform: translateY(-.02em);
+}
+.lc-years {
+  top: 36.2%;
+  font-family: var(--body-font); font-size: 3.4cqw;
+  letter-spacing: .20em; color: var(--vedic-ivory); opacity: .93;
+}
+
+/* Subperiod names sit below the painted marks; the range sits below them. */
+.lc-node {
+  position: absolute; transform: translateX(-50%);
+  top: 43.9%; text-align: center;
+  font-family: var(--body-font); font-size: 2.85cqw;
+  letter-spacing: .04em; color: rgba(242,231,219,.78); white-space: nowrap;
+}
+.lc-node.now { color: #fff; font-weight: 600; }
+.lc-range {
+  top: 47.15%;
+  font-family: var(--body-font); font-size: 2.95cqw;
+  letter-spacing: .05em; color: var(--vedic-ivory);
+}
+
+.lc-pair {
+  top: 57.6%;
+  font-family: var(--display-font); font-weight: 500;
+  font-size: 7.3cqw; letter-spacing: .045em; color: #fff;
+  text-transform: uppercase; white-space: nowrap;
+}
+.lc-summary {
+  top: 61.6%; left: 14%; right: 14%;
+  font-family: var(--display-font);
+  font-size: 4.05cqw; line-height: 1.48; color: var(--vedic-ivory);
+}
+
+/* The painted season panel is the door to the full reading. */
+.lc-door {
+  position: absolute; top: 50.2%; left: 5.5%; right: 5.5%; height: 24.5%;
+  display: block; border: 0; background: none; padding: 0;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  border-radius: 3.4cqw;
+}
+.lc-door:focus-visible { outline: .3cqw solid var(--vedic-gold); outline-offset: .4cqw; }
+.lc-door:active { background: rgba(212,161,120,.07); }
+
+/* Hot-zones over the painted navigation bar. */
+.lc-btn {
+  position: absolute; left: 10.5%; right: 10.5%; height: 4.3%;
+  display: block; border: 0; background: none; padding: 0;
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+  border-radius: 1.8cqw;
+}
+.lc-btn:active { background: rgba(212,161,120,.07); }
+.lc-btn:focus-visible { outline: .3cqw solid var(--vedic-gold); outline-offset: .3cqw; }
+.lc-btn.ktw { top: 78.1%; }
+.lc-btn.wcn { top: 85.0%; }
+
+.lc-nav { position: absolute; bottom: 1.2%; left: 10%; right: 10%; height: 3.2%; display: flex; }
+.lc-nav a { flex: 1; -webkit-tap-highlight-color: transparent; }
+.lc-nav a:focus-visible { outline: .25cqw solid var(--vedic-gold); }
+
+.lc-empty { position: absolute; top: 25%; left: 13%; right: 13%; text-align: center; }
+.lc-empty h2 {
+  font-family: var(--display-font); font-weight: 600;
+  font-size: 6.4cqw; line-height: 1.22; color: #fff; margin: 0 0 2.6cqw;
+}
+.lc-empty p {
+  font-family: var(--body-font); font-size: 3.5cqw;
+  line-height: 1.68; color: rgba(242,231,219,.86); margin: 0;
+}
+
+.lc-stamp {
+  position: absolute; left: 1.6%; bottom: 5.2%;
+  font: 400 2.05cqw/1 "SF Mono", Menlo, monospace;
+  color: rgba(242,231,219,.20); letter-spacing: .08em;
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+<script src="coz-saved.js?v=20"></script>
+<script src="saved-vedic-library.js?v=1"></script>
+</head>
+<body>
+
+<div class="lc-stage" id="lcStage"></div>
+
+<script src="coz-graha.js"></script>
+<script>
+(function () {
+  'use strict';
+  var G = window.COZ_GRAHA;
+  var stage = document.getElementById('lcStage');
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  /* Measured from the supplied artwork. Fixed, because they are painted in. */
+  var MARK_X = [27.2, 49.8, 71.3];
+
+  var NAV =
+    '<div class="lc-nav">' +
+      '<a href="vedic-reading.html" aria-label="Home"></a>' +
+      '<a href="#" data-foot="saved" aria-label="Saved"></a>' +
+      '<a href="#" data-foot="account" aria-label="Account"></a>' +
+    '</div>' +
+    '<div class="lc-stamp" aria-hidden="true">LC2.4 · NAV TEST N2.0</div>';
+
+  function failClosed(reason) {
+    stage.innerHTML =
+      '<div class="lc-empty">' +
+        '<h2>Your life cycle<br>is not ready yet</h2>' +
+        '<p>Your chart is saved to this device when your reading is prepared. Open your reading first, then return here.</p>' +
+      '</div>' + NAV;
+    if (window.console) console.warn('[LIFE CYCLE] fail-closed: ' + reason);
+  }
+
+  var chart = G.readChart();
+  if (!chart) { failClosed('no cozChartJSON on this device'); return; }
+
+  var lc = chart.lifeCycle;
+  if (!lc) { failClosed('cozChartJSON carries no lifeCycle block (exporter predates LC1.0)'); return; }
+  if (!lc.mahadasha || !lc.mahadasha.lord) { failClosed('no current Mahadasha in timing data'); return; }
+  if (!lc.antardasha || !lc.antardasha.lord) { failClosed('no current Antardasha in timing data'); return; }
+
+  var md = lc.mahadasha, ad = lc.antardasha;
+  var years = new Date(md.startTimestamp).getUTCFullYear() + ' \u2013 ' + new Date(md.endTimestamp).getUTCFullYear();
+
+  /* Names for the three painted marks: previous, current, next. A missing
+     neighbour leaves its mark unlabelled rather than inventing a period. */
+  function nodes() {
+    var seq = lc.antardashaSequence || [], at = -1;
+    for (var i = 0; i < seq.length; i++) {
+      if (seq[i].startTimestamp === ad.startTimestamp) { at = i; break; }
+    }
+    var trio = [
+      at > 0 ? seq[at - 1] : null,
+      at >= 0 ? seq[at] : { lord: ad.lord },
+      (at >= 0 && at + 1 < seq.length) ? seq[at + 1] : (lc.nextAntardasha || null)
+    ];
+    var out = '';
+    for (var k = 0; k < 3; k++) {
+      if (!trio[k]) continue;
+      out += '<div class="lc-node' + (k === 1 ? ' now' : '') + '" style="left:' + MARK_X[k] + '%">' +
+             esc(trio[k].lord) + '</div>';
+    }
+    return out;
+  }
+
+  function summary() {
+    var a = G.THEMES[md.lord], b = G.THEMES[ad.lord];
+    if (!a || !b) return '';
+    /* The season panel is painted at a fixed height, so the blurb is built
+       from the leading terms of each theme line. Trimming here, not in the
+       theme data, keeps the full lists intact for the reading page. */
+    function lead(t, n) {
+      var parts = t.split(', ');
+      return parts.slice(0, n).join(', ');
+    }
+    return 'A period that may bring questions of ' + esc(lead(b, 2)) +
+           ' into sharper focus within a longer chapter of ' + esc(lead(a, 2)) + '.';
+  }
+
+  stage.innerHTML =
+    '<div class="f lc-lord">' + esc(md.lord) + '</div>' +
+    '<div class="f lc-medallion"><span>' + G.glyphSVG(md.lord, '') + '</span></div>' +
+    '<div class="f lc-years">' + esc(years) + '</div>' +
+
+    nodes() +
+    '<div class="f lc-range">' + esc(ad.displayStartDate) + ' \u2013 ' + esc(ad.displayEndDate) + '</div>' +
+
+    '<div class="f lc-pair">' + esc(md.lord) + ' \u2013 ' + esc(ad.lord) + '</div>' +
+    '<div class="f lc-summary">' + summary() + '</div>' +
+    '<a class="lc-door" href="current-season.html" aria-label="Read your current season"></a>' +
+    '<a class="lc-btn ktw" href="key-time-windows.html" aria-label="Key Time Windows"></a>' +
+    '<a class="lc-btn wcn" href="what-comes-next.html" aria-label="What Comes Next"></a>' +
+
+    NAV;
+
+  /* Developer/debug only. Never rendered into the customer view. */
+  if (window.console) {
+    console.log('[LIFE CYCLE] mode=' + lc.mode + ' year=' + lc.yearLengthDays + 'd status=' + lc.validationStatus +
+                ' devaGuru=' + lc.devaGuruComparison);
+    console.log('[LIFE CYCLE] MD ' + md.lord + ' ' + md.startTimestamp.slice(0, 10) + '\u2192' + md.endTimestamp.slice(0, 10) +
+                ' | AD ' + ad.lord + ' ' + ad.startTimestamp.slice(0, 10) + '\u2192' + ad.endTimestamp.slice(0, 10) +
+                ' | next ' + (lc.nextAntardasha ? lc.nextAntardasha.lord : 'none'));
+    console.log('[LIFE CYCLE] timeline marks are baked artwork: labels show subperiod ORDER, not elapsed position.');
+  }
+})();
+</script>
+</body>
+</html>

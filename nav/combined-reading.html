@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Combined Reading · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Montserrat:wght@300;400;500&family=EB+Garamond:ital@1&display=swap" rel="stylesheet">
+<style>
+/* COZALYZE · YOUR COMBINED READING · CR2.0 · page shell
+   His backdrop (1206x2622) in three verbatim pieces so the page can grow when a
+   section opens: combined-top.jpg (rows 0-800: sun, moon, logo), combined-mid.png
+   (one row averaged from his plain middle, repeated), combined-bottom.jpg (rows
+   2150-2622: tagline + nav). All wording is live text.
+   GENERATOR NOT BUILT: the three analyses wait on the Tropical evidence-selection
+   system (his ruling, Sep 19). Nothing on this page generates language. */
+:root{ --cream:#EEE7D8; --gold:#D6B98C; --gold-soft:#B89A6E; --navy:rgb(1,11,26);
+  --head:"Cinzel",Georgia,serif; --sans:"Montserrat","Helvetica Neue",Arial,sans-serif; --body:"EB Garamond",Georgia,serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--cream);-webkit-text-size-adjust:100%}
+.page{position:relative;width:100%;max-width:640px;margin:0 auto;container-type:inline-size;text-align:center;
+  background:url("/Demo/combined-top.jpg?v=1") center top/100% auto no-repeat, url("/Demo/combined-mid.png?v=1") center top/100% 1px repeat-y, var(--navy)}
+.page,.page *{--k:calc(100cqw / 932);--K:calc(100cqw / 1206)}
+.content{padding-top:calc(395 * var(--K));min-height:calc(2150 * var(--K))}
+h1{font-family:var(--head);font-weight:500;font-size:calc(72 * var(--k));line-height:.96;letter-spacing:.02em;color:var(--cream);
+  text-shadow:0 calc(3 * var(--k)) calc(10 * var(--k)) rgba(0,0,0,.65)}
+.sys{font-family:var(--sans);font-weight:400;font-size:calc(22 * var(--k));letter-spacing:.22em;margin-right:-.22em;margin-top:calc(26 * var(--k));white-space:nowrap}
+.theme{font-family:var(--sans);font-weight:400;font-size:calc(21 * var(--k));line-height:1.62;letter-spacing:.3em;margin-right:-.3em;margin-top:calc(30 * var(--k))}
+.short{width:calc(108 * var(--k));height:1px;margin:calc(44 * var(--k)) auto 0;background:var(--gold-soft);opacity:.8}
+.status{font-family:var(--sans);font-weight:300;font-size:max(16px,calc(26 * var(--k)));line-height:1.5;color:var(--cream);margin:calc(40 * var(--k)) calc(120 * var(--k)) 0}
+.sec{padding:0 calc(110 * var(--k))}
+.num{font-family:var(--head);font-weight:400;font-size:calc(24 * var(--k));color:var(--gold-soft);margin-top:calc(38 * var(--k));line-height:1}
+.sec h2{font-family:var(--head);font-weight:500;font-size:calc(38 * var(--k));letter-spacing:.02em;line-height:1.1;color:var(--cream);margin-top:calc(22 * var(--k));white-space:nowrap}
+.prev{font-family:var(--sans);font-weight:300;font-size:max(17px,calc(27 * var(--k)));line-height:1.48;letter-spacing:.015em;color:var(--cream);margin:calc(24 * var(--k)) auto 0;max-width:calc(680 * var(--k))}
+.rfa{appearance:none;-webkit-appearance:none;background:none;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:.5em;
+  margin-top:calc(20 * var(--k));padding:8px 6px;font-family:var(--sans);font-weight:500;font-size:max(11px,calc(21 * var(--k)));
+  letter-spacing:.2em;color:var(--gold);-webkit-tap-highlight-color:transparent}
+.rfa svg{width:1.05em;height:1.05em;transition:transform .45s ease}
+.rfa[aria-expanded="true"] svg{transform:rotate(180deg)}
+.rfa:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+.acc{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s ease}
+.acc.open{grid-template-rows:1fr}
+.acc-in{overflow:hidden}
+.body{text-align:left;padding:calc(30 * var(--k)) calc(34 * var(--k)) calc(34 * var(--k));margin:calc(18 * var(--k)) 0 0;background:rgba(3,7,18,.72);border-radius:10px}   /* CR2.9: the panel stays inside its column, so no text is clipped */
+.body p{font-family:var(--sans);font-weight:300;font-size:max(19px,calc(30 * var(--k)));line-height:1.6;color:var(--cream)}
+.body p+p{margin-top:.95em}
+.body .dev{font-style:italic;color:var(--gold);text-align:center}
+.div{height:calc(28 * var(--k));margin:calc(38 * var(--k)) calc(172 * var(--k)) 0;display:flex;align-items:center}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--gold-soft);opacity:.85}
+.div svg{width:calc(24 * var(--k));height:calc(24 * var(--k));margin:0 calc(6 * var(--k));color:var(--gold);flex:none}
+.note{font-family:var(--body);font-style:italic;font-size:clamp(17px,4.6vw,19px);color:var(--cream);opacity:.85;margin:calc(56 * var(--k)) calc(90 * var(--k)) 0}
+.pager{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:calc(46 * var(--k)) calc(90 * var(--k)) 0}
+.pager a{font-family:var(--head);font-weight:500;font-size:max(11.5px,calc(22 * var(--k)));letter-spacing:.18em;color:var(--gold);text-decoration:none;padding:10px 4px;-webkit-tap-highlight-color:transparent}
+.pager a:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+/* development trace panel: only with ?debug=1, never for customers */
+.dbg{margin:calc(40 * var(--k)) calc(40 * var(--k)) 0;text-align:left;font:11px/1.45 Menlo,Consolas,monospace;color:#cfd8e3;background:rgba(0,0,0,.55);border:1px solid #3a4a60;border-radius:6px;padding:10px}
+.dbg summary{cursor:pointer;color:#f2d38a;font-weight:bold}
+.dbg table{width:100%;border-collapse:collapse;margin-top:8px}
+.dbg td,.dbg th{border-top:1px solid #2c3a4d;padding:5px 4px;vertical-align:top;word-break:break-word}
+.dbg th{color:#f2d38a;text-align:left}
+.dbg .ok{color:#8fd19e}.dbg .bad{color:#ff8a80}
+.dbg button{margin-top:8px;font:12px Menlo,monospace;padding:6px 10px;background:#1d2a3b;color:#f2d38a;border:1px solid #3a4a60;border-radius:4px}
+.art-bottom{position:relative;height:calc(472 * var(--K));background:url("/Demo/combined-bottom.jpg?v=1") center top/100% auto no-repeat}
+.nav a{position:absolute;top:calc(369 * var(--K));height:calc(76 * var(--K));display:block;-webkit-tap-highlight-color:transparent}
+.nav .home{left:calc(127 * var(--K));width:calc(240 * var(--K))}
+.nav .saved{left:calc(470 * var(--K));width:calc(225 * var(--K))}
+.nav .acct{left:calc(830 * var(--K));width:calc(219 * var(--K))}
+.stamp{position:fixed;right:6px;bottom:2px;z-index:2;font:8px/1 var(--sans);letter-spacing:.08em;color:rgba(204,164,102,.45);pointer-events:none}
+</style>
+<!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
+<script src="coz-saved.js?v=20"></script>
+</head>
+<body>
+<main class="page">
+ <div class="content">
+  <h1>YOUR<br>COMBINED<br>READING</h1>
+  <p class="sys">Western (Tropical) + Vedic (Sidereal)</p>
+  <p class="theme">HOW YOUR TWO CHARTS<br>SPEAK TOGETHER</p>
+  <div class="short" aria-hidden="true"></div>
+  <p class="status" id="status" hidden></p>
+
+  <section class="sec" id="shared-themes">
+    <p class="num">I</p>
+    <h2>SHARED THEMES</h2>
+    <p class="prev">The patterns that repeat across both charts—showing where your outward expression and inner blueprint reinforce similar qualities, needs, and recurring life themes.</p>
+    <button class="rfa" type="button" aria-expanded="false" aria-controls="acc-shared" hidden>READ FULL ANALYSIS <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
+    <div class="acc" id="acc-shared"><div class="acc-in"><div class="body" data-key="sharedThemes" data-label="Shared Themes"></div></div></div>
+  </section>
+  <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
+
+  <section class="sec" id="different-emphases">
+    <p class="num">II</p>
+    <h2>DIFFERENT EMPHASES</h2>
+    <p class="prev">Where the two systems place their attention differently—revealing distinct perspectives on your personality, relationships, and direction, and how those perspectives may complement one another.</p>
+    <button class="rfa" type="button" aria-expanded="false" aria-controls="acc-different" hidden>READ FULL ANALYSIS <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
+    <div class="acc" id="acc-different"><div class="acc-in"><div class="body" data-key="differentEmphases" data-label="Different Emphases"></div></div></div>
+  </section>
+  <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
+
+  <section class="sec" id="integrated-view">
+    <p class="num">III</p>
+    <h2>YOUR INTEGRATED VIEW</h2>
+    <p class="prev">A unified interpretation that brings both perspectives together—showing how your outward expression and inner blueprint may operate as parts of one more complete picture.</p>
+    <button class="rfa" type="button" aria-expanded="false" aria-controls="acc-integrated" hidden>READ FULL ANALYSIS <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 9l7 7 7-7"/></svg></button>
+    <div class="acc" id="acc-integrated"><div class="acc-in"><div class="body" data-key="integratedView" data-label="Your Integrated View"></div></div></div>
+  </section>
+
+  <p class="note">These themes describe possible patterns—not fixed outcomes.</p>
+  <nav class="pager" aria-label="Reading navigation">
+    <a href="compare-reading.html">&lsaquo; BACK</a>
+    <a href="your-ascendants.html">NEXT: YOUR ASCENDANTS &rsaquo;</a>
+  </nav>
+ </div>
+ <div class="art-bottom">
+  <nav class="nav" aria-label="Main">
+    <a class="home" href="compare-reading.html" aria-label="Home"></a>
+    <a class="saved" href="#" aria-label="Saved"></a>
+    <a class="acct" href="#" aria-label="Account"></a>
+  </nav>
+ </div>
+</main>
+<div class="stamp">COMBINED READING · CR3.3 · NAV TEST N2.0</div>
+
+<script src="dev-review-engine.js?v=8"></script>
+<script src="ascendant-library.js?v=5"></script>
+<script src="compare-evidence.js?v=3"></script>
+<script src="compare-generator.js?v=11"></script>
+<script>
+(function(){
+  var FAIL = "We couldn\u2019t load both charts for this reading. Please return and run your chart again.";
+  var status = document.getElementById("status");
+  var buttons = [].slice.call(document.querySelectorAll(".rfa"));
+
+  /* accordion: one section open at a time, nothing regenerates on open or close */
+  function setOpen(btn, open){
+    var acc = document.getElementById(btn.getAttribute("aria-controls"));
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+    acc.classList.toggle("open", open);
+  }
+  buttons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var opening = btn.getAttribute("aria-expanded") !== "true";
+      buttons.forEach(function(b){ if (b !== btn) setOpen(b, false); });
+      setOpen(btn, opening);
+    });
+  });
+
+  /* ?debug=1 only: the internal evidence trace beside the reading, plus a JSON download */
+  function renderTrace(rec, man){
+    function e(t){ return String(t == null ? "" : t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+    var st = rec.vedicEvidenceStatus || {};
+    var prior = {};
+    var rows = [];
+    [["sharedThemes","I Shared Themes"],["differentEmphases","II Different Emphases"],["integratedView","III Integrated View"]].forEach(function(x){
+      (rec[x[0]].evidence || []).forEach(function(ev){
+        var vc = (ev.vedicClaimIds || []).map(function(c){ var s = st[c] || {}; return e(c) + "<br><span class='ok'>" + e(s.recordStatus || "?") + "</span>"; }).join("<br>");
+        var check = "";
+        if (x[0] === "integratedView"){
+          var fresh = (ev.tropicalFactors || []).concat(ev.vedicClaimIds || []).filter(function(i){ return !prior[i]; });
+          check = fresh.length ? "<span class='bad'>NEW: " + e(fresh.join(", ")) + "</span>" : "<span class='ok'>only earlier evidence</span>";
+        } else (ev.tropicalFactors || []).concat(ev.vedicClaimIds || []).forEach(function(i){ prior[i] = 1; });
+        rows.push("<tr><td>" + x[1] + "<br>" + e(ev.id) + " ¶" + e((ev.paragraphs || []).join(",")) + "</td><td>" + e(ev.theme) + "<br>" + e(ev.use) +
+          (ev.buildsOn ? "<br>builds on " + e(ev.buildsOn.join(", ")) : "") + "</td><td>" + e((ev.tropicalFactors || []).join("; ")) +
+          "<br><span class='bad'>unreviewed model interpretation</span></td><td>" + vc + "</td><td>" + e(ev.why || ev.note || "") + (check ? "<br>" + check : "") + "</td></tr>");
+      });
+    });
+    var box = document.createElement("details"); box.className = "dbg";
+    box.innerHTML = "<summary>DEV TRACE · " + e(rec.promptVersion) + " · " + e(rec.selectionVersion) + " · attempts " + e(rec.attempts) +
+      (rec.fromCache ? " · from cache" : " · new call") + "</summary>" +
+      "<div>developmentOnly " + rec.developmentOnly + " · productionEligible " + rec.productionEligible + " · Western: " + e(rec.tropicalEvidenceStatus) + "</div>" +
+      "<div>words: I " + rec.sharedThemes.wordCountMeasured + " · II " + rec.differentEmphases.wordCountMeasured + " · III " + rec.integratedView.wordCountMeasured +
+      " · soft issues: " + e(((rec.trace.validation || {}).soft || []).join("; ") || "none") + " · first attempt problems: " + e((rec.firstAttemptProblems || []).join("; ") || "none") + "</div>" +
+      "<div>comparable themes: " + e(Object.keys(rec.trace.comparableThemes || {}).filter(function(k){ return rec.trace.comparableThemes[k]; }).join(", ")) + "</div>" +
+      "<table><tr><th>Section</th><th>Theme / use</th><th>Western factors</th><th>Vedic claims + status</th><th>Why / III check</th></tr>" + rows.join("") + "</table>" +
+      "<button type='button'>Download trace JSON</button>";
+    box.querySelector("button").addEventListener("click", function(){
+      var blob = new Blob([JSON.stringify({ record: rec, manifest: man }, null, 2)], { type: "application/json" });
+      var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "combined-trace-" + rec.runId + ".json";
+      document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    });
+    document.querySelector(".pager").insertAdjacentElement("afterend", box);
+  }
+
+  /* input gate: only a validated chart-run pair (same run ID + birth fingerprint
+     in both engines' saved charts). Never an older chart. */
+  window.COZ_ASC.ensurePair().then(function(res){
+    if (!res.ok){
+      console.log("[COZ COMBINED] pair refused:", res.reason);
+      status.textContent = FAIL; status.hidden = false;
+      return;
+    }
+    window.COZ_COMBINED_INPUT = { runId: res.pair.runId, fingerprint: res.pair.fingerprint, engineVersions: res.pair.engineVersions };
+    var bodies = [].slice.call(document.querySelectorAll(".body"));
+    function esc(t){ return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+    /* CR2.4 (Sep 22, item 5): the generation is normally started earlier by index.html
+       when the Compare dashboard opens. If that job is still running, wait for its result
+       in the shared cache instead of starting a second call. Network drops retry; a
+       Try again control reruns the whole step. */
+    var G = window.COZ_COMBINED_GEN, E = window.COZ_COMPARE_EVIDENCE;
+    function show(rec){
+      window.COZ_COMBINED_RECORD = rec;
+      if (/[?&]debug=1\b/.test(location.search)) renderTrace(rec, window.COZ_COMBINED_MANIFEST);
+      bodies.forEach(function(b){
+        var sct = rec[b.getAttribute("data-key")];
+        b.innerHTML = sct.paragraphs.map(function(t){ return "<p>" + esc(t) + "</p>"; }).join("");
+      });
+    }
+    /* CR3.0 (Sep 22): this page is a VIEWER. Inside the living page it never sends a model
+       request itself; it asks the coordinator in index.html (which a page change cannot
+       kill) and shows the job's real state. Opened on its own (no coordinator), it writes
+       the reading itself under the same budget and heartbeat rules. */
+    var t0 = Date.now(), tick = null, watchTimer = null;
+    function mmss(ms){ var s = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s / 60) + ":" + ("0" + (s % 60)).slice(-2); }
+    function coordinator(){ try { if (window.parent !== window && window.parent.COZ_GEN_COORD) return window.parent.COZ_GEN_COORD; } catch(e){} return null; }
+    function jobState(){ try { var A = JSON.parse(localStorage.getItem("cozGenJobs") || "{}"); var R = A[res.pair.runId]; return (R && R.jobs && R.jobs.combined) || null; } catch(e){ return null; } }
+    function setWait(text){ bodies.forEach(function(b){ var p = b.querySelector(".wait"); if (p) p.textContent = text; }); }
+    /* CR3.1: why a step was redone, read from the saved step 1 and the live job (development) */
+    function whyText(m){
+      var parts = [], cp = G.peekStep1(res.pair, m), ph = G.readPhase(res.pair, m);
+      if (cp && cp.firstAttemptProblems && cp.firstAttemptProblems.length) parts.push("Step 1 was redone because: " + cp.firstAttemptProblems.join("; "));
+      if (ph && ph.retryReason && ph.retryReason.indexOf("step 2") === 0) parts.push("Step 2 retry because: " + ph.retryReason.slice(8));
+      return parts.join(" \u00b7 ");
+    }
+    function setWhy(m){
+      var t = whyText(m), b = bodies[0]; if (!b) return;
+      var p = b.querySelector(".why");
+      if (!t) { if (p) p.remove(); return; }
+      if (!p) { p = document.createElement("p"); p.className = "dev why"; b.appendChild(p); }
+      p.textContent = "DEV: " + t;
+    }
+    function showWaiting(m){
+      setWhy(m);
+      var js = jobState(), ph = G.readPhase(res.pair, m);
+      if (js && js.state === "queued") { setWait("Preparing your reading\u2026 waiting for the reading before it to finish \u00b7 " + mmss(Date.now() - (js.queuedAt || t0))); return; }
+      if (ph && (ph.state === "running" || ph.state === "part1_complete"))
+        setWait("Preparing your reading\u2026 " + mmss(Date.now() - ph.startedAt) + " \u00b7 step " + ph.stage + " of 2 \u00b7 attempt " + ph.validationAttempt + " \u00b7 request " + ph.totalRequests + " of " + ph.maxRequests);
+      else setWait("Preparing your reading\u2026 " + mmss(Date.now() - t0));
+    }
+    /* CV1 (Sep 25): two viewer-only limits so this page can never wait forever without saying why.
+       They stop THIS PAGE'S WAITING only: the job, its records, the generator and the coordinator
+       are never touched, and no request is sent. The limit is the generator's own worst case
+       (4 requests x 150 s) plus margin. */
+    var CV1_GRACE_MS = 8000, CV1_DEADLINE_MS = 11 * 60 * 1000;
+    function cv1Fail(kind, message){ var e = new Error(message); e.kind = kind; e.cv1 = true; return e; }
+    /* read-only diagnostic line for the two CV1 screens */
+    function cv1Diag(m){
+      var parts = [];
+      try { var bytes = 0; for (var i = 0; i < localStorage.length; i++) { var k = localStorage.key(i) || ""; bytes += (k.length + (localStorage.getItem(k) || "").length) * 2; }
+            parts.push("browser storage in use about " + (bytes / 1048576).toFixed(2) + " MB (Safari allows about 5 MB)"); } catch (e) { parts.push("storage estimate unavailable"); }
+      try { var js = jobState(); parts.push("job state " + (js ? js.state : "none") + (js && typeof js.requests === "number" ? ", " + js.requests + " requests" : "")); } catch (e) {}
+      try { var ph = m ? G.readPhase(res.pair, m) : null; if (ph) parts.push("generator phase " + ph.state + ", step " + ph.stage + ", request " + ph.totalRequests + " of " + G.MAX_REQUESTS); } catch (e) {}
+      try { var lf = JSON.parse(localStorage.getItem("cozCombinedGenLastFail") || "null");
+            if (lf) parts.push("last validation failure (" + (lf.stage || "?") + ", " + String(lf.at || "").slice(11, 19) + " UTC): " + ((lf.hard || []).slice(0, 3).join("; ") || "none listed")); } catch (e) {}
+      return "DIAGNOSTIC: " + parts.join(" \u00b7 ");
+    }
+    /* follow the coordinator's job until the reading lands or the job ends in failure */
+    function watch(m, askedAt){
+      var completeSeenAt = null;
+      return new Promise(function(resolve, reject){
+        (function poll(){
+          var hit = G.peek(res.pair, m); if (hit) return resolve(hit);
+          var js = jobState();
+          if (js && js.state === "failed" && (js.endedAt || 0) >= askedAt) {
+            var e = new Error((js.error && js.error.message) || "DEV: reading unavailable"); e.kind = js.error && js.error.kind; return reject(e);
+          }
+          if (!js && Date.now() - askedAt > 20000) return reject(new Error("DEV: the coordinator did not pick up the job"));
+          /* CV1 limit 1: the job says complete but no saved reading can be found */
+          if (js && js.state === "complete") {
+            if (completeSeenAt === null) completeSeenAt = Date.now();
+            if (Date.now() - completeSeenAt > CV1_GRACE_MS) return reject(cv1Fail("viewer_complete_missing", "DEV: the reading was generated but could not be found on this device (it may not have saved)"));
+          } else completeSeenAt = null;
+          /* CV1 limit 2: waited longer than the generator's own worst case */
+          if (Date.now() - askedAt > CV1_DEADLINE_MS) return reject(cv1Fail("viewer_timeout", "DEV: stopped waiting after 11 minutes; the job was left as it is"));
+          watchTimer = setTimeout(poll, 1000);
+        })();
+      });
+    }
+    function run(){
+      bodies.forEach(function(b){ b.innerHTML = '<p class="dev wait">Preparing your reading\u2026</p>'; });
+      clearInterval(tick); clearTimeout(watchTimer); t0 = Date.now();
+      var man = null;
+      return E.buildManifest(res).then(function(m){
+        window.COZ_COMBINED_MANIFEST = m; man = m;
+        var hit = G.peek(res.pair, m); if (hit) return hit;
+        tick = setInterval(function(){ showWaiting(m); }, 1000); showWaiting(m);
+        var c = coordinator();
+        if (c) { var askedAt = Date.now(); c.request("combined", { runId: res.pair.runId, priority: true }); return watch(m, askedAt); }
+        /* standalone (opened outside the living page) */
+        if (G.inFlight(res.pair, m)) return G.waitForLive(res.pair, m).then(function(r){ return r || G.getCombined(res, m); });
+        return G.getCombined(res, m);
+      }).then(function(rec){ clearInterval(tick); show(rec); }).catch(function(e){
+        clearInterval(tick); clearTimeout(watchTimer);
+        console.log("[COZ COMBINED]", e && e.message);
+        var msg = ((e && e.message) || "DEV: reading unavailable") + " (" + mmss(Date.now() - t0) + " total)";
+        var diag = (e && e.cv1) ? cv1Diag(man) : "";
+        bodies.forEach(function(b, i){ b.innerHTML = '<p class="dev">' + esc(msg) + '</p>' + (i === 0 && diag ? '<p class="dev cv1">' + esc(diag) + '</p>' : '') + (i === 0 ? '<p class="dev"><a href="#" class="retry">Try again</a></p>' : ''); });
+        if (man) setWhy(man);
+        var r = document.querySelector(".body .retry"); if (r) r.addEventListener("click", function(ev){ ev.preventDefault(); run(); });
+      });
+    }
+    /* leaving the page only stops this page's watching; the job keeps running in index.html */
+    window.addEventListener("pagehide", function(){ clearInterval(tick); clearTimeout(watchTimer); });
+    run();
+    buttons.forEach(function(b){ b.hidden = false; });
+  });
+})();
+</script>
+</body>
+</html>

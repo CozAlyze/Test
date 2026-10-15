@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Current Season · CozAlyze</title>
+<!--
+  COZALYZE · CURRENT SEASON · CS2.3
+  Reached from current-life-cycle.html.
+
+  One reusable template. No lord, date, house, nakshatra or sentence about any
+  single chart is baked in. Everything below is composed at runtime from
+  localStorage "cozChartJSON": the lifeCycle block for timing, the planets
+  array for verified natal placements.
+
+  Composition follows the approved engine specification:
+    - claims are drafted only from supplied factors,
+    - each materially personalised claim needs two independent supporting
+      factors, counted once per underlying factor (synonyms do not count twice),
+    - optional modifiers are omitted when absent, never inferred,
+    - the page fails closed when a core item is missing,
+    - the claim ledger is developer-only and never reaches the customer view.
+
+  SCOPE NOTE (read before trusting the prose): this composer works from the
+  factors the master actually verifies today: period lords, natal sign, Whole
+  Sign house, nakshatra, pada and verified same-house co-presence. The master's
+  cozChartJSON carries no house rulerships, no graha drishti, no dispositor
+  links and no dignity data, so those layers of the specification are not
+  implemented and the corresponding claims are never drafted. Depth is
+  therefore below the reference sample in charts whose richness came from those
+  missing layers. This is a stated gap, not a silent shortfall.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vedic-navy: #000f26;
+  --vedic-gold: #d4a178;
+  --vedic-gold-muted: rgba(212, 161, 120, 0.65);
+  --vedic-ivory: #e5d4c5;
+  --vedic-ivory-muted: rgba(229, 212, 197, 0.88);
+  --display-font: "Cormorant Garamond", Georgia, serif;
+  --body-font: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --asq-gold: #c9a15e;
+  --asq-nav-h: 64px;
+  --side-pad: 22px;
+}
+@media (max-width: 374px) { :root { --side-pad: 17px; } }
+
+* { box-sizing: border-box; }
+html { background: var(--vedic-navy); -webkit-text-size-adjust: 100%; }
+body {
+  margin:0; background:var(--vedic-navy); color:var(--vedic-ivory);
+  font-family:var(--body-font); -webkit-font-smoothing:antialiased;
+}
+
+/* Page background: Jason's moon asset, fixed so it does not scroll away. */
+.cs-sky {
+  position:fixed; inset:0; z-index:0;
+  background-image:url("/Demo/season-moon-bg.png");
+  background-size:cover; background-position:center top;
+}
+.cs-sky::after {
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,15,38,0) 0%, rgba(0,15,38,.26) 40%, rgba(0,15,38,.70) 100%);
+}
+.cs-head-in { position:relative; z-index:1; padding:18px 0 2px; text-align:center; }
+.vedic-logo { display:block; width:64px; height:auto; margin:0 auto; }
+
+/* Reading panel: the framed card from the approved artwork, rendered in CSS
+   so it reflows to any text length instead of being a fixed-size image. */
+.cs-wrap { position:relative; z-index:1; max-width:620px; margin:0 auto; padding:8px var(--side-pad) calc(var(--asq-nav-h) + 74px); }
+/* The reading panel reproduces Jason's frame artwork. A border-image would
+   squash the corner flourishes, which are ~214px deep in the 850x1536 source,
+   into a thin border, so the panel is built the way the artwork is: the double
+   gold rule and interior fill in CSS at the artwork's own colours, and the four
+   corner ornaments cropped from the source file and placed at true proportion.
+   The panel then grows to whatever length the reading runs to without ever
+   distorting the ornaments. */
+.cs-panel {
+  position:relative;
+  background:#00152a;
+  border:1.5px solid #b67d4d;
+  border-radius:20px;
+  padding:34px 24px 32px;
+  box-shadow:inset 0 0 0 4px #00152a, inset 0 0 0 5px rgba(182,125,77,.55);
+}
+.cs-panel .orn {
+  position:absolute; width:46px; height:46px; pointer-events:none;
+  background-image:url("/Demo/reading-panel-corners.png");
+  background-size:92px 92px;
+}
+.cs-panel .orn.tl { top:11px;    left:11px;  background-position:0 0; }
+.cs-panel .orn.tr { top:11px;    right:11px; background-position:-46px 0; }
+.cs-panel .orn.bl { bottom:11px; left:11px;  background-position:0 -46px; }
+.cs-panel .orn.br { bottom:11px; right:11px; background-position:-46px -46px; }
+@media (max-width:380px) {
+  .cs-panel { padding:30px 18px 28px; }
+  .cs-panel .orn { width:38px; height:38px; background-size:76px 76px; }
+  .cs-panel .orn.tr { background-position:-38px 0; }
+  .cs-panel .orn.bl { background-position:0 -38px; }
+  .cs-panel .orn.br { background-position:-38px -38px; }
+}
+
+.cs-eyebrow {
+  text-align:center; font-family:var(--display-font);
+  font-size:clamp(18.5px,5vw,21.5px); color:var(--vedic-gold);
+  letter-spacing:.02em; margin:0 0 4px;
+}
+.cs-pair {
+  text-align:center; font-family:var(--display-font); font-weight:500;
+  font-size:clamp(23px,6.4vw,31px); letter-spacing:.04em;
+  overflow-wrap:break-word; color:#fff;
+  margin:0 0 16px; text-transform:uppercase;
+}
+
+/* Paired medallions with the connector from the approved artwork. */
+.cs-pairmark { display:flex; align-items:center; justify-content:center; gap:0; margin:0 0 18px; }
+.cs-pairmark .cs-join { width:46px; height:1.5px; background:var(--vedic-gold); position:relative; }
+.cs-pairmark .cs-join::after {
+  content:""; position:absolute; left:50%; top:50%; width:8px; height:8px;
+  transform:translate(-50%,-50%) rotate(45deg); background:var(--vedic-navy);
+  border:1.5px solid var(--vedic-gold);
+}
+.coz-medallion {
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius:50%; color:var(--vedic-gold); border:1.5px solid var(--vedic-gold);
+  background:radial-gradient(circle at 50% 38%, rgba(212,161,120,.15), rgba(0,15,38,.7) 72%);
+}
+.coz-medallion .coz-glyph {
+  font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols 2",var(--display-font),serif;
+  line-height:1; color:currentColor; transform:translateY(-.02em);
+}
+
+.cs-dates {
+  text-align:center; font-family:var(--body-font);
+  font-size:clamp(17px,4.6vw,19px); letter-spacing:.05em;
+  color:var(--vedic-ivory); margin:0 0 16px;
+}
+.cs-rule { display:flex; align-items:center; justify-content:center; gap:10px; margin:16px auto; max-width:360px; }
+.cs-rule i { flex:1; height:1px; background:linear-gradient(90deg,transparent,var(--vedic-gold-muted),transparent); }
+.cs-rule b { width:6px; height:6px; border-radius:50%; background:var(--vedic-gold); opacity:.9; }
+
+.cs-lede {
+  text-align:center; font-family:var(--display-font);
+  font-size:clamp(21px,5.6vw,24px); line-height:1.46;
+  color:var(--vedic-gold); margin:0 0 5px;
+}
+h1.cs-h1 {
+  text-align:center; font-family:var(--display-font); font-weight:500;
+  font-size:clamp(26.5px,6.9vw,32px); line-height:1.2; color:#fff;
+  margin:18px 0 16px; letter-spacing:.012em;
+}
+.cs-intro p {
+  font-family:var(--body-font); font-size:clamp(16.5px,4.45vw,18px);
+  line-height:1.74; color:var(--vedic-ivory-muted);
+  margin:0 0 14px; text-align:center;
+}
+.cs-reading p {
+  font-family:var(--body-font); font-size:clamp(17px,4.6vw,18.5px);
+  line-height:1.78; color:var(--vedic-ivory); margin:0 0 18px;
+}
+.cs-disclaimer {
+  text-align:center; font-family:var(--body-font);
+  font-size:clamp(15px,4vw,16.4px); line-height:1.66;
+  color:var(--vedic-ivory-muted); margin:6px 0 0;
+}
+
+.cs-explore { margin:26px 0 0; }
+.cs-explore h2 {
+  font-family:var(--display-font); font-size:clamp(18.5px,4.9vw,20.5px);
+  color:var(--vedic-gold); font-weight:500; margin:0 0 10px; letter-spacing:.015em;
+}
+.cs-row {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  width:100%; border:0; border-top:1px solid rgba(212,161,120,.22);
+  background:none; color:var(--vedic-ivory); text-align:left;
+  padding:14px 2px; font-family:var(--display-font);
+  font-size:clamp(18.5px,5vw,20.5px); cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.cs-row:last-of-type { border-bottom:1px solid rgba(212,161,120,.22); }
+.cs-row .cs-chev { color:var(--vedic-gold-muted); font-size:17px; }
+.cs-row[aria-disabled="true"] { opacity:.45; cursor:default; }
+.cs-nav { display:flex; justify-content:space-between; gap:14px; margin:20px 0 0; padding:0 24px 34px; }
+.cs-nav a {
+  font-family:var(--body-font); font-size:14.8px; letter-spacing:.03em;
+  color:var(--vedic-gold); text-decoration:none;
+}
+.cs-nav a:focus-visible { outline:1px solid var(--vedic-gold); outline-offset:3px; }
+.cs-nav span { opacity:.4; color:var(--vedic-ivory-muted); font-family:var(--body-font); font-size:14.8px; }
+
+.cs-empty { padding:28px 22px; text-align:center; }
+.cs-empty h2 { font-family:var(--display-font); font-weight:600; font-size:clamp(21px,5.6vw,25px); color:#fff; margin:0 0 10px; }
+.cs-empty p { font-family:var(--body-font); font-size:14.5px; line-height:1.66; color:var(--vedic-ivory-muted); margin:0; }
+
+#cozFoot {
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(8,11,17,.86);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(201,161,94,.18);
+}
+#cozFoot .coz-foot-tag {
+  text-align:center; font-family:'EB Garamond',serif; font-style:italic;
+  font-size:13px; letter-spacing:.04em; color:#8b8272; padding:11px 20px 3px;
+}
+#cozFoot .coz-foot-links { display:flex; height:var(--asq-nav-h); }
+#cozFoot a {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; text-decoration:none; color:#8b8272; font-size:10.5px; letter-spacing:.06em;
+  font-family:'EB Garamond',serif; -webkit-tap-highlight-color:transparent;
+}
+#cozFoot a svg { width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+#cozFoot a:active { color:var(--asq-gold); }
+
+.cs-stamp {
+  position:fixed; left:6px; bottom:calc(var(--asq-nav-h) + 30px); z-index:50;
+  font:10px/1 "SF Mono", Menlo, monospace; color:rgba(229,212,197,.22); pointer-events:none;
+}
+@media print { .cs-sky, #cozFoot, .cs-stamp { display:none !important; } }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; animation:none !important; } }
+</style>
+<script src="coz-saved.js?v=20"></script>
+<script src="saved-vedic-library.js?v=1"></script>
+</head>
+<body>
+
+<div class="cs-sky" aria-hidden="true"></div>
+<header class="cs-head-in">
+  <img class="vedic-logo" src="/Demo/vedic-logo.png" alt="" width="1000" height="1055" aria-hidden="true">
+</header>
+
+<main class="cs-wrap"><div class="cs-panel"><span class="orn tl" aria-hidden="true"></span><span class="orn tr" aria-hidden="true"></span><span class="orn bl" aria-hidden="true"></span><span class="orn br" aria-hidden="true"></span><div id="csPanel"></div></div></main>
+
+<div id="cozFoot">
+  <div class="coz-foot-tag">CozAlyze helps you see it all</div>
+  <div class="coz-foot-links">
+    <a href="vedic-reading.html"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>Home</a>
+    <a href="#" data-foot="saved"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Saved</a>
+    <a href="#" data-foot="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.4 3.9-5 7-5s5.8 1.6 7 5"/></svg>Account</a>
+  </div>
+</div>
+
+<div class="cs-stamp" aria-hidden="true">CURRENT SEASON · CS2.3 · NAV TEST N2.0</div>
+
+<script src="coz-graha.js"></script>
+<script>
+(function () {
+  'use strict';
+  var G = window.COZ_GRAHA;
+  var panel = document.getElementById('csPanel');
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+
+  var DISCLAIMER = 'These are themes that may be present during this period, not predictions of what will happen.';
+
+  /* Nakshatra modifiers: motivation/direction only, connected back to the
+     graha and its house by the composer. Never rendered as standalone
+     encyclopedia text, no mythology or deities. */
+  var NAK = {
+    'Ashwini':'a quick, initiating quality and a pull toward fresh starts',
+    'Bharani':'a pattern of carrying something through to its conclusion',
+    'Krittika':'a clarifying, cutting-through quality that separates what matters from what does not',
+    'Rohini':'a steady, cultivating quality that wants something to grow and last',
+    'Mrigashira':'a searching quality that keeps looking for the thing not yet found',
+    'Ardra':'a quality of necessary upheaval that clears the ground',
+    'Punarvasu':'themes of renewal, restoration, and returning to what feels essential',
+    'Pushya':'a nourishing, protective quality that steadies what it holds',
+    'Ashlesha':'a close-held, perceptive quality attentive to undercurrents',
+    'Magha':'an awareness of lineage, inheritance, and what was handed down',
+    'P.Phalguni':'a pull toward ease, pleasure, and shared enjoyment',
+    'U.Phalguni':'a preference for steady arrangements and dependable commitments',
+    'Hasta':'a practical, skilled quality that wants to shape things by hand',
+    'Chitra':'an eye for form and design, and a wish to make something well',
+    'Swati':'an independent, self-directed quality that resists being held',
+    'Vishakha':'a focused, goal-directed quality that pursues one aim at a time',
+    'Anuradha':'a loyal, cooperative quality that builds through relationship',
+    'Jyeshtha':'a protective, senior quality that takes responsibility',
+    'Mula':'an instinct to reach the root and remove what is unnecessary',
+    'P.Ashadha':'an invigorating quality that revives momentum',
+    'U.Ashadha':'a persistent quality oriented toward lasting results',
+    'Shravana':'a listening, learning quality that gathers understanding',
+    'Dhanishta':'a rhythmic, capable quality suited to sustained effort',
+    'Shatabhisha':'a private, investigative quality drawn to what is hidden',
+    'P.Bhadrapada':'an intense quality willing to sit with difficulty',
+    'U.Bhadrapada':'a deep, settling quality that seeks calm beneath the surface',
+    'Revati':'a pattern of completion, transition, and carrying forward what remains meaningful at the end of a cycle'
+  };
+  /* Full names used by the birth-chart record map onto the short forms above. */
+  var NAK_ALIAS = {
+    'Purva Phalguni':'P.Phalguni','Uttara Phalguni':'U.Phalguni',
+    'Purva Ashadha':'P.Ashadha','Uttara Ashadha':'U.Ashadha',
+    'Purva Bhadrapada':'P.Bhadrapada','Uttara Bhadrapada':'U.Bhadrapada'
+  };
+  function nakText(n) { if (!n) return null; return NAK[n] || NAK[NAK_ALIAS[n]] || null; }
+
+  /* Pada modifiers: manner of expression only. */
+  var PADA = {
+    1: 'Its first pada adds an initiating, self-starting emphasis',
+    2: 'Its second pada adds a practical emphasis on what can actually be built or kept',
+    3: 'Its third pada adds a thoughtful, communicative quality and a willingness to consider more than one possibility',
+    4: 'Its fourth pada adds an emphasis on emotional meaning and on what feels settled'
+  };
+
+  /* ---------------- Evidence ledger (developer-only) ---------------- */
+  var ledger = [];
+  function claim(text, factors, note) {
+    var unique = {}, n = 0;
+    for (var i = 0; i < factors.length; i++) { if (!unique[factors[i]]) { unique[factors[i]] = 1; n++; } }
+    var ok = n >= 2;
+    ledger.push({ claim: text.slice(0, 74) + (text.length > 74 ? '\u2026' : ''),
+                  factors: Object.keys(unique), count: n,
+                  result: ok ? 'included' : 'omitted (under two independent factors)',
+                  note: note || '' });
+    return ok ? text : null;
+  }
+
+  function failClosed(reason) {
+    panel.innerHTML =
+      '<div class="cs-empty">' +
+        '<h2>Your season reading is not ready yet</h2>' +
+        '<p>Your chart is saved to this device when your reading is prepared. Open your reading first, then return here.</p>' +
+      '</div>';
+    if (window.console) console.warn('[CURRENT SEASON] fail-closed: ' + reason);
+  }
+
+  /* ---------------- Load and validate ---------------- */
+  var chart = G.readChart();
+  if (!chart) { failClosed('no cozChartJSON on this device'); return; }
+  var lc = chart.lifeCycle;
+  if (!lc || !lc.mahadasha || !lc.antardasha) { failClosed('timing data incomplete'); return; }
+
+  var md = lc.mahadasha, ad = lc.antardasha;
+  var mdP = G.planet(chart, md.lord), adP = G.planet(chart, ad.lord);
+
+  /* Core requirements from the specification: verified sign, house,
+     nakshatra and pada for BOTH active lords. Missing any one fails closed. */
+  function complete(p) {
+    return p && p.signNumber >= 1 && p.signNumber <= 12 &&
+           p.house >= 1 && p.house <= 12 && p.nakshatra && p.pada >= 1 && p.pada <= 4;
+  }
+  if (!complete(mdP)) { failClosed('Mahadasha lord ' + md.lord + ' lacks verified sign/house/nakshatra/pada'); return; }
+  if (!complete(adP)) { failClosed('Antardasha lord ' + ad.lord + ' lacks verified sign/house/nakshatra/pada'); return; }
+
+  /* ---------------- Compose ---------------- */
+  var paras = [];
+
+  /* 1. The larger chapter. Factors: active MD status + verified house. */
+  var mdArea = G.HOUSE_AREAS[mdP.house], mdOrd = G.ordinal(mdP.house);
+  var p1 = claim(
+    'Your larger ' + esc(md.lord) + ' chapter can bring ' + esc(G.THEMES[md.lord]) +
+    ' into longer-term focus. Because ' + esc(md.lord) + ' occupies the ' + esc(mdOrd) +
+    ' house of your birth chart, that emphasis may settle most noticeably around ' + esc(mdArea) +
+    '. What receives attention here tends to develop over years rather than weeks.',
+    ['md_active', 'md_house_' + mdP.house]
+  );
+  if (p1) paras.push(p1);
+
+  /* 2. Nakshatra and pada of the MD lord, tied back to graha and house. */
+  var mdNak = nakText(mdP.nakshatra);
+  if (mdNak) {
+    var p2 = claim(
+      esc(md.lord) + '\u2019s placement in ' + esc(mdP.nakshatra) + ' adds ' + esc(mdNak) +
+      '. ' + esc(PADA[mdP.pada]) + ', which may shape how this longer chapter is approached rather than what it concerns.',
+      ['md_nakshatra_' + mdP.nakshatra, 'md_pada_' + mdP.pada, 'md_active']
+    );
+    if (p2) paras.push(p2);
+  }
+
+  /* 3. The current season. Factors: active AD status + verified house. */
+  var adArea = G.HOUSE_AREAS[adP.house], adOrd = G.ordinal(adP.house);
+  var p3 = claim(
+    esc(ad.lord) + ' now shapes the current season within that larger chapter. ' + esc(ad.lord) +
+    ' brings ' + esc(G.THEMES[ad.lord]) + ' into focus. In your chart ' + esc(ad.lord) +
+    ' occupies the ' + esc(adOrd) + ' house, the area connected with ' + esc(adArea) +
+    '. This may place nearer-term attention there than the wider chapter alone would suggest.',
+    ['ad_active', 'ad_house_' + adP.house]
+  );
+  if (p3) paras.push(p3);
+
+  /* 4. Nakshatra and pada of the AD lord. */
+  var adNak = nakText(adP.nakshatra);
+  if (adNak) {
+    var p4 = claim(
+      esc(ad.lord) + '\u2019s placement in ' + esc(adP.nakshatra) + ' adds ' + esc(adNak) +
+      '. ' + esc(PADA[adP.pada]) + '. During this season these may describe the manner in which those themes come forward.',
+      ['ad_nakshatra_' + adP.nakshatra, 'ad_pada_' + adP.pada, 'ad_active']
+    );
+    if (p4) paras.push(p4);
+  }
+
+  /* 5. Verified co-presence. Optional modifier: omitted entirely when absent,
+     never inferred. Factors: AD house + another graha verified in that house. */
+  var mates = G.coTenants(chart, ad.lord);
+  if (mates.length) {
+    var names = mates.length === 1 ? mates[0]
+              : mates.slice(0, -1).join(', ') + ' and ' + mates[mates.length - 1];
+    var themeBits = [];
+    for (var m = 0; m < mates.length && m < 2; m++) if (G.THEMES[mates[m]]) themeBits.push(G.THEMES[mates[m]]);
+    if (themeBits.length) {
+      var p5 = claim(
+        esc(names) + (mates.length > 1 ? ' also occupy' : ' also occupies') +
+        ' this area of your birth chart, adding questions of ' + esc(themeBits.join('; and ')) +
+        ' to ' + esc(adOrd) + '-house matters. You may find these threads harder to separate than usual during this season.',
+        ['ad_house_' + adP.house, 'cotenancy_' + mates.join('_')]
+      );
+      if (p5) paras.push(p5);
+    }
+  }
+
+  /* 6. Lord-to-lord synthesis. Same house, same sign, or contrast. This is
+     the paragraph that must explain a pattern rather than append two others. */
+  var sameHouse = (mdP.house === adP.house), sameSign = (mdP.signNumber === adP.signNumber);
+  var syn;
+  if (sameHouse) {
+    syn = claim(
+      esc(md.lord) + ' and ' + esc(ad.lord) + ' occupy the same house in your chart, so the season and the chapter point at the same part of life rather than pulling apart. That can concentrate attention: what the longer chapter has been slowly reshaping may become more immediate now, in the area of ' + esc(adArea) + '.',
+      ['md_house_' + mdP.house, 'ad_house_' + adP.house, 'md_active', 'ad_active']
+    );
+  } else if (sameSign) {
+    syn = claim(
+      esc(md.lord) + ' and ' + esc(ad.lord) + ' share a sign in your chart, which can give the season and the wider chapter a similar manner even though they activate different areas of life. The style may feel consistent while the subject changes.',
+      ['md_sign_' + mdP.signNumber, 'ad_sign_' + adP.signNumber, 'md_active']
+    );
+  } else {
+    syn = claim(
+      esc(md.lord) + ' and ' + esc(ad.lord) + ' work on different areas of your chart, so this season may involve holding two emphases at once: the longer concern of ' + esc(mdArea) + ', and the nearer one of ' + esc(adArea) +
+      '. The work of the period may be less about choosing between them than about letting each have its proper place.',
+      ['md_house_' + mdP.house, 'ad_house_' + adP.house, 'md_active', 'ad_active']
+    );
+  }
+  if (syn) paras.push(syn);
+
+  /* ---------------- Render ---------------- */
+  var lede = 'A season of ' + esc(G.THEMES[ad.lord].split(',')[0]) + ' within a longer chapter of ' +
+             esc(G.THEMES[md.lord].split(',')[0]) + '.';
+
+  panel.innerHTML =
+    '<p class="cs-eyebrow">Your Current Season</p>' +
+    '<p class="cs-pair">' + esc(md.lord) + ' \u2013 ' + esc(ad.lord) + '</p>' +
+    '<div class="cs-pairmark">' + G.medallion(md.lord, 68) + '<span class="cs-join"></span>' + G.medallion(ad.lord, 68) + '</div>' +
+    '<p class="cs-dates">' + esc(ad.displayStartDate) + ' \u2013 ' + esc(ad.displayEndDate) + '</p>' +
+    '<div class="cs-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+    '<p class="cs-lede">' + lede + '</p>' +
+    '<div class="cs-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+
+    '<h1 class="cs-h1">Understanding<br>Your Current Season</h1>' +
+    '<div class="cs-intro">' +
+      '<p>Vimshottari Dasha is a Vedic timing system that maps your life through a sequence of planetary periods calculated from the Moon\u2019s position at birth. The Mahadasha describes the larger chapter unfolding over several years, while the Antardasha describes the shorter season operating within that chapter.</p>' +
+      '<p>These periods do not determine exactly what will happen. Instead, they indicate themes and areas of life that may receive greater attention. Your reading combines the active Mahadasha and Antardasha with their placements in your birth chart to explore how this particular season may express itself for you.</p>' +
+    '</div>' +
+    '<div class="cs-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+
+    '<div class="cs-reading">' + paras.map(function (t) { return '<p>' + t + '</p>'; }).join('') + '</div>' +
+
+    '<div class="cs-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+    '<p class="cs-disclaimer">' + DISCLAIMER + '</p>' +
+
+    '<div class="cs-explore">' +
+      '<div class="cs-nav">' +
+        '<a href="current-life-cycle.html">\u2190 Back to Life Cycle Overview</a>' +
+        '<a href="key-time-windows.html">Next: Key Time Windows \u2192</a>' +
+      '</div>' +
+    '</div>';
+
+  /* ---------------- Developer-only output ---------------- */
+  if (window.console) {
+    var words = panel.querySelector('.cs-reading').textContent.trim().split(/\s+/).length;
+    console.log('[CURRENT SEASON] mode=' + lc.mode + ' year=' + lc.yearLengthDays + 'd status=' + lc.validationStatus);
+    console.log('[CURRENT SEASON] MD ' + md.lord + ' h' + mdP.house + ' ' + mdP.nakshatra + ' p' + mdP.pada +
+                ' | AD ' + ad.lord + ' h' + adP.house + ' ' + adP.nakshatra + ' p' + adP.pada +
+                ' | personalised words=' + words);
+    if (console.table) console.table(ledger); else console.log(ledger);
+    console.log('[CURRENT SEASON] NOT IMPLEMENTED (absent from cozChartJSON): house rulerships, graha drishti, dispositor links, dignity. Claims depending on these were never drafted.');
+  }
+})();
+</script>
+</body>
+</html>

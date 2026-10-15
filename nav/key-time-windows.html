@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Key Time Windows · CozAlyze</title>
+<!--
+  COZALYZE · KEY TIME WINDOWS · KTW1.3
+  Reached from current-life-cycle.html.
+
+  Three windows only: the previous Antardasha, the current one, and the next.
+  Nine at this depth would be far too long, and the current and upcoming
+  entries stay brief because Your Current Season and What Comes Next carry the
+  deeper readings.
+
+  Same assets and type as current-season.html so the three readings read as one
+  set: Jason's moon background, his panel frame corners, the shared tokens.
+
+  COMPOSITION. Each window's prose is built from the subperiod lord's verified
+  natal house, its nakshatra, and the Mahadasha lord it sits inside, so the same
+  lord pair reads differently in different charts. The house supplies the base
+  layer of what is activated; the period lords and nakshatra colour it. A
+  house-only bank would make every Saturn-in-the-sixth window identical whether
+  the chapter were Moon, Venus, Mars or Jupiter, which is the flattening the
+  specification warns against.
+
+  Past windows use "may have", never "did". Nothing is asserted as having
+  happened, and no window is called good or bad.
+
+  NOT IMPLEMENTED, because cozChartJSON does not carry them: house rulerships,
+  graha drishti, dispositor links, dignity. Claims depending on those layers are
+  never drafted.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vedic-navy:#000f26;
+  --vedic-gold:#d4a178;
+  --vedic-gold-muted:rgba(212,161,120,.65);
+  --vedic-ivory:#e5d4c5;
+  --vedic-ivory-muted:rgba(229,212,197,.88);
+  --display-font:"Cormorant Garamond", Georgia, serif;
+  --body-font:"Avenir Next","Helvetica Neue",Arial,sans-serif;
+  --asq-gold:#c9a15e;
+  --asq-nav-h:64px;
+  --side-pad:22px;
+}
+@media (max-width:374px){ :root{ --side-pad:17px; } }
+*{box-sizing:border-box}
+html{background:var(--vedic-navy);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--vedic-navy);color:var(--vedic-ivory);font-family:var(--body-font);-webkit-font-smoothing:antialiased}
+
+.ktw-sky{
+  position:fixed; inset:0; z-index:0;
+  background-image:url("/Demo/season-moon-bg.png");
+  background-size:cover; background-position:center top;
+}
+.ktw-sky::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,15,38,0) 0%, rgba(0,15,38,.26) 40%, rgba(0,15,38,.70) 100%);
+}
+.ktw-head{position:relative;z-index:1;padding:18px 0 2px;text-align:center}
+.vedic-logo{display:block;width:64px;height:auto;margin:0 auto}
+
+.ktw-wrap{position:relative;z-index:1;max-width:620px;margin:0 auto;padding:8px var(--side-pad) calc(var(--asq-nav-h) + 74px)}
+
+/* Panel treatment carried over from current-season.html: rule and fill in CSS
+   at the artwork's own colours, corner ornaments cropped from Jason's frame. */
+.ktw-panel{
+  position:relative;background:#00152a;
+  border:1.5px solid #b67d4d;border-radius:20px;
+  padding:34px 24px 32px;
+  box-shadow:inset 0 0 0 4px #00152a, inset 0 0 0 5px rgba(182,125,77,.55);
+}
+.ktw-panel .orn{
+  position:absolute;width:46px;height:46px;pointer-events:none;
+  background-image:url("/Demo/reading-panel-corners.png");background-size:92px 92px;
+}
+.ktw-panel .orn.tl{top:11px;left:11px;background-position:0 0}
+.ktw-panel .orn.tr{top:11px;right:11px;background-position:-46px 0}
+.ktw-panel .orn.bl{bottom:11px;left:11px;background-position:0 -46px}
+.ktw-panel .orn.br{bottom:11px;right:11px;background-position:-46px -46px}
+@media (max-width:380px){
+  .ktw-panel{padding:30px 18px 28px}
+  .ktw-panel .orn{width:38px;height:38px;background-size:76px 76px}
+  .ktw-panel .orn.tr{background-position:-38px 0}
+  .ktw-panel .orn.bl{background-position:0 -38px}
+  .ktw-panel .orn.br{background-position:-38px -38px}
+}
+
+.ktw-eyebrow{text-align:center;font-family:var(--display-font);font-style:italic;
+  font-size:clamp(18.5px,5vw,21.5px);color:var(--vedic-gold);letter-spacing:.02em;margin:0 0 4px}
+h1.ktw-h1{text-align:center;font-family:var(--display-font);font-weight:500;
+  font-size:clamp(26.5px,6.9vw,32px);line-height:1.2;color:#fff;margin:0 0 16px;letter-spacing:.012em}
+
+.ktw-rule{display:flex;align-items:center;justify-content:center;gap:10px;margin:18px auto;max-width:360px}
+.ktw-rule i{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--vedic-gold-muted),transparent)}
+.ktw-rule b{width:6px;height:6px;border-radius:50%;background:var(--vedic-gold);opacity:.9}
+
+.ktw-intro p{font-family:var(--body-font);font-size:clamp(16.5px,4.45vw,18px);
+  line-height:1.74;color:var(--vedic-ivory-muted);margin:0 0 14px;text-align:center}
+
+/* One window block. Deliberately plain: a heading, its position and dates, a
+   short paragraph, then the two labelled lines. */
+.ktw-win{margin:0 0 6px}
+.ktw-pair{text-align:center;font-family:var(--display-font);font-weight:500;
+  font-size:clamp(24px,6.4vw,30px);letter-spacing:.045em;color:#fff;
+  margin:0 0 4px;text-transform:uppercase;overflow-wrap:break-word}
+.ktw-when{text-align:center;font-family:var(--body-font);
+  font-size:clamp(14px,3.8vw,15.4px);letter-spacing:.05em;
+  color:var(--vedic-gold);margin:0 0 14px}
+.ktw-when .pos{color:var(--vedic-ivory-muted)}
+.ktw-body{font-family:var(--body-font);font-size:clamp(16px,4.3vw,17.4px);
+  line-height:1.78;color:var(--vedic-ivory);margin:0 0 14px}
+.ktw-line{font-family:var(--body-font);font-size:clamp(15.5px,4.15vw,16.8px);
+  line-height:1.7;color:var(--vedic-ivory);margin:0 0 11px}
+.ktw-line b{font-family:var(--display-font);font-weight:600;font-style:italic;
+  font-size:1.08em;color:var(--vedic-gold);letter-spacing:.015em}
+
+.ktw-disclaimer{text-align:center;font-family:var(--body-font);
+  font-size:clamp(15px,4vw,16.4px);line-height:1.66;color:var(--vedic-ivory-muted);margin:6px 0 0}
+
+.ktw-explore{margin:26px 0 0}
+.ktw-explore h2{font-family:var(--display-font);font-size:clamp(18.5px,4.9vw,20.5px);
+  color:var(--vedic-gold);font-weight:500;margin:0 0 10px;letter-spacing:.015em}
+.ktw-row{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+  border:0;border-top:1px solid rgba(212,161,120,.22);background:none;color:var(--vedic-ivory);
+  text-align:left;padding:14px 2px;font-family:var(--display-font);
+  font-size:clamp(18.5px,5vw,20.5px);cursor:pointer;-webkit-tap-highlight-color:transparent;
+  text-decoration:none}
+.ktw-row:last-of-type{border-bottom:1px solid rgba(212,161,120,.22)}
+.ktw-row .chev{color:var(--vedic-gold-muted);font-size:17px}
+.ktw-row[aria-disabled="true"]{opacity:.45;cursor:default}
+.ktw-nav{display:flex;justify-content:space-between;gap:14px;margin:20px 0 0;padding:0 24px 34px}
+.ktw-nav a{font-family:var(--body-font);font-size:14.8px;letter-spacing:.03em;color:var(--vedic-gold);text-decoration:none}
+
+.ktw-empty{padding:28px 22px;text-align:center}
+.ktw-empty h2{font-family:var(--display-font);font-weight:600;font-size:clamp(21px,5.6vw,25px);color:#fff;margin:0 0 10px}
+.ktw-empty p{font-family:var(--body-font);font-size:15px;line-height:1.66;color:var(--vedic-ivory-muted);margin:0}
+
+#cozFoot{position:fixed;left:0;right:0;bottom:0;z-index:40;padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(8,11,17,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(201,161,94,.18)}
+#cozFoot .coz-foot-tag{text-align:center;font-family:'EB Garamond',serif;font-style:italic;
+  font-size:13px;letter-spacing:.04em;color:#8b8272;padding:11px 20px 3px}
+#cozFoot .coz-foot-links{display:flex;height:var(--asq-nav-h)}
+#cozFoot a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  text-decoration:none;color:#8b8272;font-size:10.5px;letter-spacing:.06em;font-family:'EB Garamond',serif;
+  -webkit-tap-highlight-color:transparent}
+#cozFoot a svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+#cozFoot a:active{color:var(--asq-gold)}
+
+.ktw-stamp{position:fixed;left:6px;bottom:calc(var(--asq-nav-h) + 30px);z-index:50;
+  font:10px/1 "SF Mono",Menlo,monospace;color:rgba(229,212,197,.22);pointer-events:none}
+@media print{.ktw-sky,#cozFoot,.ktw-stamp{display:none !important}}
+@media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+</style>
+<script src="coz-saved.js?v=20"></script>
+<script src="saved-vedic-library.js?v=1"></script>
+</head>
+<body>
+
+<div class="ktw-sky" aria-hidden="true"></div>
+<header class="ktw-head">
+  <img class="vedic-logo" src="/Demo/vedic-logo.png" alt="" width="1000" height="1055" aria-hidden="true">
+</header>
+
+<main class="ktw-wrap"><div class="ktw-panel">
+  <span class="orn tl" aria-hidden="true"></span><span class="orn tr" aria-hidden="true"></span>
+  <span class="orn bl" aria-hidden="true"></span><span class="orn br" aria-hidden="true"></span>
+  <div id="ktwPanel"></div>
+</div></main>
+
+<div id="cozFoot">
+  <div class="coz-foot-tag">CozAlyze helps you see it all</div>
+  <div class="coz-foot-links">
+    <a href="vedic-reading.html"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>Home</a>
+    <a href="#" data-foot="saved"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Saved</a>
+    <a href="#" data-foot="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.4 3.9-5 7-5s5.8 1.6 7 5"/></svg>Account</a>
+  </div>
+</div>
+
+<div class="ktw-stamp" aria-hidden="true">KEY TIME WINDOWS · KTW1.3 · NAV TEST N2.0</div>
+
+<script src="coz-graha.js"></script>
+<script>
+(function () {
+  'use strict';
+  var G = window.COZ_GRAHA;
+  var panel = document.getElementById('ktwPanel');
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c];
+    });
+  }
+
+  var DISCLAIMER = 'These are themes that may be present during this period, not predictions of what will happen.';
+
+  /* House layer: what the window activates, and the two directions it can run.
+     This is the base, modulated below by the period lords and nakshatra. */
+  var HOUSE = {
+    1:  { area:'identity, personal direction, and how you meet life',
+          opp:'clarifying what you want to be known for, and acting more directly from your own judgement',
+          prs:'uncertainty while a familiar self-image loosens, or acting before you have settled what you want' },
+    2:  { area:'resources, values, speech, and what you gather around you',
+          opp:'putting your resources in order, and getting clearer about what is genuinely worth keeping',
+          prs:'holding on past the point of usefulness, or measuring your worth by what you have accumulated' },
+    3:  { area:'effort, courage, siblings, communication, and shorter journeys',
+          opp:'building skill through repetition, speaking more plainly, and backing yourself in smaller undertakings',
+          prs:'scattering effort across too many fronts, or friction with those closest to your daily life' },
+    4:  { area:'home, family, emotional security, privacy, and belonging',
+          opp:'settling your living situation, and tending the relationships that let you rest',
+          prs:'restlessness about where you belong, or difficulty separating comfort from what actually sustains you' },
+    5:  { area:'creativity, children, learning, and what you enjoy expressing',
+          opp:'making something you care about, and giving your attention to what you do for its own sake',
+          prs:'losing patience when the work does not come easily, or treating enjoyment as something to be earned' },
+    6:  { area:'work, routines, service, and meeting ongoing demands',
+          opp:'establishing sustainable routines, strengthening your abilities through consistent effort, and resolving practical matters patiently',
+          prs:'feeling overburdened, frustration with slow progress, or difficulty balancing responsibility with your own needs' },
+    7:  { area:'partnership, agreements, and one-to-one relationship',
+          opp:'reaching clearer terms with the people you work and live alongside',
+          prs:'carrying more of an arrangement than was agreed, or avoiding a conversation that needs having' },
+    8:  { area:'obstacles, sudden change, hidden matters, and what is kept private',
+          opp:'looking honestly at something you have set aside, and working steadily through a difficulty rather than around it',
+          prs:'unease while circumstances change at their own pace, or keeping a concern to yourself longer than helps' },
+    9:  { area:'meaning, belief, teachers, higher study, and longer journeys',
+          opp:'reconsidering an earlier conclusion, and finding a perspective that fits who you are now',
+          prs:'reaching for an answer before your understanding has caught up, or outgrowing a framework before another is ready' },
+    10: { area:'work in the world, visibility, responsibility, and direction',
+          opp:'taking on responsibility that fits, and making your direction legible to others',
+          prs:'measuring yourself against a standard you did not choose, or visibility arriving before you feel ready' },
+    11: { area:'networks, gains, community, and longer-range hopes',
+          opp:'strengthening the connections that support your aims, and being clearer about what you are working toward',
+          prs:'spreading yourself across too many circles, or holding an aim that no longer means what it did' },
+    12: { area:'retreat, rest, inner life, and what is set down',
+          opp:'making room for rest, and releasing an obligation that has quietly outlived its purpose',
+          prs:'withdrawing further than helps, or fatigue that arrives before you notice its cause' }
+  };
+
+  /* Lord layer. The window's lord colours HOW the area is met, and adds its own
+     slant to each of the two lines, so two windows in the same house do not read
+     alike when their lords differ. */
+  var MANNER = {
+    Sun:     'through questions of recognition and self-definition',
+    Moon:    'through questions of care, security, and how things feel',
+    Mars:    'through effort, decision, and the wish to act',
+    Mercury: 'through thinking, exchange, and practical detail',
+    Jupiter: 'through growth, meaning, and taking a wider view',
+    Venus:   'through relationship, value, and what appeals to you',
+    Saturn:  'through responsibility, patience, and steady work',
+    Rahu:    'through the unfamiliar and the not-yet-tried',
+    Ketu:    'through release, simplification, and turning inward'
+  };
+  var LORD_OPP = {
+    Sun:'standing behind a decision as your own', Moon:'trusting what you already sense',
+    Mars:'starting something you have been circling', Mercury:'putting words to what was unclear',
+    Jupiter:'letting an understanding widen', Venus:'restoring something that had gone quiet',
+    Saturn:'doing the unglamorous part properly', Rahu:'trying an approach you have not before',
+    Ketu:'setting down what you no longer need'
+  };
+  var LORD_PRS = {
+    Sun:'or taking a setback more personally than it warrants', Moon:'or letting mood decide more than it should',
+    Mars:'or forcing a pace the situation cannot hold', Mercury:'or over-analysing what needs a decision',
+    Jupiter:'or expecting more than conditions can supply', Venus:'or smoothing something over rather than settling it',
+    Saturn:'or carrying it alone longer than necessary', Rahu:'or chasing novelty past the point of use',
+    Ketu:'or stepping back before the matter is finished'
+  };
+
+  /* Nakshatra layer, short form, used as one closing clause only. */
+  var NAK = {
+    'Ashwini':'a quick, initiating quality','Bharani':'a pattern of carrying things through to their conclusion',
+    'Krittika':'a clarifying quality that separates what matters from what does not','Rohini':'a steady, cultivating quality',
+    'Mrigashira':'a searching quality','Ardra':'a quality of necessary upheaval',
+    'Punarvasu':'a pattern of renewal and return','Pushya':'a nourishing, steadying quality',
+    'Ashlesha':'a close-held, perceptive quality','Magha':'an awareness of lineage and inheritance',
+    'P.Phalguni':'a pull toward ease and shared enjoyment','U.Phalguni':'a preference for dependable arrangements',
+    'Hasta':'a practical, skilled quality','Chitra':'an eye for form and craft',
+    'Swati':'an independent, self-directed quality','Vishakha':'a focused, goal-directed quality',
+    'Anuradha':'a loyal, cooperative quality','Jyeshtha':'a protective, senior quality',
+    'Mula':'an instinct to reach the root of things','P.Ashadha':'an invigorating quality',
+    'U.Ashadha':'a persistent quality oriented toward lasting results','Shravana':'a listening, gathering quality',
+    'Dhanishta':'a rhythmic, capable quality','Shatabhisha':'a private, investigative quality',
+    'P.Bhadrapada':'an intense quality willing to sit with difficulty','U.Bhadrapada':'a deep, settling quality',
+    'Revati':'a pattern of completion and carrying forward what still matters'
+  };
+  var NAK_ALIAS = {
+    'Purva Phalguni':'P.Phalguni','Uttara Phalguni':'U.Phalguni','Purva Ashadha':'P.Ashadha',
+    'Uttara Ashadha':'U.Ashadha','Purva Bhadrapada':'P.Bhadrapada','Uttara Bhadrapada':'U.Bhadrapada'
+  };
+  function nakText(n){ if(!n) return null; return NAK[n] || NAK[NAK_ALIAS[n]] || null; }
+
+  /* Pada, expressed as a manner clause. Never labelled as a pada. */
+  var PADA = {
+    1:'and a pull to begin rather than wait',
+    2:'and a preference for what can actually be built or kept',
+    3:'and a willingness to hold more than one possibility at a time',
+    4:'and an ear for what feels settled rather than merely correct'
+  };
+
+  var ledger = [];
+  function claim(text, factors) {
+    var u = {}, n = 0;
+    for (var i=0;i<factors.length;i++){ if(!u[factors[i]]){u[factors[i]]=1;n++;} }
+    ledger.push({ claim:text.slice(0,70)+(text.length>70?'\u2026':''), factors:Object.keys(u),
+                  count:n, result: n>=2 ? 'included' : 'omitted (under two factors)' });
+    return n>=2 ? text : null;
+  }
+
+  function failClosed(reason) {
+    panel.innerHTML =
+      '<div class="ktw-empty"><h2>Your key time windows are not ready yet</h2>' +
+      '<p>Your chart is saved to this device when your reading is prepared. Open your reading first, then return here.</p></div>';
+    if (window.console) console.warn('[KEY TIME WINDOWS] fail-closed: ' + reason);
+  }
+
+  var chart = G.readChart();
+  if (!chart) { failClosed('no cozChartJSON on this device'); return; }
+  var lc = chart.lifeCycle;
+  if (!lc || !lc.mahadasha || !lc.antardasha) { failClosed('timing data incomplete'); return; }
+
+  var md = lc.mahadasha, ad = lc.antardasha;
+  var seq = lc.antardashaSequence || [];
+  var at = -1;
+  for (var i=0;i<seq.length;i++){ if(seq[i].startTimestamp===ad.startTimestamp){ at=i; break; } }
+  if (at < 0) { failClosed('current Antardasha not found in its sequence'); return; }
+
+  /* The previous window, the current one, then every remaining window through
+     to the end of this Mahadasha. A chapter can run years past the current
+     subperiod, and each handover is a real change of emphasis worth naming. */
+  var trio = [];
+  if (at > 0) trio.push({ pos:'Previous Window', seg: seq[at-1] });
+  trio.push({ pos:'Current Window', seg: seq[at] });
+  for (var k = at+1; k < seq.length; k++) {
+    trio.push({ pos: (k === at+1) ? 'Upcoming Window' : 'Later Window', seg: seq[k] });
+  }
+  if (trio.length === 1 && lc.nextAntardasha) {
+    trio.push({ pos:'Upcoming Window', seg: lc.nextAntardasha });
+  }
+
+  function longDate(iso) {
+    var M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var d = new Date(iso);
+    return M[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  }
+
+  function windowHTML(entry) {
+    var seg = entry.seg;
+    if (!seg) return '';
+    var p = G.planet(chart, seg.lord);
+    if (!p || !(p.house >= 1 && p.house <= 12)) return '';
+
+    var H = HOUSE[p.house];
+    var past = entry.pos === 'Previous Window';
+    var later = entry.pos === 'Later Window';
+    var nk = nakText(p.nakshatra);
+    var pd = PADA[p.pada];
+
+    /* The house, nakshatra and pada are analysed but never named. They decide
+       which area is described and how it is characterised; the customer reads
+       their own situation rather than a chart report. */
+    var open = past
+      ? 'This window may have drawn your attention toward '
+      : (entry.pos === 'Current Window'
+          ? 'This window may be drawing your attention toward '
+          : 'This window may draw your attention toward ');
+
+    var body = claim(
+      open + esc(H.area) + ', ' + esc(MANNER[seg.lord] || 'in its own way') +
+      ', inside the longer ' + esc(md.lord) + ' chapter.' +
+      (nk ? ' There is ' + esc(nk) + ' running through it' + (pd ? ', ' + esc(pd) : '') + '.' : ''),
+      ['window_active', 'lord_house_' + p.house, 'md_' + md.lord]
+    );
+
+    /* Both lines combine the house layer with the lord's own slant. */
+    var opp = esc(H.opp) + ', and ' + esc(LORD_OPP[seg.lord] || 'working with what the period offers') + '.';
+    var prs = esc(H.prs) + ', ' + esc(LORD_PRS[seg.lord] || 'or pushing past what the period supports') + '.';
+
+    return '<div class="ktw-win">' +
+      '<p class="ktw-pair">' + esc(md.lord) + '\u2013' + esc(seg.lord) + '</p>' +
+      '<p class="ktw-when"><span class="pos">' + esc(entry.pos) + '</span> \u00B7 ' +
+        esc(longDate(seg.startTimestamp)) + '\u2013' + esc(longDate(seg.endTimestamp)) + '</p>' +
+      (body ? '<p class="ktw-body">' + body + '</p>' : '') +
+      '<p class="ktw-line"><b>Potential Opportunities:</b> ' + opp + '</p>' +
+      '<p class="ktw-line"><b>Possible Pressures:</b> ' + prs + '</p>' +
+    '</div>';
+  }
+
+  var blocks = trio.map(windowHTML).filter(Boolean);
+  if (!blocks.length) { failClosed('no window had a verified house for its lord'); return; }
+
+  panel.innerHTML =
+    '<p class="ktw-eyebrow">Your Current Life Cycle</p>' +
+    '<h1 class="ktw-h1">Key Time Windows</h1>' +
+    '<div class="ktw-intro">' +
+      '<p>Your Mahadasha describes the larger chapter unfolding over several years, while each Antardasha creates a shorter window within it. The windows below run from the one just past, through the one you are in, to each remaining window before this chapter closes in ' + esc(longDate(md.endTimestamp)) + '. They highlight possible areas of attention, opportunity, and adjustment, not fixed events.</p>' +
+    '</div>' +
+    blocks.join('<div class="ktw-rule" aria-hidden="true"><i></i><b></b><i></i></div>') +
+    '<div class="ktw-rule" aria-hidden="true"><i></i><b></b><i></i></div>' +
+    '<p class="ktw-disclaimer">' + DISCLAIMER + '</p>' +
+    '<div class="ktw-explore">' +
+      '<div class="ktw-nav">' +
+        '<a href="current-life-cycle.html">\u2190 Back to Life Cycle Overview</a>' +
+        '<a href="what-comes-next.html">Next: What Comes Next \u2192</a>' +
+      '</div>' +
+    '</div>';
+
+  if (window.console) {
+    console.log('[KEY TIME WINDOWS] mode=' + lc.mode + ' year=' + lc.yearLengthDays + 'd status=' + lc.validationStatus);
+    trio.forEach(function (t) {
+      if (!t.seg) return;
+      var p = G.planet(chart, t.seg.lord);
+      console.log('  ' + t.pos + ': ' + md.lord + '-' + t.seg.lord +
+                  ' h' + (p ? p.house : '?') + ' ' + (p ? p.nakshatra : '?') +
+                  '  ' + t.seg.startTimestamp.slice(0,10) + '\u2192' + t.seg.endTimestamp.slice(0,10));
+    });
+    if (console.table) console.table(ledger); else console.log(ledger);
+    console.log('[KEY TIME WINDOWS] NOT IMPLEMENTED (absent from cozChartJSON): house rulerships, graha drishti, dispositor links, dignity.');
+  }
+})();
+</script>
+</body>
+</html>

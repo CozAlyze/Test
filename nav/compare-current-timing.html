@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your Current Timing · CozAlyze</title>
+<!--
+  COZALYZE · COMPARE · CURRENT TIMING · CT3.0 · overview
+  Reached from compare-reading.html ("Your Current Timing").
+
+  Artwork: compare-current-timing-bg.jpg (his composite, 1206 x 2622). Baked in:
+  logo, CozAlyze, title, subtitle, Vedic Cycle / Tropical Sky, the empty
+  diagram with its lotus, divider and moon phases, You Are Here, the
+  Where The Two Meet panel and its button, the tagline, the nav bar.
+  This page draws no visual element of its own. Live text and glyphs are
+  positioned at percentage coordinates measured from that file, the same
+  technique as current-life-cycle.html.
+
+  Live per person (compare-current-timing.js): Mahadasha glyph + name,
+  the Mahadasha-Antardasha pair, and only the Tropical transit planets
+  that are inside the TRANSIT_POLICY orbs right now (0 to 3). The panel
+  carries his approved fixed copy. No Antardasha dates: the painted
+  Vedic half has no free space between the pair and the lotus.
+
+  Transit planets use the platform's existing Unicode planet symbols
+  (the same set coz-graha.js uses). No sphere art exists in the repo, so none is shown.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/Demo/compare-current-timing-bg.jpg?v=1">
+<style>
+:root {
+  --gold: #e6c07f;
+  --ivory: #efeeee;
+  --serif: "EB Garamond", Georgia, serif;
+  --symbols: "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2", Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; background: rgb(0,2,8); overflow-x: hidden; color: var(--ivory);
+  font-family: var(--serif); -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+}
+body { padding-bottom: env(safe-area-inset-bottom); }
+.ct-stage {
+  position: relative; width: 100%; margin: 0 auto;
+  aspect-ratio: 1206 / 2622;
+  background: url("/Demo/compare-current-timing-bg.jpg?v=1") center top / 100% 100% no-repeat;
+  container-type: inline-size; overflow: hidden;
+}
+@media (min-width: 520px) { .ct-stage { max-width: 480px; } }
+
+.p { position: absolute; transform: translate(-50%, -50%); line-height: 1; text-align: center; white-space: nowrap; }
+
+/* Vedic half, centred on the painted divider at x 38.47% */
+.v-glyph { left: 38.47%; top: 29.94%; font-family: var(--symbols); font-size: 6.4cqw; color: var(--gold); }
+.v-lord  { left: 38.47%; top: 32.49%; font-size: 3.6cqw; font-weight: 500; letter-spacing: .09em; text-transform: uppercase; color: #fff; }
+.v-pair  { left: 38.47%; top: 36.0%;  font-size: 2.5cqw; letter-spacing: .05em; text-transform: uppercase; color: #fff; }
+
+/* Tropical half, three slots on the painted orbits */
+.t-glyph { font-family: var(--symbols); font-size: 4.8cqw; color: var(--gold); }
+
+.ct-summary {
+  position: absolute; left: 13%; right: 13%; top: 58.3%; height: 11.1%;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font-size: 3.15cqw; line-height: 1.32; color: var(--ivory); min-width: 0;
+}
+.ct-summary p { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+
+.hot { position: absolute; display: block; -webkit-tap-highlight-color: transparent; }
+.hot:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+.read { left: 12.9%; top: 69.4%; width: 74.2%; height: 4.2%; border-radius: 999px; }
+.nav-home { left: 10.5%; top: 96.1%; width: 24.5%; height: 2.7%; }
+.nav-saved { left: 35%; top: 96.1%; width: 26%; height: 2.7%; }
+.nav-acct { left: 61%; top: 96.1%; width: 26%; height: 2.7%; }
+.read[aria-disabled="true"] { pointer-events: none; }
+
+.stamp { position: fixed; right: 6px; bottom: 2px; font: 8px/1 var(--serif); letter-spacing: .08em; color: rgba(204,164,102,.45); pointer-events: none; z-index: 9; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+<!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
+<script src="coz-saved.js?v=20"></script>
+</head>
+<body>
+<main class="ct-stage" id="stage">
+  <h1 class="sr">Your Current Timing</h1>
+  <div class="p v-glyph" id="vGlyph" aria-hidden="true"></div>
+  <div class="p v-lord" id="vLord"></div>
+  <div class="p v-pair" id="vPair"></div>
+  <div id="tSlots"></div>
+  <div class="ct-summary" id="summary"><p>Your Vedic timing describes the longer chapter unfolding through your current Mahadasha and Antardasha. Tropical transits describe the shorter planetary conditions interacting with your natal chart now. Together, they offer two time scales for understanding the themes receiving emphasis in the present moment.</p></div>
+  <a class="hot read" id="read" href="compare-current-timing-reading.html?v=3" aria-label="Read your full timing" aria-disabled="true"></a>
+  <nav aria-label="Main">
+    <a class="hot nav-home" href="compare-reading.html" aria-label="Home"></a>
+    <a class="hot nav-saved" href="#" aria-label="Saved"></a>
+    <a class="hot nav-acct" href="#" aria-label="Profile"></a>
+  </nav>
+</main>
+<div class="stamp" aria-hidden="true">CURRENT TIMING · CT3.0 · NAV TEST N2.0</div>
+
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script src="coz-graha.js"></script>
+<script src="dev-review-engine.js?v=8"></script>
+<script src="ascendant-library.js?v=4"></script>
+<!-- Oct 2: ?v=6 so this page loads compare-current-timing.js CT3.4 (loadFresh for Compare saves), not a cached copy -->
+<script src="compare-current-timing.js?v=6"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var G = window.COZ_GRAHA, TM = window.COZ_TIMING;
+
+  /* Slot positions measured on the painted orbits of compare-current-timing-bg.jpg. */
+  var SLOTS = [
+    { sx: 64.2, sy: 28.99 },
+    { sx: 67.7, sy: 33.33 },
+    { sx: 63.6, sy: 38.44 }
+  ];
+  var PAIR_MAX_CQW = 19;   /* painted room between the inner ring and the centre line */
+
+  function fitPair(el) {
+    var stage = $('stage'), max = stage.clientWidth * PAIR_MAX_CQW / 100;
+    el.style.fontSize = '';
+    var w = el.scrollWidth;
+    if (w > max) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * max / w) + 'px';
+  }
+
+  /* The approved copy is fixed wording, so it cannot be shortened. On very
+     narrow screens the type steps down only as far as the painted panel requires. */
+  function fitSummary() {
+    var box = $('summary'), p = box.firstChild;
+    p.style.fontSize = '';
+    for (var i = 0; i < 12 && p.offsetHeight > box.clientHeight; i++) {
+      p.style.fontSize = (parseFloat(getComputedStyle(p).fontSize) * 0.96) + 'px';
+    }
+  }
+  fitSummary();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitSummary);
+
+  function paintSlots(d) {
+    /* fast transits take slots 0 and 1, the slow transit slot 2; empty slots stay empty */
+    var html = '';
+    d.fast.map(function (h, i) { return [h, i]; }).concat(d.slow ? [[d.slow, 2]] : []).forEach(function (x) {
+      var h = x[0], s = SLOTS[x[1]];
+      html += '<div class="p t-glyph" style="left:' + s.sx + '%;top:' + s.sy + '%" role="img" aria-label="' +
+              h.planet + ' transit, ' + h.aspect + ' to natal ' + h.target + '">' + TM.TGLYPH[h.planet] + '\uFE0E</div>';
+    });
+    $('tSlots').innerHTML = html;
+  }
+
+  TM.load().then(function (d) {
+    if (!d.ok) {
+      $('summary').firstChild.textContent = TM.FAIL;
+      fitSummary();
+      if (window.console) console.warn('[CURRENT TIMING] fail-closed: ' + d.reason);
+      return;
+    }
+    $('vGlyph').innerHTML = G.glyphSVG(d.md.lord, '');
+    $('vLord').textContent = d.md.lord;
+    $('vPair').textContent = d.md.lord + ' \u2013 ' + d.ad.lord;
+    fitPair($('vPair'));
+    paintSlots(d);
+
+    $('read').removeAttribute('aria-disabled');
+    var refit = function () { fitPair($('vPair')); fitSummary(); };
+    window.addEventListener('resize', refit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N2.0 (CozAlyze/Test only): the test storage guard (test-storage.js), pasted first so it runs before
+     any other script: storage under cozTEST:, no reading servers, art and data from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N2.0 (Oct 15 2026; N1.1 r2's guard, hardened after the N2 isolation review)
+   CozAlyze/Test/nav only, never the Demo.
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). The build
+      refuses any page or script that uses storage any other way (property-style access, another
+      window's or frame's storage, IndexedDB, cookies, workers) and every script is a pinned copy in
+      this folder. Storage events from Demo writes (another tab) never reach the test pages.
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+      The build refuses any page or script that names another host.
+   4. FRAMES AND WINDOWS. A frame or a new window may only open one of this folder's own pages (PAGES
+      below; a refused frame shows a blank page). Never a Demo page, the setup page, a missing page, or
+      an inline (srcdoc) frame, any of which could run without this guard.
+   5. FAIL CLOSED. If any part of this guard cannot be installed, the page stops before anything else runs
+      and says so.
+
+   Art, video, styles and data files load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N2.0";
+  var P = "cozTEST:";
+  /* this folder's own pages (the build checks this list against the pages it builds) */
+  var PAGES = ["account.html", "saved-charts.html",
+    "vedic-reading.html", "vedic-birth-chart.html", "saved-vedic-document.html", "current-life-cycle.html",
+    "current-season.html", "key-time-windows.html", "what-comes-next.html",
+    "tropical-reading.html", "tropical-birth-chart.html", "tropical-current-transits.html", "saved-tropical-document.html",
+    "compare-reading.html", "combined-reading.html", "your-ascendants.html", "ascendant-reading.html",
+    "compare-current-timing.html", "compare-current-timing-reading.html", "compare-birth-charts.html",
+    "compare-system.html", "saved-compare-document.html"];
+  try {
+    /* ---------- 1. storage ---------- */
+    var proto = Storage.prototype;
+    var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+    var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+    var rawLen = function (st) { return lenDesc.get.call(st); };
+    var testKeys = function (st) {
+      var out = [], n = rawLen(st), i, key;
+      for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+      return out;
+    };
+    /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+    var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+    var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+    var usedBytes = function (st) {
+      var n = rawLen(st), t = 0, i, key, v;
+      for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+      return t;
+    };
+    proto.getItem = function (key) { return g.call(this, P + key); };
+    proto.setItem = function (key, v) {
+      var pk = P + key;
+      if (this === LOCAL) {
+        var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+        if (add > 0 && usedBytes(this) + add > CAP) {
+          try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+          throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+        }
+      }
+      return s.call(this, pk, v);
+    };
+    proto.removeItem = function (key) { return r.call(this, P + key); };
+    proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+    proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+    Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+    /* a Demo page writing in another tab fires "storage" events here; they never reach the test pages */
+    window.addEventListener("storage", function (ev) { if (!ev.key || ev.key.indexOf(P) !== 0) ev.stopImmediatePropagation(); }, true);
+
+    /* ---------- 3. network ---------- */
+    var blocked = window.__cozTestBlocked = [];
+    var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+    var abs = function (u) { try { return new URL(String(u), location.href); } catch (e) { return null; } };
+    var allowed = function (u) {
+      var a = abs(u); if (!a) return false;
+      if (a.protocol === "data:" || a.protocol === "blob:") return true;
+      return a.origin === location.origin || HOSTS.test(a.href);
+    };
+    var refuse = function (u, via) {
+      var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+      blocked.push({ via: via, url: where, at: new Date().toISOString() });
+      try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers or open a Demo page)"); } catch (e) {}
+      return new TypeError("The CozAlyze test refused a request to " + where + ".");
+    };
+    if (window.fetch) {
+      var nf = window.fetch;
+      window.fetch = function (input, init) {
+        var u = typeof input === "string" ? input : (input && input.url) || String(input);
+        if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+        return nf.apply(this, arguments);
+      };
+    }
+    if (window.XMLHttpRequest) {
+      var xo = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+    }
+    if (window.EventSource) {
+      var ES = window.EventSource;
+      var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+      ESW.prototype = ES.prototype; window.EventSource = ESW;
+    }
+    if (window.WebSocket) {
+      var WS = window.WebSocket;
+      var WSW = function (u) { throw refuse(u, "websocket"); };
+      WSW.prototype = WS.prototype; window.WebSocket = WSW;
+    }
+    if (navigator.sendBeacon) {
+      var sb = navigator.sendBeacon.bind(navigator);
+      navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+    }
+
+    /* ---------- 4. frames and windows: this folder's own pages only ---------- */
+    var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, /Test/nav/ */
+    var pageOK = function (u) {
+      var a = abs(u); if (!a || a.origin !== location.origin || a.pathname.indexOf(DIR) !== 0) return false;
+      return PAGES.indexOf(a.pathname.slice(DIR.length)) >= 0;
+    };
+    var frameOK = function (u) { var a = abs(u); return !!a && (a.href === "about:blank" || pageOK(u)); };
+    var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+    var sd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "srcdoc");
+    if (sd) Object.defineProperty(HTMLIFrameElement.prototype, "srcdoc", { configurable: true, enumerable: sd.enumerable, get: sd.get,
+      set: function () { refuse("about:srcdoc", "frame"); } });
+    var sa = Element.prototype.setAttribute;
+    Element.prototype.setAttribute = function (n, v) {
+      if (this instanceof HTMLIFrameElement) {
+        var name = String(n).toLowerCase();
+        if (name === "srcdoc") { refuse("about:srcdoc", "frame"); return; }
+        if (name === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+      }
+      return sa.call(this, n, v);
+    };
+    var wo = window.open;
+    window.open = function (u) {
+      if (u == null || String(u).trim() === "" || !pageOK(u)) { refuse(u == null ? "about:blank" : u, "window"); return null; }
+      return wo.apply(window, arguments);
+    };
+
+    window.COZ_TEST_ASSETS = "/Demo/";
+    try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+  } catch (err) {
+    /* ---------- 5. fail closed: no storage, no requests, and the page stops here ---------- */
+    try { console.error("[COZ TEST] the test guard could not start, so this page stopped: " + (err && err.message)); } catch (e) {}
+    try { ["getItem", "setItem", "removeItem", "key", "clear"].forEach(function (m) { Storage.prototype[m] = function () { throw new Error("The CozAlyze test page stopped."); }; }); } catch (e) {}
+    try { window.fetch = function () { return Promise.reject(new TypeError("The CozAlyze test page stopped.")); }; } catch (e) {}
+    try { XMLHttpRequest.prototype.open = function () { throw new TypeError("The CozAlyze test page stopped."); }; } catch (e) {}
+    try { window.open = function () { return null; }; } catch (e) {}
+    try { window.stop(); } catch (e) {}
+    try { document.documentElement.innerHTML = '<body style="margin:0;padding:48px 24px;background:#02040c;color:#EEE7D8;font:16px/1.5 -apple-system,Helvetica,Arial,sans-serif">This test page stopped because its safety check couldn’t start. Nothing was changed.</body>'; } catch (e) {}
+    throw err;
+  }
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saved Reading · CozAlyze</title>
+<!--
+  COZALYZE · SAVED TROPICAL DOCUMENT · TD1.4 (Oct 14 2026)
+  TD1.4 (Jason): every view ends with the Your Saved Chart links, like the saved Vedic document
+  (saved-vedic-document.html SVD1.1): Your Birth Chart, Your Tropical Reading, Your Ascendant,
+  Your Current Transits. The page being read shows unlinked. The links are hidden in print.
+  TD1.3 (Jason): from Compare the Back button reads "Back to Your Tropical Birth Chart", matching the
+  Compare page title (CSY1.5+). From Saved, unchanged.
+  TD1.2: opened from Compare (from=compare), Back returns to that Compare page
+  (compare-system.html?sys=tropical#reading). Saved Library behavior unchanged.
+  One renderer for the Tropical saved-document views:
+    saved-tropical-document.html?view=reading&id=<record>     Your Tropical Reading (six sections)
+    saved-tropical-document.html?view=ascendant&id=<record>   Your Ascendant (Rising Sign)
+    saved-tropical-document.html?view=transits&id=<record>    Your Current Transits (TD1.1: recalculated
+                                                              from the record's own Tropical chart each time
+                                                              the page opens; never stored)
+  Data: the selected cozSavedCharts record's library (rec.library.tropical), captured at save
+  time by saved-tropical-library.js. Document renderer only: no animation, no model request,
+  no regeneration. Shares saved-document.css with the Vedic documents; loads no Vedic module.
+  Print / Save PDF opens at top level when framed and expands every section.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/Demo/saved-document.css?v=1">
+<style>
+/* TD1.4: the chaining links, same rules as the saved Vedic document (saved-vedic-document.html SVD1.1) */
+.doc-links p{margin:0 0 .5rem}
+.doc-links a{color:var(--coz-gold); text-decoration:none}
+.doc-links .here{color:var(--coz-ink-soft)}
+@media print{ .doc-links{display:none} }
+</style>
+<script src="coz-saved.js?v=20"></script>
+<script src="saved-tropical-library.js?v=2"></script>
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<script src="compare-current-timing.js?v=5"></script>
+</head>
+<body>
+<div class="doc-shell">
+  <div class="doc-toolbar">
+    <a class="doc-button" id="backBtn" href="saved-charts.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to Birth Chart
+    </a>
+    <div class="doc-actions">
+    <button type="button" class="doc-button" id="expandBtn">Expand All</button>
+    <button type="button" class="doc-button" id="printBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z"/></svg>
+      Print / Save PDF
+    </button>
+    </div>
+  </div>
+  <div id="mount"></div>
+  <p class="doc-savednote" id="savedNote"></p>
+</div>
+<script>
+"use strict";
+(function(){
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DISCLOSURE = "This AI-generated astrological content is provided for reflection and entertainment only. It is not scientific, medical, legal, financial, or professional advice.";
+  var TITLES = { "reading": "Your Tropical Reading", "ascendant": "Your Ascendant", "transits": "Your Current Transits" };
+
+  function el(tag,cls,text){ var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function paras(host, list){ (list || []).forEach(function(t){ t = t == null ? "" : String(t); if (!t.trim()) return; host.appendChild(t.indexOf("## ") === 0 ? el("h3",null,t.slice(3)) : el("p",null,t)); }); return host; }
+  function pad2(n){ n = Math.round(Number(n) || 0); return (n<10?"0":"")+n; }
+  function longDate(iso){ if (!iso) return ""; var d = new Date(iso); if (isNaN(d)) return String(iso); return MONTHS[d.getUTCMonth()] + " " + d.getUTCDate() + ", " + d.getUTCFullYear(); }
+  function section(number, title, open){
+    var d = el("details","doc-section"); if (open) d.open = true;
+    var sm = el("summary"); var h2 = el("h2");
+    if (number != null){ h2.appendChild(el("span","num",number + ".")); }
+    h2.appendChild(document.createTextNode(title));
+    sm.appendChild(h2); sm.appendChild(el("span","chev","\u203A")); d.appendChild(sm);
+    return d;
+  }
+  function empty(msg, heading){
+    var c = el("div","doc-empty");
+    c.appendChild(el("h2",null,heading || "This saved reading could not be opened"));
+    var p = el("p",null,msg + " "); var a = el("a",null,"Open Saved Charts"); a.href = "saved-charts.html"; p.appendChild(a); c.appendChild(p);
+    return c;
+  }
+  function cozPrint(){
+    var framed = false; try { framed = window.top !== window; } catch (e) { framed = true; }
+    if (framed) { var u = new URL(location.href); u.searchParams.set("print", "1"); window.open(u.href, "_blank"); return; }
+    window.print();
+  }
+  function cozAutoPrint(){
+    if (!/[?&]print=1\b/.test(location.search)) return;
+    var go = function(){ setTimeout(function(){ window.print(); }, 250); };
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+  }
+
+  var qp = new URLSearchParams(location.search);
+  var view = qp.get("view") || "reading";
+  var mount = document.getElementById("mount");
+  document.getElementById("printBtn").addEventListener("click", cozPrint);
+  document.getElementById("expandBtn").addEventListener("click", function(){
+    var all = document.querySelectorAll("details.doc-section"), open = Array.prototype.every.call(all, function(d){ return d.open; });
+    all.forEach(function(d){ d.open = !open; });
+    this.textContent = open ? "Expand All" : "Collapse All";
+  });
+  window.addEventListener("beforeprint", function(){ document.querySelectorAll("details.doc-section").forEach(function(d){ d.dataset.wasOpen = d.open ? "1" : "0"; d.open = true; }); });
+  window.addEventListener("afterprint", function(){ document.querySelectorAll("details.doc-section").forEach(function(d){ if (d.dataset.wasOpen === "0") d.open = false; }); });
+
+  var lib = window.CozSavedTropical ? window.CozSavedTropical.load() : null;
+  if (!lib){ mount.appendChild(empty("It may have been removed from this device.")); return; }
+  document.getElementById("backBtn").href = "tropical-birth-chart.html?saved=1&id=" + encodeURIComponent(lib.id);
+  if (qp.get("from") === "compare") {                                  /* opened from Compare: go back there */
+    var bb = document.getElementById("backBtn");
+    bb.href = "compare-system.html?sys=tropical#reading";
+    bb.lastChild.textContent = " Back to Your Tropical Birth Chart";
+  }
+  document.title = (TITLES[view] || "Saved Reading") + " \u00B7 CozAlyze";
+
+  var paper = el("article","doc-paper"), inner = el("div","doc-inner");
+  paper.appendChild(inner);
+  inner.appendChild(el("p","doc-kicker", TITLES[view] || "Saved Reading"));
+  inner.appendChild(el("h1",null, lib.name || "Your Chart"));
+  var b = lib.birth || {}, bits = [b.date, b.time, b.location].filter(Boolean);
+  if (bits.length) inner.appendChild(el("p","doc-birthline", bits.join("  \u2022  ")));
+
+  var L = lib.library || {}, ok = true;
+
+  if (view === "reading"){
+    var R = L.reading;
+    if (!R || !R.sections){ ok = false; mount.appendChild(empty("The Tropical Reading hadn't finished when this chart was saved.")); }
+    else (R.order || []).forEach(function(s, i){
+      var d = section(s.number, s.title, i === 0);
+      d.appendChild(paras(el("div","doc-copy"), R.sections[s.id]));
+      inner.appendChild(d);
+    });
+  }
+  else if (view === "ascendant"){
+    var A = L.ascendant;
+    if (!A || !A.sign){ ok = false; mount.appendChild(empty("The Ascendant reading wasn't saved with this chart.")); }
+    else {
+      var head = el("div");
+      head.appendChild(el("p","doc-label","Tropical Ascendant"));
+      head.appendChild(el("p","doc-big", A.sign + (A.degree != null ? " " + pad2(A.degree) + "\u00B0" + pad2(A.minute) + "\u2032" : "")));
+      inner.appendChild(head);
+      var s1 = section(null,"Tropical Perspective",true); s1.appendChild(paras(el("div","doc-copy"), A.shared)); inner.appendChild(s1);
+      var s2 = section(null,"How You Meet the World",false); s2.appendChild(paras(el("div","doc-copy"), A.meet && A.meet.length ? [A.meet[0]] : [])); inner.appendChild(s2);
+      if (A.ruler && A.ruler.length){ var s3 = section(null,"Your Chart Ruler",false); s3.appendChild(paras(el("div","doc-copy"), A.ruler)); inner.appendChild(s3); }
+      var noticeList = (A.notice && A.notice.length) ? A.notice : ((A.meet && A.meet[1]) ? [A.meet[1], "These themes describe possible patterns, not fixed outcomes."] : []);
+      if (noticeList.length){ var s4 = section(null,"What to Notice",false); s4.appendChild(paras(el("div","doc-copy"), noticeList)); inner.appendChild(s4); }
+    }
+  }
+  else if (view === "transits"){
+    var TM = window.COZ_TIMING;
+    if (!lib.chart || !TM || !TM.loadTropicalChart){ ok = false; mount.appendChild(empty("The Tropical chart wasn't saved with this record.")); }
+    else {
+      mount.appendChild(paper);
+      var wait = el("p","doc-copy","Calculating your current transits\u2026"); inner.appendChild(wait);
+      TM.loadTropicalChart(lib.chart).then(function(d){
+        inner.removeChild(wait);
+        if (!d.ok){ inner.appendChild(el("p","doc-copy", TM.FAIL_TROPICAL)); links(inner); return; }
+        var now = d.now;
+        inner.appendChild(el("p","doc-label","As of " + now.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}) + ", " + now.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})));
+        var sum = el("div","doc-copy"); (d.text.summary || []).forEach(function(p){ sum.appendChild(el("p",null,p)); }); inner.appendChild(sum);
+        (d.text.sections || []).forEach(function(s, i){
+          var sec = section(null, s.title, i === 0), body = el("div","doc-copy");
+          (s.blocks || []).forEach(function(b){
+            if (b.type === "h3") body.appendChild(el("h3",null,b.text));
+            else if (b.type === "meta") body.appendChild(el("p","doc-when",b.text));
+            else body.appendChild(el("p",null,b.text));
+          });
+          sec.appendChild(body); inner.appendChild(sec);
+        });
+        var m = section(null,"How This Was Calculated",false), mb = el("div","doc-copy"), t = d.tropical, P = d.policy, st = t.settings || {}, cl = t.client || {};
+        function stamp(x){ return new Date(x).toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"}); }
+        var shown = d.fast.concat(d.slow ? [d.slow] : []);
+        [["Zodiac", st.zodiac || "Tropical"],
+         ["Calculated", stamp(now) + ". Transits are recalculated each time this page opens; they are not part of the saved record."],
+         ["Natal chart", [cl.birthDate, cl.birthTime, cl.locationLabel].filter(Boolean).join(", ")],
+         ["Transiting planets", P.fastPlanets.join(", ") + " (faster); " + P.slowPlanets.join(", ") + " (slower)" + (P.moonIncluded ? "; the Moon" : ". The Moon is not included.")],
+         ["Natal points", P.natalTargets.join(", ") + ". The nodes are " + (st.nodeType || P.nodeType) + " nodes."],
+         ["Aspects and orbs", P.aspects.map(function(a){ return a.type.charAt(0).toUpperCase() + a.type.slice(1) + " " + a.angle + "\u00B0, orb " + a.orb + "\u00B0"; }).join("; ")],
+         ["Active transits", shown.length ? shown.map(function(h){ return h.planet + " " + h.aspect + " natal " + h.target + ", orb " + h.orb.toFixed(2) + "\u00B0, " + h.status; }).join("; ") : "None within the current orbs"],
+         ["Interpretation", "The calculations and selection rules are the same ones used for Compare Current Timing. The interpretive wording is a development draft awaiting review by a Western astrologer. It has not been professionally reviewed."]
+        ].forEach(function(r){ if (!r[1]) return; var p = el("p"); var b = el("strong",null,r[0] + ". "); p.appendChild(b); p.appendChild(document.createTextNode(r[1])); mb.appendChild(p); });
+        m.appendChild(mb); inner.appendChild(m);
+        inner.appendChild(el("p","doc-when","These are themes that may be present, not predictions of what will happen."));
+        finish(true);
+      });
+      return;
+    }
+  }
+  else { ok = false; mount.appendChild(empty("Unknown view.")); }
+
+  /* TD1.4: chaining links at the end of every saved Tropical page, like the saved Vedic document */
+  function links(host){
+    var box = el("div","doc-links"), from = qp.get("from") === "compare" ? "&from=compare" : "";
+    box.appendChild(el("p","doc-label","Your Saved Chart"));
+    [["chart","Your Birth Chart"],["reading","Your Tropical Reading"],["ascendant","Your Ascendant"],["transits","Your Current Transits"]].forEach(function(v){
+      var p = el("p");
+      if (v[0] === view) p.appendChild(el("span","here",v[1]));
+      else {
+        var a = el("a",null,v[1] + " \u203A");
+        a.href = v[0] === "chart" ? "tropical-birth-chart.html?saved=1&id=" + encodeURIComponent(lib.id)
+                                  : "saved-tropical-document.html?view=" + v[0] + "&id=" + encodeURIComponent(lib.id) + from;
+        p.appendChild(a);
+      }
+      box.appendChild(p);
+    });
+    host.appendChild(box);
+  }
+  function finish(live){
+    links(inner);
+    var foot = el("footer","doc-footer");
+    foot.appendChild(el("p",null,DISCLOSURE));
+    if (lib.chart && lib.chart.documentId) foot.appendChild(el("p",null,"Generated by CozAlyze \u00B7 " + lib.chart.documentId));
+    inner.appendChild(foot);
+    if (!paper.parentNode) mount.appendChild(paper);
+    var savedAt = lib.rec.updatedAt || lib.rec.savedAt;
+    document.getElementById("savedNote").textContent = live
+      ? "Calculated for this saved chart at the moment this page opened. No animation. No rewrite."
+      : "These are your saved results. No animation. No rewrite." + (savedAt ? " \u00B7 Saved " + longDate(savedAt) : "");
+    cozAutoPrint();
+  }
+  if (!ok) { links(mount); return; }
+  finish(false);
+})();
+</script>
+</body>
+</html>
