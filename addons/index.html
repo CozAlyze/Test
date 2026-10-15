@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add-ons Preview · CozAlyze Test</title>
 <!--
-  ADD-ONS PREVIEW · P0.2 (Oct 15 2026) · CozAlyze/Test/addons only, never the Demo.
+  ADD-ONS PREVIEW · P0.3 (Oct 15 2026) · CozAlyze/Test/addons only, never the Demo.
   P0.2: the $94 package (one full reading + Compare) is approved, so no price is marked proposed any more.
+  P0.3: the Compare offer describes what Compare includes today and says it has no six-part individual reading.
   Front end only, for reviewing the post-purchase add-on screen and its wording on the phone.
   No payment, no sign-in, no Stripe, no account. Nothing is stored: the purchase state lives in the page
   address (#/...) only, so the page never reads or writes the phone's storage and never touches the Demo's data.
@@ -88,6 +89,8 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
   /* package totals by what is owned (approved Oct 15) */
   var TOTAL = { "": 0, v: 49, t: 49, c: 75, vt: 88, vc: 94, tc: 94, vtc: 113 };
   var COMPAT = 25;
+  /* P0.3: what Compare actually includes today, and that it is not a six-part individual reading */
+  var COMPARE_SUB = "The three-part Combined Reading (Shared Themes, Different Emphases, Your Integrated View), your Tropical and Vedic Ascendant readings with How They Work Together, Current Timing, and both birth charts. It does not include either six-part individual reading.";
   var STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg>';
   var app = document.getElementById("app");
 
@@ -112,7 +115,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
       out.push({ add: "v", ttl: NAME.v, sub: "The complete six-part Vedic reading of your chart." });
       out.push({ add: "t", ttl: NAME.t, sub: "The complete six-part Tropical reading of your chart." });
     }
-    if (!hasC && r.length) out.push({ add: "c", ttl: NAME.c, sub: "Where your Vedic and Tropical charts agree, differ and complement each other." });
+    if (!hasC && r.length) out.push({ add: "c", ttl: NAME.c, sub: COMPARE_SUB });
     if (key(own)) out.push({ add: "x", ttl: NAME.x, sub: "Your chart and one other person’s, read together." });
     return out;
   }
@@ -145,7 +148,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
       [["One full reading", 49], ["Compare only", 75], ["Both full readings", 88], ["One full reading + Compare", 94], ["All three", 113]]
         .map(function(r){ return '<tr><td>' + r[0] + '</td><td>$' + r[1] + '</td></tr>'; }).join("") +
       '</table><p class="muted">An add-on costs the difference. Compatibility is $25, after any first purchase.</p></div>' +
-      '<p class="stamp2">ADD-ONS PREVIEW · P0.2</p></div>';
+      '<p class="stamp2">ADD-ONS PREVIEW · P0.3</p></div>';
     app.innerHTML = h;
     Array.prototype.forEach.call(app.querySelectorAll("[data-own]"), function(cb){
       cb.addEventListener("change", function(){
@@ -173,7 +176,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     });
     h += '<section class="panel"><div class="div" aria-hidden="true">' + STAR + '</div>' +
       '<a class="pill" href="#/?own=' + own + '">Not Now</a>' +
-      '<div class="stamp">ADD-ONS PREVIEW · P0.2 · NO PAYMENT</div></section></main>';
+      '<div class="stamp">ADD-ONS PREVIEW · P0.3 · NO PAYMENT</div></section></main>';
     app.innerHTML = h;
     Array.prototype.forEach.call(app.querySelectorAll("[data-add]"), function(b){
       b.addEventListener("click", function(){ buy(own, b.getAttribute("data-add")); });
