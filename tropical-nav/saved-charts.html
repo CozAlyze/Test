@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N1.1 r2 (CozAlyze/Test only): the test storage guard (test-storage.js, pasted here so it always runs first):
+     storage under cozTEST:, no reading servers, art from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N1.1 r2 (Oct 14 2026) · CozAlyze/Test/tropical-nav only, never the Demo
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). Those scripts
+      use getItem / setItem / removeItem / key / length / clear only; no property-style access (checked
+      when this test was built; the three engine scripts are pinned copies in this folder).
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+   4. FRAMES AND WINDOWS. A frame may only open a page from this test folder (or a blank page); a new
+      window only a page from this test folder. Never a Demo page, which would use the Demo's own storage.
+
+   Art and video load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N1.1";
+  var P = "cozTEST:";
+
+  /* ---------- 1. storage ---------- */
+  var proto = Storage.prototype;
+  var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+  var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+  function rawLen(st) { return lenDesc.get.call(st); }
+  function testKeys(st) {
+    var out = [], n = rawLen(st), i, key;
+    for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+    return out;
+  }
+  /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+  var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+  var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+  function usedBytes(st) {
+    var n = rawLen(st), t = 0, i, key, v;
+    for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+    return t;
+  }
+  proto.getItem = function (key) { return g.call(this, P + key); };
+  proto.setItem = function (key, v) {
+    var pk = P + key;
+    if (this === LOCAL) {
+      var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+      if (add > 0 && usedBytes(this) + add > CAP) {
+        try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+        throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+      }
+    }
+    return s.call(this, pk, v);
+  };
+  proto.removeItem = function (key) { return r.call(this, P + key); };
+  proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+  proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+  Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+
+  /* ---------- 3. network ---------- */
+  var blocked = window.__cozTestBlocked = [];
+  var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+  function abs(u) { try { return new URL(String(u), location.href); } catch (e) { return null; } }
+  function allowed(u) {
+    var a = abs(u); if (!a) return false;
+    if (a.protocol === "data:" || a.protocol === "blob:") return true;
+    return a.origin === location.origin || HOSTS.test(a.href);
+  }
+  function refuse(u, via) {
+    var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+    blocked.push({ via: via, url: where, at: new Date().toISOString() });
+    try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers)"); } catch (e) {}
+    return new TypeError("The CozAlyze test refused a request to " + where + ".");
+  }
+  if (window.fetch) {
+    var nf = window.fetch;
+    window.fetch = function (input, init) {
+      var u = typeof input === "string" ? input : (input && input.url) || String(input);
+      if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+      return nf.apply(this, arguments);
+    };
+  }
+  if (window.XMLHttpRequest) {
+    var xo = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+  }
+  if (window.EventSource) {
+    var ES = window.EventSource;
+    var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+    ESW.prototype = ES.prototype; window.EventSource = ESW;
+  }
+  if (window.WebSocket) {
+    var WS = window.WebSocket;
+    var WSW = function (u) { throw refuse(u, "websocket"); };
+    WSW.prototype = WS.prototype; window.WebSocket = WSW;
+  }
+  if (navigator.sendBeacon) {
+    var sb = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+  }
+
+  /* ---------- 4. frames and windows ---------- */
+  var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, e.g. /Test/tropical-nav/ */
+  function inFolder(u) { var a = abs(u); return !!a && a.origin === location.origin && a.pathname.indexOf(DIR) === 0; }
+  function frameOK(u) { var a = abs(u); return !!a && (a.href === "about:blank" || inFolder(u)); }
+  var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+  if (fd && fd.set) {
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+  }
+  var sa = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function (n, v) {
+    if (this instanceof HTMLIFrameElement && String(n).toLowerCase() === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+    return sa.call(this, n, v);
+  };
+  var wo = window.open;
+  window.open = function (u) { if (!inFolder(u == null ? "" : u) || String(u) === "") { refuse(u, "window"); return null; } return wo.apply(window, arguments); };
+
+  window.COZ_TEST_ASSETS = "/Demo/";
+  try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saved Charts · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<script src="coz-saved.js?v=10"></script>
+<style>
+/* SAVED CHARTS · S1.4 · NAV TEST N1.1 (Oct 14 2026, CozAlyze/Test/tropical-nav ONLY, never the Demo)
+   Built from the Demo's S1.4 (Demo 7b7e506). Navigation rulings (Jason + Chat, Oct 8 and Oct 14):
+   Account in the bottom nav opens account.html. Home returns to the dashboard of the reading in use,
+   never index.html; this test holds only the Tropical reading, so Home opens the Tropical dashboard.
+   Empty list: "You haven't saved a chart yet. Open your Tropical reading and tap Save Chart." (approved).
+   A card or its Tropical pill opens that chart's saved Tropical pages (restore, no generation). Vedic
+   pills, Compare cards and Create a New Chart say on the page that they aren't part of this test,
+   instead of opening pages that aren't in the test. Art loads from the Demo folder.
+   S1.4 (Oct 1, local build for review): removing a card asks on the page itself, no
+   Safari pop-up. Tapping the gold bookmark turns that card's meta line into "Remove this
+   chart?" and its pills into Cancel / Remove (existing .meta and .pill styles, nothing new
+   drawn). Remove deletes that card only; Cancel, the bookmark again, or a tap elsewhere on the card
+   puts the card back. A failed removal says so on the card. One card asks at a time. ?demo=1
+   previews the question; Remove there removes nothing.
+   S1.3 (Oct 1): Home returns to the dashboard of the package last in use on this
+   device (cozHomeDash, recorded by coz-saved.js CS1.5): Vedic -> vedic-reading.html#/dashboard,
+   Tropical -> tropical-reading.html#/dashboard, Compare -> compare-reading.html. Nothing
+   recorded yet: the S1.2 rule below. Create a New Chart still goes to index.html.
+   S1.2 (Sep 24): Home returns to the Tropical dashboard when this page was
+   reached from a Tropical page; every other origin still leaves for index.html.
+   S1.1 (Sep 23). Built from his blank bake IMG_0588 (1185 x 2576), cut into
+   sc-top (rows 0-746), sc-card-chart (747-1079), sc-card-compare (1080-1412, his filled
+   card bookmark placed over the outline one, per the "every card is filled" ruling) and
+   sc-bottom (1413-2576, the nav bookmark filled with the card bookmark gold as the active
+   state). A card strip repeats for each saved record, so the page grows. All words are
+   live text laid out from his mockup. */
+:root{ --cream:#EEE7D8; --gold:#F2C898; --line:#C9A27C; --navy:#02040c;
+  --head:"Bodoni Moda",Georgia,serif; --sans:"Montserrat","Helvetica Neue",Arial,sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--cream);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.page{position:relative;width:100%;max-width:640px;margin:0 auto;container-type:inline-size}
+.page,.page *{--K:calc(100cqw / 1185)}
+.art{display:block;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-select:none}
+.top,.card,.bottom{position:relative}
+.head{position:absolute;left:0;right:0;top:calc(418 * var(--K));text-align:center}
+h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)));line-height:1.05;color:var(--cream);letter-spacing:.005em}
+.lead{font-family:var(--sans);font-weight:300;font-size:max(14px,calc(40 * var(--K)));line-height:1.35;margin-top:calc(22 * var(--K));padding:0 calc(60 * var(--K))}
+.div{display:flex;align-items:center;height:calc(30 * var(--K));margin:calc(30 * var(--K)) calc(231 * var(--K)) 0}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--line)}
+.div svg{width:calc(28 * var(--K));height:calc(28 * var(--K));margin:0 calc(12 * var(--K));color:var(--gold);flex:none}
+/* card text, positioned on the card inside its strip (card border rows 23-308) */
+.card .open{position:absolute;left:calc(75 * var(--K));top:calc(23 * var(--K));width:calc(1040 * var(--K));height:calc(286 * var(--K));
+  display:block;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card .txt{position:absolute;left:calc(430 * var(--K));top:calc(56 * var(--K));width:calc(550 * var(--K));pointer-events:none;text-align:left}
+.card .name{font-family:var(--head);font-weight:500;font-size:max(20px,calc(58 * var(--K)));line-height:1.1;color:var(--cream);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .meta{font-family:var(--sans);font-weight:300;font-size:max(13px,calc(33 * var(--K)));line-height:1.3;color:var(--cream);margin-top:calc(16 * var(--K));
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .pills{position:absolute;left:calc(430 * var(--K));top:calc(210 * var(--K));display:flex;gap:calc(22 * var(--K))}
+.pill{font-family:var(--sans);font-weight:300;font-size:max(12px,calc(30 * var(--K)));line-height:1;color:var(--cream);background:none;cursor:pointer;
+  border:1.5px solid var(--line);border-radius:999px;height:calc(59 * var(--K));min-height:26px;padding:0 calc(36 * var(--K));
+  display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent}
+.card .mark{position:absolute;left:calc(985 * var(--K));top:calc(45 * var(--K));width:calc(100 * var(--K));height:calc(100 * var(--K));
+  min-width:44px;min-height:44px;background:none;border:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.state{background:url("/Demo/sc-mid.png?v=1") center top/100% 1px repeat-y;min-height:calc(333 * var(--K));display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:calc(40 * var(--K)) calc(120 * var(--K));font-family:var(--sans);font-weight:300;font-size:max(15px,calc(36 * var(--K)));line-height:1.5}
+.bottom .create{position:absolute;left:calc(313 * var(--K));top:calc(146 * var(--K));width:calc(560 * var(--K));height:calc(104 * var(--K));min-height:44px;
+  background:none;border:0;cursor:pointer;text-align:left;padding-left:calc(142 * var(--K));white-space:nowrap;
+  font-family:var(--head);font-weight:500;font-size:max(14px,calc(40 * var(--K)));color:var(--cream);-webkit-tap-highlight-color:transparent}
+.bottom .nav a{position:absolute;top:calc(1055 * var(--K));height:calc(86 * var(--K));min-height:44px;display:block;-webkit-tap-highlight-color:transparent}
+.bottom .nav .home{left:calc(127 * var(--K));width:calc(250 * var(--K))}
+.bottom .nav .saved{left:calc(467 * var(--K));width:calc(250 * var(--K))}
+.bottom .nav .acct{left:calc(807 * var(--K));width:calc(250 * var(--K))}
+.open:focus-visible,.pill:focus-visible,.mark:focus-visible,.create:focus-visible,.nav a:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+.stamp{position:absolute;right:6px;bottom:4px;font-family:var(--sans);font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);pointer-events:none}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="top">
+    <img class="art" src="/Demo/sc-top.jpg?v=1" alt="">
+    <div class="head">
+      <h1>Saved Charts</h1>
+      <p class="lead">Return to the charts and readings you’ve saved.</p>
+      <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
+    </div>
+  </div>
+  <div id="records" aria-live="polite"><div class="state">Loading your saved charts…</div></div>
+  <div class="bottom">
+    <img class="art" src="/Demo/sc-bottom.jpg?v=1" alt="">
+    <button class="create" type="button" id="create">Create a New Chart</button>
+    <nav class="nav" aria-label="Main">
+      <a class="home" href="tropical-reading.html#/dashboard" aria-label="Home"></a>
+      <a class="saved" href="saved-charts.html" aria-label="Saved Charts" aria-current="page"></a>
+      <a class="acct" href="account.html" aria-label="Account"></a>
+    </nav>
+    <div class="stamp">S1.4 · NAV TEST N1.1</div>
+  </div>
+</main>
+<script>
+(function(){
+  var box = document.getElementById("records");
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var DEMO = /[?&]demo=1\b/.test(location.search);
+  var byId = {};                                                    /* NAV TEST: the records on screen, by id */
+  /* NAV TEST: tester notes for what this Tropical test does not include (test build only) */
+  var NOT_IN_TEST = { vedic: "The Vedic pages aren't part of this Tropical test yet.", compare: "Compare isn't part of this Tropical test yet.",
+                      create: "Creating a new chart isn't part of this Tropical test." };
+  function tell(text){ if (window.CozSaved && CozSaved.note) CozSaved.note(text); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function longDate(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ""); return m ? MONTHS[+m[2] - 1] + " " + (+m[3]) + ", " + m[1] : ""; }
+  function card(r){
+    var chart = r.kind !== "compare";
+    var name = r.name || (chart ? "Your Chart" : "Saved Comparison");
+    /* a record saved before all its readings finished says so (his ruling) */
+    var meta = chart ? [longDate(r.birthDate), "Your Chart"].filter(Boolean).join(" \u2022 ") : "Saved Comparison";
+    if (r.complete === false) meta += " \u2022 Incomplete";
+    var pills = chart
+      ? (r.systems && r.systems.vedic ? '<button class="pill" type="button" data-go="vedic">Vedic</button>' : '') +
+        (r.systems && r.systems.tropical ? '<button class="pill" type="button" data-go="tropical">Tropical</button>' : '')
+      : '<button class="pill" type="button" data-go="compare">Compare</button>';
+    return '<div class="card" data-id="' + esc(r.id) + '" data-name="' + esc(name) + '">' +
+      '<img class="art" src="' + (chart ? '/Demo/sc-card-chart.jpg?v=1' : '/Demo/sc-card-compare.jpg?v=1') + '" alt="">' +
+      '<button class="open" type="button" aria-label="Open ' + esc(name) + '"></button>' +
+      '<div class="txt"><p class="name">' + esc(name) + '</p><p class="meta">' + esc(meta) + '</p></div>' +
+      '<div class="pills">' + pills + '</div>' +
+      '<button class="mark" type="button" aria-label="Remove ' + esc(name) + ' from Saved Charts"></button>' +
+    '</div>';
+  }
+  function state(text){ box.innerHTML = '<div class="state">' + esc(text) + '</div>'; }
+  function render(){
+    if (DEMO) {   /* his mockup examples; nothing is read from or written to storage */
+      box.innerHTML = card({ id: "demo-1", kind: "chart", name: "Jason Dougherty", birthDate: "1977-08-20", systems: { vedic: true, tropical: true } }) +
+                      card({ id: "demo-2", kind: "compare", name: "Matthew" });
+      return;
+    }
+    if (!window.CozSaved) return state("Your saved charts couldn't be read on this device.");
+    CozSaved.list().then(function(recs){
+      if (!recs.length) return state("You haven't saved a chart yet. Open your Tropical reading and tap Save Chart.");
+      byId = {}; recs.forEach(function(r){ byId[r.id] = r; });
+      box.innerHTML = recs.map(card).join("");
+    }, function(){ state("Your saved charts couldn't be read on this device."); });
+  }
+  /* S1.4: on-page removal question, existing .meta and .pill styles only */
+  function ask(c){
+    box.querySelectorAll(".card.confirming").forEach(putBack);
+    var meta = c.querySelector(".meta"), pills = c.querySelector(".pills");
+    c.dataset.meta = meta.textContent; c.dataset.pills = pills.innerHTML;
+    c.classList.add("confirming");
+    meta.setAttribute("aria-live", "polite"); meta.textContent = "Remove this chart?";
+    pills.innerHTML = '<button class="pill" type="button" data-act="cancel">Cancel</button>' +
+                      '<button class="pill" type="button" data-act="remove">Remove</button>';
+    try { pills.querySelector('[data-act="cancel"]').focus({ preventScroll: true }); } catch (e) {}
+  }
+  function putBack(c, note){
+    if (!c.classList.contains("confirming")) return;
+    c.classList.remove("confirming");
+    c.querySelector(".pills").innerHTML = c.dataset.pills || "";
+    c.querySelector(".meta").textContent = note || c.dataset.meta || "";
+  }
+  box.addEventListener("click", function(ev){
+    var c = ev.target.closest(".card"); if (!c) return;
+    var id = c.getAttribute("data-id");
+    if (ev.target.closest(".mark")) {
+      if (c.classList.contains("confirming")) putBack(c); else ask(c);
+      return;
+    }
+    if (c.classList.contains("confirming")) {
+      var act = ev.target.closest("[data-act]"), a = act && act.getAttribute("data-act");
+      if (a === "remove") {
+        if (DEMO) return putBack(c);                               /* preview only: nothing is removed */
+        act.disabled = true;
+        CozSaved.remove(id).then(render, function(){ putBack(c, "This saved chart couldn't be removed."); });
+        return;
+      }
+      putBack(c);                                                  /* Cancel, or any other tap on this card */
+      return;
+    }
+    if (DEMO) return;
+    var pill = ev.target.closest(".pill"), go = pill && pill.getAttribute("data-go");
+    /* NAV TEST: only the Tropical saved pages are in this test */
+    var rec = byId[id] || null;
+    if (!rec) return tell("This saved chart couldn't be opened.");
+    if (go === "vedic") return tell(NOT_IN_TEST.vedic);
+    if (go === "compare" || rec.kind === "compare") return tell(NOT_IN_TEST.compare);
+    if (!(rec.systems && rec.systems.tropical)) return tell(NOT_IN_TEST.vedic);
+    try { location.href = CozSaved.restore(id, "tropical"); }
+    catch (e) { tell("This saved chart couldn't be opened."); }
+  });
+  /* NAV TEST: Home returns to the dashboard of the reading in use (cozHomeDash, recorded by coz-saved.js in
+     test storage). Only the Tropical reading is in this test, so Home opens the Tropical dashboard; never
+     index.html. Create a New Chart isn't part of this test, so it says so on the page. Account is a plain
+     link to account.html (coz-saved.js CS1.9-T routes it too). */
+  var HOME = { tropical: "tropical-reading.html#/dashboard" };
+  function homeDash(){ try { var h = JSON.parse(localStorage.getItem("cozHomeDash") || "null"); return h && HOME[h.dash] ? HOME[h.dash] : null; } catch (e) { return null; } }
+  document.querySelector(".nav .home").addEventListener("click", function(ev){ ev.preventDefault(); location.href = homeDash() || HOME.tropical; });
+  document.getElementById("create").addEventListener("click", function(ev){ ev.preventDefault(); tell(NOT_IN_TEST.create); });
+  render();
+})();
+</script>
+</body>
+</html>

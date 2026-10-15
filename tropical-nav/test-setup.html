@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tropical Navigation Test · Setup</title>
+<!--
+  COZALYZE · TROPICAL NAVIGATION TEST · SETUP · N1.1 r2 (Oct 14 2026) · CozAlyze/Test/tropical-nav only
+  The one page in this folder that does not load test-storage.js, because it has to read the Demo's data
+  to copy it. It loads no other script and no Demo file.
+  COPY (only when "Copy my Demo chart into the test" is tapped): reads these Demo entries and nothing else:
+    emergeBirthData            the current chart's birth record (its run)
+    cozTropicalChartJSON       only if it belongs to that run
+    cozTropicalReading         only if it belongs to that run and is not a sample
+    cozRestoredRunId           only if the current chart is a reopened saved chart
+    cozSavedCharts             only the saved chart records that include Tropical (no Vedic-only, no Compare); inside
+                               each record's snapshot, only the entries a saved chart is made of (the coz-saved.js
+                               list below), so nothing else an older save might hold comes along
+  and writes them under "cozTEST:" (test storage). The test copy is replaced, never merged. Never copied:
+  the tester password (cozDemoTesterCode and the older names), the browser test key, reading-server job
+  records, logs, flags, and every other entry. If the phone's storage would get too full for the Demo,
+  older saved charts are left out of the copy (and the page says so) rather than crowding the Demo.
+  Before copying, the page measures how much storage is in use (sizes only).
+  CLEAR: removes every "cozTEST:" entry. Nothing else.
+  DEMO CHECK: one short code computed from the Demo's saved charts, its current-chart entries (the ones a
+  saved chart restores) and its Home memory (cozHomeDash, which every reading page writes when it opens).
+  Same code before and after testing = the test changed none of them. Shown only; nothing is stored.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@500&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{ --cream:#EEE7D8; --gold:#F2C898; --line:#C9A27C; --navy:#02040c; --muted:#b9ae9a;
+  --head:"Bodoni Moda",Georgia,serif; --sans:"Montserrat","Helvetica Neue",Arial,sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--cream);-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.5;padding:calc(env(safe-area-inset-top) + 28px) 20px calc(env(safe-area-inset-bottom) + 40px)}
+main{max-width:560px;margin:0 auto}
+h1{font-family:var(--head);font-weight:500;font-size:28px;line-height:1.15}
+h2{font-family:var(--head);font-weight:500;font-size:20px;margin:30px 0 8px;color:var(--gold)}
+p{margin-top:8px}
+.muted{color:var(--muted);font-size:14px}
+.code{font-family:var(--sans);font-weight:400;font-size:24px;letter-spacing:.12em;color:var(--gold);margin-top:6px}
+.box{border:1px solid rgba(201,162,124,.45);border-radius:14px;padding:14px 16px;margin-top:10px}
+.box p:first-child{margin-top:0}
+button{font-family:var(--sans);font-weight:400;font-size:15px;color:var(--cream);background:none;border:1.5px solid var(--line);
+  border-radius:999px;padding:12px 20px;margin-top:14px;width:100%;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:disabled{opacity:.5}
+button:focus-visible,a:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+#msg{min-height:1.5em;color:var(--gold)}
+ul{list-style:none;margin-top:6px}
+li{margin-top:10px}
+a{color:var(--gold);text-decoration:none;font-size:17px}
+.stamp{margin-top:36px;font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);text-align:right}
+</style>
+</head>
+<body>
+<main>
+  <h1>Tropical Navigation Test</h1>
+  <p class="muted">Setup for this phone. The test pages keep their own copy of your data, so nothing you do in the test changes the Demo.</p>
+
+  <h2>Demo check</h2>
+  <div class="box">
+    <p class="code" id="demoCode">…</p>
+    <p class="muted" id="demoInfo"></p>
+    <p class="muted">Write this code down before you start. When you finish testing, open this page again. The code must be the same.</p>
+  </div>
+
+  <h2>Test data</h2>
+  <div class="box" id="testInfo"><p class="muted">Checking…</p></div>
+  <button type="button" id="copy">Copy my Demo chart into the test</button>
+  <p class="muted">Copies only your current chart, its Tropical chart and reading, and your saved charts that include Tropical. It writes only to test storage. Your tester password and everything else are never copied.</p>
+  <button type="button" id="clear">Clear test data</button>
+  <p id="msg" role="status" aria-live="polite"></p>
+
+  <h2>Open the test</h2>
+  <ul>
+    <li><a href="tropical-reading.html#/dashboard">Tropical dashboard ›</a></li>
+    <li><a href="saved-charts.html">Saved Charts ›</a></li>
+    <li><a href="account.html">Account ›</a></li>
+  </ul>
+  <p class="stamp">TEST SETUP · N1.1 r2</p>
+</main>
+<script>
+(function(){
+  "use strict";
+  var LS = window.localStorage, P = "cozTEST:";
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  /* the Demo entries a saved chart restores, plus the saved charts store: the Demo check covers these */
+  var CHECKED = ["cozSavedCharts", "emergeBirthData", "cozChartJSON", "cozTropicalChartJSON", "cozTropicalReading", "cozCompareReading",
+                 "cozAscendantPair", "cozVedicReadingComplete", "cozTropicalReadingComplete", "cozRestoredRunId", "cozWorkingBackup", "cozHomeDash"];
+  /* what a saved chart's snapshot is made of (coz-saved.js CS1.8 FIXED and RUN_PREFIX, plus cozGenDraft:) */
+  var SNAP_FIXED = ["emergeBirthData", "cozChartJSON", "cozTropicalChartJSON", "cozTropicalReading", "cozCompareReading",
+                    "cozAscendantPair", "cozVedicReadingComplete", "cozTropicalReadingComplete"];
+  var SNAP_PREFIX = ["cozCombinedReadingDEV:", "cozCombinedStep1DEV:", "cozAscReading:", "cozGenDraft:"];
+  /* never copied under any name: the tester password (all its names), the browser test key and model, server job records */
+  var NEVER = /^(cozDemoTesterCode|cozDemoTesterCodePrevious|cozTropicalServerKey|cozVedicServerKey|cozTestApiKey|cozTestModel|cozTropicalServerJob|cozTropicalServerBase|cozVedicServerJob|cozCompareServerJob)$/;
+  function snapKeyOK(k){
+    if (NEVER.test(k)) return false;
+    return SNAP_FIXED.indexOf(k) >= 0 || SNAP_PREFIX.some(function(p){ return k.indexOf(p) === 0; });
+  }
+  function cleanRecord(r){                       /* a copy of the record with only the snapshot entries a saved chart is made of */
+    var c = JSON.parse(JSON.stringify(r)), snap = c.snapshot || {}, out = {};
+    Object.keys(snap).forEach(function(k){ if (snapKeyOK(k)) out[k] = snap[k]; });
+    if (c.snapshot) c.snapshot = out;
+    return c;
+  }
+  var CAP = 4.0 * 1048576;                       /* estimated bytes (2 per character): leave the Demo at least 1 MB of room */
+  var $ = function(id){ return document.getElementById(id); };
+
+  function raw(k){ try { return LS.getItem(k); } catch (e) { return null; } }
+  function parse(s){ try { return JSON.parse(s || "null"); } catch (e) { return null; } }
+  function longDate(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ""); return m ? MONTHS[+m[2] - 1] + " " + (+m[3]) + ", " + m[1] : ""; }
+  function hash(str){
+    var h1 = 0x811c9dc5, h2 = 0x9747b28c;
+    for (var i = 0; i < str.length; i++){ var c = str.charCodeAt(i); h1 ^= c; h1 = Math.imul(h1, 16777619); h2 ^= c; h2 = Math.imul(h2, 0x5bd1e995); h2 ^= h2 >>> 13; }
+    var x = ("0000000" + ((h1 ^ h2) >>> 0).toString(16)).slice(-8).toUpperCase();
+    return x.slice(0, 4) + " " + x.slice(4);
+  }
+  function allKeys(){ var out = [], i, k; for (i = 0; i < LS.length; i++){ k = LS.key(i); if (k != null) out.push(k); } return out; }
+  function testKeys(){ return allKeys().filter(function(k){ return k.indexOf(P) === 0; }); }
+  function size(k, v){ return ((k ? k.length : 0) + (v ? v.length : 0)) * 2; }
+  function mb(b){ return (b / 1048576).toFixed(2) + " MB"; }
+
+  function demoCheck(){
+    var parts = CHECKED.map(function(k){ var v = raw(k); return k + "\u0000" + (v == null ? "\u0001none" : v); });
+    var store = parse(raw("cozSavedCharts")), n = store && Array.isArray(store.records) ? store.records.length : 0;
+    $("demoCode").textContent = hash(parts.join("\u0002"));
+    $("demoInfo").textContent = n + (n === 1 ? " saved chart" : " saved charts") + " in the Demo on this phone.";
+  }
+
+  function runOf(o){ return o && o.run && o.run.runId ? o.run : null; }
+  function belongs(o, bd){ var r = runOf(o); return !!(r && bd && r.runId === bd.runId && r.fingerprint === bd.fingerprint); }
+
+  /* what the copy would contain: only the entries listed at the top of this file */
+  function plan(){
+    var out = { entries: [], notes: [], records: 0, recordsLeft: 0, chart: null };
+    var bdRaw = raw("emergeBirthData"), bd = parse(bdRaw);
+    if (bd && bd.runId){
+      out.entries.push(["emergeBirthData", bdRaw]); out.chart = bd;
+      var tcRaw = raw("cozTropicalChartJSON"), tc = parse(tcRaw);
+      if (belongs(tc, bd)) out.entries.push(["cozTropicalChartJSON", tcRaw]); else out.notes.push("Your current Demo chart has no Tropical chart yet. Open its Tropical reading in the Demo, then copy again.");
+      var trRaw = raw("cozTropicalReading"), tr = parse(trRaw);
+      if (belongs(tr, bd) && tr.fixture !== true && tr.sample !== true) out.entries.push(["cozTropicalReading", trRaw]);
+      else out.notes.push("Your current Demo chart's Tropical reading isn't on this phone, so the test reading pages will say it isn't available.");
+      var rr = raw("cozRestoredRunId"); if (rr && rr === bd.runId) out.entries.push(["cozRestoredRunId", rr]);
+    } else out.notes.push("There's no current chart in the Demo on this phone, so only saved charts are copied.");
+    var store = parse(raw("cozSavedCharts"));
+    if (store && Array.isArray(store.records)){
+      var recs = store.records.filter(function(r){ return r && r.kind === "chart" && r.systems && r.systems.tropical === true; }).map(cleanRecord);
+      out.records = recs.length; out.store = { version: store.version || 1, compareSlots: typeof store.compareSlots === "number" ? store.compareSlots : 1, records: recs };
+    }
+    return out;
+  }
+  function total(entries){ return entries.reduce(function(a, e){ return a + size(P + e[0], e[1]); }, 0); }
+
+  function info(){
+    var bd = parse(LS.getItem(P + "emergeBirthData")), store = parse(LS.getItem(P + "cozSavedCharts"));
+    var n = store && Array.isArray(store.records) ? store.records.length : 0, tk = testKeys();
+    var box = $("testInfo"); box.innerHTML = "";
+    function line(t, cls){ var p = document.createElement("p"); if (cls) p.className = cls; p.textContent = t; box.appendChild(p); }
+    if (!tk.length){ line("No test data on this phone yet.", "muted"); return; }
+    if (bd && bd.runId){
+      line("Test chart: " + [bd.name || "Your Chart", longDate(bd.birthDate)].filter(Boolean).join(" · "));
+      var tc = parse(LS.getItem(P + "cozTropicalChartJSON")), tr = parse(LS.getItem(P + "cozTropicalReading"));
+      line("Tropical chart: " + (belongs(tc, bd) ? "yes" : "no") + " · Tropical reading: " + (belongs(tr, bd) && Array.isArray(tr.sections) && tr.sections.length === 6 ? "complete" : "not available"), "muted");
+    } else line("No current chart in the test.", "muted");
+    line("Saved charts in the test: " + n, "muted");
+  }
+  function say(t){ $("msg").textContent = t; }
+
+  $("copy").addEventListener("click", function(){
+    var pl = plan(), entries = pl.entries.slice(), store = pl.store, dropped = 0;
+    if (!entries.length && !(store && store.records.length)){ say("There's nothing to copy: no chart and no saved Tropical charts in the Demo on this phone. The Demo was not changed."); return; }
+    /* room check: what the phone holds now, minus the old test copy (replaced), plus this copy */
+    var used = 0, oldTest = 0;
+    allKeys().forEach(function(k){ var b = size(k, raw(k)); used += b; if (k.indexOf(P) === 0) oldTest += b; });
+    var base = used - oldTest + total(entries);
+    var storeJSON = store ? JSON.stringify(store) : null;
+    while (store && store.records.length && base + size(P + "cozSavedCharts", storeJSON) > CAP){ store.records.pop(); dropped++; storeJSON = JSON.stringify(store); }
+    if (base > CAP){ say("This phone's storage is too full to copy the test data without crowding the Demo (" + mb(used) + " in use). Nothing was copied, and the Demo was not changed."); return; }
+    if (store) entries.push(["cozSavedCharts", storeJSON]);
+    /* replace the test copy: clear it, then write only the planned entries, all or nothing */
+    testKeys().forEach(function(k){ LS.removeItem(k); });
+    try { var ss = window.sessionStorage, sk = []; for (var i = 0; i < ss.length; i++){ var q = ss.key(i); if (q && q.indexOf(P) === 0) sk.push(q); } sk.forEach(function(q){ ss.removeItem(q); }); } catch (e) {}
+    var written = [];
+    try {
+      entries.forEach(function(e){ LS.setItem(P + e[0], e[1]); written.push(P + e[0]); });
+    } catch (e) {
+      written.forEach(function(k){ LS.removeItem(k); });
+      say("There isn't enough room on this phone to copy the test data. Nothing was copied, and the Demo was not changed.");
+      info(); demoCheck(); return;
+    }
+    var kept = store ? store.records.length : 0, what = [];
+    if (pl.chart) what.push("your current chart");
+    what.push(kept + (kept === 1 ? " saved Tropical chart" : " saved Tropical charts"));
+    var t = "Copied " + what.join(" and ") + " into the test. The Demo was not changed.";
+    if (dropped) t += " " + dropped + " older saved " + (dropped === 1 ? "chart was" : "charts were") + " left out so the Demo keeps enough room.";
+    if (pl.notes.length) t += " " + pl.notes.join(" ");
+    say(t); info(); demoCheck();
+  });
+  $("clear").addEventListener("click", function(){
+    testKeys().forEach(function(k){ LS.removeItem(k); });
+    try { var ss = window.sessionStorage, sk = []; for (var i = 0; i < ss.length; i++){ var q = ss.key(i); if (q && q.indexOf(P) === 0) sk.push(q); } sk.forEach(function(q){ ss.removeItem(q); }); } catch (e) {}
+    say("Test data cleared. The Demo was not changed."); info(); demoCheck();
+  });
+
+  demoCheck(); info();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N1.1 r2 (CozAlyze/Test only): the test storage guard (test-storage.js, pasted here so it always runs first):
+     storage under cozTEST:, no reading servers, art from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N1.1 r2 (Oct 14 2026) · CozAlyze/Test/tropical-nav only, never the Demo
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). Those scripts
+      use getItem / setItem / removeItem / key / length / clear only; no property-style access (checked
+      when this test was built; the three engine scripts are pinned copies in this folder).
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+   4. FRAMES AND WINDOWS. A frame may only open a page from this test folder (or a blank page); a new
+      window only a page from this test folder. Never a Demo page, which would use the Demo's own storage.
+
+   Art and video load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N1.1";
+  var P = "cozTEST:";
+
+  /* ---------- 1. storage ---------- */
+  var proto = Storage.prototype;
+  var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+  var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+  function rawLen(st) { return lenDesc.get.call(st); }
+  function testKeys(st) {
+    var out = [], n = rawLen(st), i, key;
+    for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+    return out;
+  }
+  /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+  var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+  var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+  function usedBytes(st) {
+    var n = rawLen(st), t = 0, i, key, v;
+    for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+    return t;
+  }
+  proto.getItem = function (key) { return g.call(this, P + key); };
+  proto.setItem = function (key, v) {
+    var pk = P + key;
+    if (this === LOCAL) {
+      var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+      if (add > 0 && usedBytes(this) + add > CAP) {
+        try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+        throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+      }
+    }
+    return s.call(this, pk, v);
+  };
+  proto.removeItem = function (key) { return r.call(this, P + key); };
+  proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+  proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+  Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+
+  /* ---------- 3. network ---------- */
+  var blocked = window.__cozTestBlocked = [];
+  var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+  function abs(u) { try { return new URL(String(u), location.href); } catch (e) { return null; } }
+  function allowed(u) {
+    var a = abs(u); if (!a) return false;
+    if (a.protocol === "data:" || a.protocol === "blob:") return true;
+    return a.origin === location.origin || HOSTS.test(a.href);
+  }
+  function refuse(u, via) {
+    var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+    blocked.push({ via: via, url: where, at: new Date().toISOString() });
+    try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers)"); } catch (e) {}
+    return new TypeError("The CozAlyze test refused a request to " + where + ".");
+  }
+  if (window.fetch) {
+    var nf = window.fetch;
+    window.fetch = function (input, init) {
+      var u = typeof input === "string" ? input : (input && input.url) || String(input);
+      if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+      return nf.apply(this, arguments);
+    };
+  }
+  if (window.XMLHttpRequest) {
+    var xo = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+  }
+  if (window.EventSource) {
+    var ES = window.EventSource;
+    var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+    ESW.prototype = ES.prototype; window.EventSource = ESW;
+  }
+  if (window.WebSocket) {
+    var WS = window.WebSocket;
+    var WSW = function (u) { throw refuse(u, "websocket"); };
+    WSW.prototype = WS.prototype; window.WebSocket = WSW;
+  }
+  if (navigator.sendBeacon) {
+    var sb = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+  }
+
+  /* ---------- 4. frames and windows ---------- */
+  var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, e.g. /Test/tropical-nav/ */
+  function inFolder(u) { var a = abs(u); return !!a && a.origin === location.origin && a.pathname.indexOf(DIR) === 0; }
+  function frameOK(u) { var a = abs(u); return !!a && (a.href === "about:blank" || inFolder(u)); }
+  var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+  if (fd && fd.set) {
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+  }
+  var sa = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function (n, v) {
+    if (this instanceof HTMLIFrameElement && String(n).toLowerCase() === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+    return sa.call(this, n, v);
+  };
+  var wo = window.open;
+  window.open = function (u) { if (!inFolder(u == null ? "" : u) || String(u) === "") { refuse(u, "window"); return null; } return wo.apply(window, arguments); };
+
+  window.COZ_TEST_ASSETS = "/Demo/";
+  try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Account · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<script src="coz-saved.js?v=10"></script>
+<style>
+/* ACCOUNT · A1.1 · NAV TEST N1.1 (Oct 14 2026, CozAlyze/Test/tropical-nav ONLY, not the Demo yet)
+   One Account page, to be shared by Tropical, Vedic and Compare (Tropical is tested first).
+   Built from Jason's Account art (1183 x 2323, sent Oct 14) with only the sample profile column removed
+   (his sample name, email and Edit Profile button): acct-art.jpg. Everything else is his art as supplied.
+   The profile column is live: the owner's name, the email line and the Edit Profile button. It belongs
+   to the account owner, never to whichever chart is open. Until accounts exist it reads "Your Account"
+   and the email line is hidden (Oct 8 ruling). Every action that needs an account says so on the page,
+   in the approved wording, instead of pretending to work. Cards, Sign Out, Terms and Privacy are real
+   buttons over his art (temporary preview, approved Oct 14). Bottom nav: Home returns to the dashboard
+   of the reading in use (Tropical in this test), Saved opens the Saved Charts list, Account is this page.
+   Colors of the live profile text are sampled from his art so it matches the baked card titles. */
+:root{ --white:#FBFAFD; --mail:#EFF0F4; --pilltext:#E8E8EE; --pillline:#A88F80; --gold:#F2C898; --navy:#02040c;
+  --head:"Bodoni Moda",Georgia,serif; --sans:"Montserrat","Helvetica Neue",Arial,sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--white);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{padding-bottom:env(safe-area-inset-bottom)}
+.page{position:relative;width:100%;max-width:640px;margin:0 auto;container-type:inline-size}
+.page,.page *{--K:calc(100cqw / 1183)}
+.art{display:block;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-select:none}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hot{position:absolute;display:block;background:none;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.hot:focus-visible,.pill:focus-visible,.nav a:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+/* profile card: border x 83-1123, y 685-953. The live column starts where his sample name did (x 397). */
+.who{position:absolute;left:calc(397 * var(--K));top:calc(var(--who-top) * var(--K));width:calc(690 * var(--K));--who-top:738}
+/* name: Bodoni Moda 400 at 56 (closest to the lettering in his art, measured against his sample name). Live text keeps
+   his art's proportions at phone widths; the small floors only matter on very narrow screens. */
+.who .name{font-family:var(--head);font-weight:400;font-size:max(16px,calc(56 * var(--K)));line-height:1.1;color:var(--white);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who .email{display:none;font-family:var(--sans);font-weight:300;font-size:max(11px,calc(33 * var(--K)));line-height:1.3;color:var(--mail);
+  margin-top:calc(14 * var(--K));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who.has-email{--who-top:712}
+.who.has-email .email{display:block}
+.pill{font-family:var(--sans);font-weight:300;font-size:max(10px,calc(32 * var(--K)));line-height:1;color:var(--pilltext);background:none;cursor:pointer;
+  border:max(1px, calc(3 * var(--K))) solid var(--pillline);border-radius:999px;height:calc(69 * var(--K));min-height:26px;width:calc(280 * var(--K));
+  display:inline-flex;align-items:center;justify-content:center;margin-top:calc(24 * var(--K));-webkit-tap-highlight-color:transparent;position:relative}
+/* the drawn pill stays the size in his art; its tap area extends to 44px tall */
+.pill::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+/* small targets on his art (Sign Out, Terms, Privacy, the nav) are at least 44px tall, centered on what is drawn */
+.tap44{height:44px !important}
+.nav a{position:absolute;display:block;-webkit-tap-highlight-color:transparent}
+.stamp{position:absolute;right:6px;bottom:4px;font-family:var(--sans);font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);pointer-events:none}
+</style>
+</head>
+<body>
+<main class="page">
+  <img class="art" src="acct-art.jpg?v=2" alt="" width="1183" height="2323">
+  <h1 class="sr-only">Account</h1>
+  <p class="sr-only">Manage your details, purchases, and preferences.</p>
+  <div class="who" id="who">
+    <p class="name" id="acctName">Your Account</p>
+    <p class="email" id="acctEmail"></p>
+    <button class="pill" type="button" data-need="account">Edit Profile</button>
+  </div>
+  <!-- his four cards as drawn (borders measured on his art) -->
+  <button class="hot" type="button" data-need="account" aria-label="Birth Information"
+    style="left:calc(83 * var(--K));top:calc(977 * var(--K));width:calc(1040 * var(--K));height:calc(173 * var(--K))"></button>
+  <button class="hot" type="button" data-need="account" aria-label="Purchases and Access"
+    style="left:calc(83 * var(--K));top:calc(1169 * var(--K));width:calc(1040 * var(--K));height:calc(171 * var(--K))"></button>
+  <button class="hot" type="button" data-need="account" aria-label="Settings"
+    style="left:calc(83 * var(--K));top:calc(1358 * var(--K));width:calc(1040 * var(--K));height:calc(169 * var(--K))"></button>
+  <button class="hot" type="button" data-need="account" aria-label="Privacy and Data"
+    style="left:calc(83 * var(--K));top:calc(1547 * var(--K));width:calc(1040 * var(--K));height:calc(168 * var(--K))"></button>
+  <!-- Sign Out (border x 287-919, y 1757-1841); Terms (x 475-549) and Privacy (x 644-732), text y 1884-1912.
+       Tap areas meet halfway between them (y 1862) and use the empty space around them, so none overlaps. -->
+  <button class="hot" type="button" data-need="signout" aria-label="Sign Out"
+    style="left:calc(287 * var(--K));top:calc(1716 * var(--K));width:calc(632 * var(--K));height:calc(146 * var(--K))"></button>
+  <button class="hot" type="button" data-need="terms" aria-label="Terms"
+    style="left:calc(430 * var(--K));top:calc(1862 * var(--K));width:calc(168 * var(--K));height:max(44px, calc(84 * var(--K)))"></button>
+  <button class="hot" type="button" data-need="privacy" aria-label="Privacy"
+    style="left:calc(602 * var(--K));top:calc(1862 * var(--K));width:calc(168 * var(--K));height:max(44px, calc(84 * var(--K)))"></button>
+  <!-- his nav pill (x 103-1103, y 2167-2262): Home, Saved, Account (Account is drawn as the active one) -->
+  <nav class="nav" aria-label="Main">
+    <a class="home tap44" href="tropical-reading.html#/dashboard" aria-label="Home"
+      style="left:calc(103 * var(--K));top:calc(2214 * var(--K) - 22px);width:calc(333 * var(--K))"></a>
+    <a class="saved tap44" href="saved-charts.html" aria-label="Saved Charts"
+      style="left:calc(436 * var(--K));top:calc(2214 * var(--K) - 22px);width:calc(334 * var(--K))"></a>
+    <a class="acct tap44" href="account.html" aria-label="Account" aria-current="page"
+      style="left:calc(770 * var(--K));top:calc(2214 * var(--K) - 22px);width:calc(333 * var(--K))"></a>
+  </nav>
+  <div class="stamp">A1.1 · NAV TEST N1.1</div>
+</main>
+<script>
+(function(){
+  /* the approved wording (Oct 14) */
+  var SAY = {
+    account: "This will be available once you can sign in to your CozAlyze account.",
+    signout: "You aren't signed in. Accounts aren't available yet.",
+    terms:   "The Terms page isn't published yet.",
+    privacy: "The Privacy page isn't published yet."
+  };
+  function tell(text, from){ if (window.CozSaved && CozSaved.note) CozSaved.note(text, null, from); }
+  document.querySelectorAll("[data-need]").forEach(function(b){
+    b.addEventListener("click", function(ev){ ev.preventDefault(); tell(SAY[b.getAttribute("data-need")] || SAY.account, b); });
+  });
+
+  /* The account owner comes from the account backend once one exists, never from a chart or a saved
+     record (the owner is not whichever chart is open). Until then: the neutral heading, no email line. */
+  function showOwner(owner){
+    var who = document.getElementById("who"), email = owner && owner.email ? String(owner.email) : "";
+    document.getElementById("acctName").textContent = owner && owner.name ? String(owner.name) : "Your Account";
+    document.getElementById("acctEmail").textContent = email;
+    who.classList.toggle("has-email", !!email);
+  }
+  showOwner(null);
+
+  /* Home: the dashboard of the reading in use (recorded by coz-saved.js). Only Tropical is in this test. */
+  var HOME = { tropical: "tropical-reading.html#/dashboard" };
+  function homeDash(){ try { var h = JSON.parse(localStorage.getItem("cozHomeDash") || "null"); return h && HOME[h.dash] ? HOME[h.dash] : null; } catch (e) { return null; } }
+  document.querySelector(".nav .home").addEventListener("click", function(ev){ ev.preventDefault(); location.href = homeDash() || HOME.tropical; });
+  document.querySelector(".nav .acct").addEventListener("click", function(ev){ ev.preventDefault(); window.scrollTo(0, 0); });   /* already here */
+})();
+</script>
+</body>
+</html>

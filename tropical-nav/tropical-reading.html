@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N1.1 r2 (CozAlyze/Test only): the test storage guard (test-storage.js, pasted here so it always runs first):
+     storage under cozTEST:, no reading servers, art from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N1.1 r2 (Oct 14 2026) · CozAlyze/Test/tropical-nav only, never the Demo
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). Those scripts
+      use getItem / setItem / removeItem / key / length / clear only; no property-style access (checked
+      when this test was built; the three engine scripts are pinned copies in this folder).
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+   4. FRAMES AND WINDOWS. A frame may only open a page from this test folder (or a blank page); a new
+      window only a page from this test folder. Never a Demo page, which would use the Demo's own storage.
+
+   Art and video load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N1.1";
+  var P = "cozTEST:";
+
+  /* ---------- 1. storage ---------- */
+  var proto = Storage.prototype;
+  var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+  var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+  function rawLen(st) { return lenDesc.get.call(st); }
+  function testKeys(st) {
+    var out = [], n = rawLen(st), i, key;
+    for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+    return out;
+  }
+  /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+  var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+  var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+  function usedBytes(st) {
+    var n = rawLen(st), t = 0, i, key, v;
+    for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+    return t;
+  }
+  proto.getItem = function (key) { return g.call(this, P + key); };
+  proto.setItem = function (key, v) {
+    var pk = P + key;
+    if (this === LOCAL) {
+      var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+      if (add > 0 && usedBytes(this) + add > CAP) {
+        try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+        throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+      }
+    }
+    return s.call(this, pk, v);
+  };
+  proto.removeItem = function (key) { return r.call(this, P + key); };
+  proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+  proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+  Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+
+  /* ---------- 3. network ---------- */
+  var blocked = window.__cozTestBlocked = [];
+  var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+  function abs(u) { try { return new URL(String(u), location.href); } catch (e) { return null; } }
+  function allowed(u) {
+    var a = abs(u); if (!a) return false;
+    if (a.protocol === "data:" || a.protocol === "blob:") return true;
+    return a.origin === location.origin || HOSTS.test(a.href);
+  }
+  function refuse(u, via) {
+    var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+    blocked.push({ via: via, url: where, at: new Date().toISOString() });
+    try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers)"); } catch (e) {}
+    return new TypeError("The CozAlyze test refused a request to " + where + ".");
+  }
+  if (window.fetch) {
+    var nf = window.fetch;
+    window.fetch = function (input, init) {
+      var u = typeof input === "string" ? input : (input && input.url) || String(input);
+      if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+      return nf.apply(this, arguments);
+    };
+  }
+  if (window.XMLHttpRequest) {
+    var xo = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+  }
+  if (window.EventSource) {
+    var ES = window.EventSource;
+    var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+    ESW.prototype = ES.prototype; window.EventSource = ESW;
+  }
+  if (window.WebSocket) {
+    var WS = window.WebSocket;
+    var WSW = function (u) { throw refuse(u, "websocket"); };
+    WSW.prototype = WS.prototype; window.WebSocket = WSW;
+  }
+  if (navigator.sendBeacon) {
+    var sb = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+  }
+
+  /* ---------- 4. frames and windows ---------- */
+  var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, e.g. /Test/tropical-nav/ */
+  function inFolder(u) { var a = abs(u); return !!a && a.origin === location.origin && a.pathname.indexOf(DIR) === 0; }
+  function frameOK(u) { var a = abs(u); return !!a && (a.href === "about:blank" || inFolder(u)); }
+  var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+  if (fd && fd.set) {
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+  }
+  var sa = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function (n, v) {
+    if (this instanceof HTMLIFrameElement && String(n).toLowerCase() === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+    return sa.call(this, n, v);
+  };
+  var wo = window.open;
+  window.open = function (u) { if (!inFolder(u == null ? "" : u) || String(u) === "") { refuse(u, "window"); return null; } return wo.apply(window, arguments); };
+
+  window.COZ_TEST_ASSETS = "/Demo/";
+  try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000f26">
+<title>Your Tropical Reading · CozAlyze</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   COZALYZE · COMPLETE TROPICAL READING · T4.4 · transits label
+   Paid dashboard + reveal + six reading sections in ONE document
+   (standing rule: no iframe, no page navigation between them).
+   Design tokens and structure follow the supplied spec verbatim.
+   ============================================================ */
+:root {
+  --vedic-navy: #000f26;
+  --vedic-gold: #d4a178;
+  --vedic-gold-muted: rgba(212, 161, 120, 0.65);
+  --vedic-ivory: #e5d4c5;
+  --vedic-ivory-muted: rgba(229, 212, 197, 0.88);
+  --display-font: "Cormorant Garamond", Georgia, serif;
+  --body-font: "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  --side-pad: 28px;
+  --dash-zoom: 1;            /* opens showing the whole art, then eases to --dash-zoom-in */
+  --dash-zoom-in: 1.3;    /* same landing as the Vedic dashboard; the bottom nav pill sits below the screen at this zoom */
+}
+@media (max-width: 374px) { :root { --side-pad: 20px; } }
+
+* { box-sizing: border-box; }
+html { background: var(--vedic-navy); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--vedic-navy);
+  color: var(--vedic-ivory);
+  font-family: var(--body-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Fixed background layer: iOS ignores background-attachment on body,
+   so the image lives on its own fixed layer behind the scrolling content. */
+.vedic-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-color: var(--vedic-navy);
+  background-image: url("/Demo/vedic-moon-bg.png");
+  background-size: cover;
+  background-position: top center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.vedic-reading-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100svh;
+  padding:
+    calc(env(safe-area-inset-top) + 24px)
+    var(--side-pad)
+    calc(env(safe-area-inset-bottom) + 24px);
+}
+
+.vedic-reading-content {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  animation: vedicFadeIn 240ms ease-out;
+}
+@keyframes vedicFadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vedic-reading-content { animation: none; }
+  .stage { transition: none; }
+}
+
+/* ---------- header ---------- */
+.vedic-back-button {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: calc(var(--side-pad) - 10px);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--vedic-gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.vedic-back-button svg { width: 30px; height: 20px; display: block; }
+.vedic-back-button:focus-visible { outline: 1px solid var(--vedic-gold-muted); outline-offset: 4px; border-radius: 4px; }
+
+.vedic-header {
+  text-align: center;
+  padding-top: 6px;
+}
+/* His logo lockup (emblem + CozAlyze wordmark) as one image, white keyed out.
+   Width is set so the wordmark reads at the spec's 28–30px display size. */
+.vedic-logo {
+  display: block;
+  width: 140px;
+  height: auto;
+  margin: 0 auto;
+}
+.vedic-eyebrow {
+  font-family: var(--body-font);
+  font-size: clamp(13px, 3.5vw, 14.5px);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--vedic-ivory-muted);
+  margin: 12px 0 0;
+  padding-left: 0.28em; /* optical centre with the trailing tracking */
+}
+.vedic-counter {
+  font-family: var(--display-font);
+  font-size: clamp(27px, 7.2vw, 31px);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  font-variant-numeric: lining-nums;
+  color: var(--vedic-gold);
+  margin: 40px 0 0;
+}
+
+/* ---------- ornamental divider ---------- */
+.vedic-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: min(100%, 420px);
+  margin: 14px auto;
+  color: var(--vedic-gold);
+}
+.vedic-divider::before,
+.vedic-divider::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--vedic-gold-muted);
+}
+.vedic-divider svg { width: 16px; height: 16px; flex: 0 0 auto; display: block; }
+
+/* ---------- title ---------- */
+.vedic-title {
+  font-family: var(--display-font);
+  font-size: clamp(2.6rem, 11.5vw, 3.4rem);
+  font-weight: 500;
+  line-height: 0.98;
+  color: var(--vedic-gold);
+  text-align: center;
+  text-wrap: balance;
+  margin: 10px 0;
+}
+.vedic-title--long {
+  font-size: clamp(2.35rem, 10vw, 2.9rem);
+}
+
+/* ---------- body ---------- */
+.vedic-body {
+  font-family: var(--body-font);
+  font-size: clamp(1.25rem, 5.4vw, 1.4rem);
+  line-height: 1.55;
+  font-weight: 400;
+  color: var(--vedic-ivory);
+  margin-top: 24px;
+}
+.vedic-body p { margin: 0 0 1.35em; }
+.vedic-body p:last-child { margin-bottom: 0; }
+.vedic-body p.dev-label { font-size: 14px; font-style: italic; color: #8b8272; }
+
+/* ---------- bottom navigation ---------- */
+.vedic-nav { margin-top: 34px; }
+.vedic-nav-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--vedic-gold);
+}
+.vedic-nav-rule::before,
+.vedic-nav-rule::after {
+  content: "";
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--vedic-gold-muted);
+}
+.vedic-nav-rule svg { width: 14px; height: 14px; flex: 0 0 auto; display: block; }
+.vedic-nav-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-top: 6px;
+}
+.vedic-nav a,
+.vedic-nav button {
+  font-family: var(--body-font);
+  font-size: clamp(16px, 4.3vw, 18px);
+  font-weight: 400;
+  color: var(--vedic-gold);
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+}
+.vedic-nav a:focus-visible,
+.vedic-nav button:focus-visible { outline: 1px solid var(--vedic-gold-muted); outline-offset: 4px; border-radius: 4px; }
+.vedic-nav .vedic-nav-next { text-align: right; justify-content: flex-end; }
+.vedic-nav svg:not(.vedic-nav-rule svg) { width: 24px; height: 15px; flex: 0 0 auto; }
+
+/* ============================================================
+   PAID DASHBOARD  (his art = frame 0 of the reveal clip, so the
+   dashboard and the video's first frame are pixel-identical)
+   ============================================================ */
+body[data-view="dashboard"] .vedic-reading-page,
+body[data-view="dashboard"] .vedic-bg { display: none; }
+body[data-view="reading"] .dash { display: none; }
+
+.dash {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  background: var(--vedic-navy);
+  overflow: hidden;
+}
+/* one shared stage: contain-fit box with the clip's exact aspect, centred */
+.stage {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  aspect-ratio: 972 / 2128;
+  width: min(100vw, calc(100svh * 972 / 2128));   /* contain-fit: the whole art */
+  /* --dash-zoom 1 = whole art; above 1 the stage scales up around its centre and
+     crops evenly. Done with transform so iOS animates it smoothly. */
+  transform: translate(-50%, -50%) scale(var(--dash-zoom, 1));
+  transition: transform 1400ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: transform;
+  container-type: inline-size;
+  overflow: hidden;
+}
+.stage-art,
+.stage video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: var(--vedic-navy);
+}
+.stage video { background: transparent; }   /* the art under it shows until the first frame paints */
+.hot {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  color: transparent;
+  font-size: 0;
+}
+.hot:focus-visible { outline: 1px solid var(--vedic-gold-muted); outline-offset: 2px; border-radius: 8px; }
+.hot[disabled] { cursor: default; }
+/* live ascendant: shown ONLY when the sign is not the sample Leo baked into the art */
+.asc-patch, .asc-glyph, .asc-label { position: absolute; display: none; pointer-events: none; }
+.stage[data-asc-live="1"] .asc-patch,
+.stage[data-asc-live="1"] .asc-glyph,
+.stage[data-asc-live="1"] .asc-label { display: block; }
+/* geometry measured on the 972-wide art, all in cqw so x and y share one scale:
+   baked lion ring centred (215,1378) outer radius ~44 (~48 with its points), baked "Leo" at x 332–383, y 1394–1417 */
+.asc-patch-glyph {
+  left: 16.82cqw; top: 136.47cqw;
+  width: 10.6cqw; height: 10.6cqw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(5,17,33) 0 80%, rgba(5,17,33,0) 100%);
+}
+.asc-patch-text {
+  left: 33.7cqw; top: 142.6cqw;
+  width: 6.8cqw; height: 4.1cqw;
+  background: radial-gradient(ellipse at center, rgb(5,17,33) 0 60%, rgba(5,17,33,0) 100%);
+}
+.asc-glyph {                       /* his ring-<sign>.png, sized so its ring matches the baked one */
+  left: 17.08cqw; top: 136.73cqw;
+  width: 10.1cqw; height: 10.1cqw;
+}
+.asc-glyph img { display: block; width: 100%; height: 100%; }
+.asc-label {
+  left: 34.26cqw; top: 143.0cqw;
+  font: 500 3.5cqw/1 var(--display-font);
+  color: var(--vedic-ivory);
+  white-space: nowrap;
+}
+.dash-preparing .hot-reading { opacity: 0.45; }
+
+/* ============================================================
+   REVEAL OVERLAY  (video plays once, then everything disappears
+   and the reading emerges)
+   ============================================================ */
+.reveal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background:#000;
+  overflow: hidden;
+  display: none;
+}
+.reveal.is-on { display: block; }
+.reveal .asc-patch, .reveal .asc-glyph, .reveal .asc-label { transition: opacity 320ms ease-out; }
+.reveal.asc-off .asc-patch, .reveal.asc-off .asc-glyph, .reveal.asc-off .asc-label { opacity: 0; }
+.reveal-curtain {
+  position: absolute;
+  inset: 0;
+  background: var(--vedic-navy);
+  opacity: 0;
+  transition: opacity 480ms ease-in;
+  pointer-events: none;
+}
+.reveal.is-closing .reveal-curtain { opacity: 1; }
+.reveal-back {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 10px);
+  left: 18px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--vedic-gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.reveal-back svg { width: 30px; height: 20px; display: block; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+body.scroll-locked { overflow: hidden; touch-action: none; }
+
+/* ---------- v20.1 shared reading footer (his ruling) ----------
+   One footer across the whole reading: the CozAlyze line plus Home, Saved and
+   Account. It reuses the #asqNav treatment already in this file rather than
+   introducing a new look. The dashboard keeps its own painted footer, so this
+   one stays hidden there, and it never prints. */
+#cozFoot {
+  position:fixed; left:0; right:0; bottom:0; z-index:40;
+  padding-bottom:env(safe-area-inset-bottom);
+  background:rgba(8,11,17,.86);
+  backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(201,161,94,.18);
+  display:none;
+}
+#cozFoot .coz-foot-tag {
+  text-align:center; font-family:'EB Garamond',serif; font-style:italic;
+  font-size:13px; letter-spacing:.04em; color:#8b8272;
+  padding:11px 20px 3px;
+}
+#cozFoot .coz-foot-links { display:flex; height:var(--asq-nav-h,64px); }
+#cozFoot a {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; text-decoration:none; color:#8b8272; font-size:10.5px; letter-spacing:.06em;
+  font-family:'EB Garamond',serif; -webkit-tap-highlight-color:transparent;
+}
+#cozFoot a svg {
+  width:21px; height:21px; stroke:currentColor; fill:none;
+  stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round;
+}
+#cozFoot a:active { color:var(--asq-gold,#c9a15e); }
+#cozFoot a:focus-visible { outline:1px solid var(--asq-gold,#c9a15e); outline-offset:-4px; }
+/* shown on the reading and, once the ascendant has settled, on the ascendant */
+body[data-view="reading"] #cozFoot { display:block; }
+body[data-view="ascendant"].asq-done #cozFoot { display:block; }
+/* the footer owns the bottom of the screen, so the content clears it */
+body[data-view="reading"] .vedic-reading-page {
+  padding-bottom:calc(env(safe-area-inset-bottom) + var(--asq-nav-h,64px) + 60px);
+}
+
+/* ---------- build stamp (project standing rule) ---------- */
+.vedic-stamp {
+  position: fixed;
+  right: 8px;
+  bottom: calc(env(safe-area-inset-bottom) + 4px);
+  z-index: 2;
+  font: 9px/1 var(--body-font);
+  letter-spacing: 0.08em;
+  color: rgba(212, 161, 120, 0.35);
+  pointer-events: none;
+}
+
+/* ============================================================
+   ASCENDANT EMERGENCE (carried from VEDIC READING V2.5 "swell + unbroken field").
+   Tapping the Ascendant door: black beat, the person's sign born small at the
+   centre and swelling to full screen over 3s while it plays, then the reading
+   rises beneath it and the sign pins to the top. Standing rule: the swell is
+   part of every sign emergence and is never removed. Namespaced "asq".
+   ============================================================ */
+body[data-view="ascendant"] .dash,
+body[data-view="ascendant"] .vedic-reading-page,
+body[data-view="ascendant"] .vedic-bg,
+body[data-view="ascendant"] .reveal { display: none !important; }
+body:not([data-view="ascendant"]) .asq { display: none !important; }
+body.asq-locked { overflow: hidden; height: 100dvh; }
+body[data-view="ascendant"] { background: #0b0f16; }
+.asq { --asq-bg:#0b0f16; --asq-gold:#c9a15e; --asq-champagne:#e9d7ae; --asq-ivory:#ddd3c2;
+  --asq-hairline:rgba(201,161,94,.28); --asq-nav-h:64px; }
+#asqVeil { position:fixed; inset:0; z-index:54; background:#000; opacity:0; pointer-events:none; transition:opacity .7s ease; }
+#asqVeil.on { opacity:1; pointer-events:auto; }
+#asqHero { position:fixed; top:0; left:0; right:0; height:100dvh; z-index:20; background:#000;
+  display:flex; align-items:center; justify-content:center; overflow:hidden; will-change:height; transition:none; }
+#asqHero.settling { transition:height 1.4s cubic-bezier(.22,.61,.21,1); }
+#asqScale { width:100%; height:100%; transform-origin:center 46%; will-change:transform; }
+#asqHero video { width:100%; height:100%; object-fit:contain; display:block; opacity:0; transition:opacity .9s ease; }
+#asqHero.playing video { opacity:1; }
+#asqHero.bloom #asqScale { transform:scale(.06); }
+#asqHero.bloom.grown #asqScale { animation:asqBloom 3s linear forwards; }
+@keyframes asqBloom { from { transform:scale(.06); } to { transform:scale(1); } }
+#asqContent { position:fixed; top:0; left:0; right:0; z-index:19; background:var(--asq-bg); color:var(--asq-ivory);
+  font-family:'EB Garamond', Georgia, serif; -webkit-font-smoothing:antialiased;
+  transform:translateY(100dvh); will-change:transform; visibility:hidden; }
+#asqContent.rising { visibility:visible; transition:transform 1.4s cubic-bezier(.22,.61,.21,1); }
+body.asq-done #asqHero { position:fixed; top:0; left:0; right:0; height:var(--settled-h); z-index:20; background:#000; }
+body.asq-done #asqContent { position:relative; z-index:1; margin-top:var(--settled-h); transform:none; visibility:visible; transition:none; }
+#asqContent .wrap { max-width:640px; margin:0 auto; padding:34px 24px calc(var(--asq-nav-h) + env(safe-area-inset-bottom) + 72px); }
+#asqContent .eyebrow { display:flex; align-items:center; gap:14px; justify-content:center; color:var(--asq-champagne);
+  font-size:18px; letter-spacing:.38em; text-transform:uppercase; font-family:'Cormorant Garamond',serif; font-weight:600; padding-left:.38em; }
+#asqContent .eyebrow::before, #asqContent .eyebrow::after { content:""; flex:0 0 44px; height:1px; background:linear-gradient(90deg,transparent,var(--asq-hairline)); }
+#asqContent .eyebrow::after { background:linear-gradient(90deg,var(--asq-hairline),transparent); }
+#asqContent h1 { font-family:'Cormorant Garamond',serif; font-weight:600; color:var(--asq-champagne); text-align:center; font-size:44px;
+  line-height:1.05; letter-spacing:.10em; margin:10px 0 4px; padding-left:.10em; text-shadow:0 0 26px rgba(233,215,174,.18); }
+#asqContent .subtitle { display:flex; align-items:center; justify-content:center; gap:10px; font-family:'Cormorant Garamond',serif;
+  font-style:italic; font-weight:500; color:var(--asq-champagne); font-size:23px; }
+#asqContent .subtitle .orn { color:var(--asq-gold); font-style:normal; font-size:.62em; transform:translateY(1px); }
+#asqContent .head-rule { width:min(320px,72%); margin:20px auto 0; height:12px; position:relative; }
+#asqContent .head-rule::before { content:""; position:absolute; left:0; right:0; top:5px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--asq-hairline) 18%,var(--asq-hairline) 82%,transparent); }
+#asqContent .head-rule::after { content:"\25C6"; position:absolute; left:50%; top:0; transform:translateX(-50%); color:var(--asq-gold);
+  font-size:9px; background:var(--asq-bg); padding:0 8px; line-height:12px; }
+#asqContent section { margin-top:42px; }
+#asqContent h2 { font-family:'Cormorant Garamond',serif; font-weight:700; color:var(--asq-gold); font-size:26px; line-height:1.25;
+  letter-spacing:.14em; text-transform:uppercase; margin-bottom:16px; }
+#asqContent .reading-copy p { font-size:22px; line-height:1.65; color:var(--asq-ivory); margin-bottom:18px; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+#asqContent .reading-copy p:last-child { margin-bottom:0; }
+#asqContent .reading-copy p.dev-label { font-size:14px; font-style:italic; color:#8b8272; }
+#asqContent .divider { margin:40px auto 0; width:100%; height:12px; position:relative; }
+#asqContent .divider::before { content:""; position:absolute; left:0; right:0; top:5px; height:1px;
+  background:linear-gradient(90deg,transparent,var(--asq-hairline) 20%,var(--asq-hairline) 80%,transparent); }
+#asqContent .divider::after { content:"\25C6"; position:absolute; left:50%; top:0; transform:translateX(-50%); color:var(--asq-gold);
+  font-size:9px; background:var(--asq-bg); padding:0 8px; line-height:12px; }
+#asqNav { position:fixed; left:0; right:0; bottom:0; z-index:40; height:calc(var(--asq-nav-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom); background:rgba(8,11,17,.86); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  border-top:1px solid rgba(201,161,94,.18); display:flex; opacity:0; pointer-events:none; transition:opacity .8s ease; }
+body.asq-done #asqNav { opacity:1; pointer-events:auto; }
+#asqNav a { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-decoration:none;
+  color:#8b8272; font-size:10.5px; letter-spacing:.06em; font-family:'EB Garamond',serif; }
+#asqNav a svg { width:21px; height:21px; stroke:currentColor; fill:none; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; }
+#asqNav a.active { color:var(--asq-gold); }
+@media (prefers-reduced-motion: reduce) { #asqHero.settling { transition:none; } #asqContent.rising { transition:none; } }
+
+/* ---------- dashboard pinch zoom (Sep 1): the landing eases to --dash-zoom-in, which
+   pushes the bottom nav pill below the screen; two fingers now zoom the art between
+   the whole frame (1) and the landing (--dash-zoom-in) so Home, Saved and Account can
+   always be reached. Native browser zoom stays off. ---------- */
+.dash { touch-action: none; }
+.dash.pinching .stage { transition: none; }
+
+  /* skip-ahead (Sep 1 ruling): subtle gold text, never a button. Appears only on
+     a device that has already been through the experience once. */
+  .coz-skip { position:fixed; top:calc(env(safe-area-inset-top) + 16px); right:18px; z-index:9999;
+    font-family:-apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; font-size:11px; letter-spacing:0.16em;
+    text-transform:uppercase; color:rgba(201,161,94,0.55); background:transparent; border:0; padding:10px 6px;
+    opacity:0; pointer-events:none; transition:opacity 0.9s ease; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .coz-skip.on { opacity:1; pointer-events:auto; }
+  .coz-skip:active { color:rgba(233,215,174,0.9); }
+  /* NAV TEST N1.1: Save Chart, its own control (the bookmark no longer saves). Same gold text as Skip,
+     same corner. Shown on the dashboard, the reading and the settled Ascendant; never during the
+     reveal, the Ascendant swell, or while Skip is showing. Placement is Jason's call. */
+  body[data-view="dashboard"] .coz-save, body[data-view="reading"] .coz-save,
+  body[data-view="ascendant"].asq-done .coz-save { opacity:1; pointer-events:auto; }
+  body.scroll-locked .coz-save, body.asq-locked .coz-save,
+  body:has(.coz-skip.asq.on) .coz-save { opacity:0 !important; pointer-events:none !important; }
+
+/* one-finger pan (Sep 1): when the dashboard is zoomed in, dragging moves the art up
+   and down within its edges so the bottom nav pill can be pulled into view */
+.stage { transform: translate(-50%, calc(-50% + var(--dash-pan, 0px))) scale(var(--dash-zoom, 1)); }
+.dash.panning .stage { transition: none; }
+@keyframes cozPageIn { from { opacity: 0; } to { opacity: 1; } }
+body[data-view="reading"] .vedic-reading-page { animation: none; }
+.reveal-curtain { transition: opacity 1400ms ease-in-out; }
+
+/* through the sun (Sep 1 ruling): after the burst the camera keeps going, the sun
+   fills the screen with light and the reading emerges out of it */
+/* the sun sits at 41.2% of the clip height (measured on the last frame): the drive scales about it */
+.reveal.is-through .stage { transform-origin: 50% 41.2%; transition: transform 3200ms cubic-bezier(0.42, 0, 0.9, 0.35), transform-origin 0s;
+  /* the sun is carried to the exact screen centre while the stage grows about it */
+  transform: translate(-50%, calc(-50% + 8.8%)) scale(calc(var(--dash-zoom, 1) * 5.5)); }
+.reveal.is-through .reveal-curtain { background: radial-gradient(circle at 50% 50%, #fff6df 0%, #f1d9a6 45%, #e4b978 100%); transition: opacity 1400ms ease-in; }
+#cozLight { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 50% 42%, #fff6df 0%, #f1d9a6 45%, #e4b978 100%); transition: opacity 1800ms ease-out; }
+#cozLight.on { opacity: 1; transition: none; }
+/* text zoom (Sep 1 ruling): wherever there is reading text, two fingers scale it up
+   to 2x and back; the text reflows, nothing else on the page zooms */
+#vedicContent, #asqContent .wrap { zoom: var(--coz-text-zoom, 1); }
+
+/* Sep 20: the reveal stage un-zooms from the dashboard's 1.3 to 1 while the gold
+   light covers the screen, so the flight plays full size instead of cropped. */
+#revealStage, #tropicalRevealStage, #compareRevealStage,
+.reveal .stage {
+  transform: translate(-50%, calc(-50% + var(--dash-pan, 0px))) scale(var(--reveal-zoom, var(--dash-zoom, 1)));
+  transition: transform 1300ms cubic-bezier(0.33, 0, 0.2, 1);
+}
+</style>
+<script src="coz-saved.js?v=10"></script>
+<script src="saved-tropical-library.js?v=1"></script>
+<!-- NAV TEST: coz-tropical-server.js is not loaded here, so this page never contacts the Tropical server. A reading shows only
+     when its complete text was copied into the test; otherwise the page says it is not available yet. -->
+</head>
+<body data-view="dashboard">
+<button type="button" class="coz-skip coz-save" data-coz-save aria-label="Save this chart">Save Chart</button>
+
+<div class="vedic-bg" aria-hidden="true"></div>
+
+<!-- ===== PAID DASHBOARD ===== -->
+<div class="dash" id="dash" aria-label="Your Tropical reading dashboard">
+  <div class="stage" id="dashStage">
+    <img class="stage-art" src="/Demo/tropical-dash.jpg?v=10" alt="" width="972" height="2128">
+    <div class="asc-patch asc-patch-glyph" aria-hidden="true"></div>
+    <div class="asc-patch asc-patch-text" aria-hidden="true"></div>
+    <div class="asc-glyph" aria-hidden="true"></div>
+    <div class="asc-label" aria-hidden="true"></div>
+
+    <button class="hot hot-reading" id="hotReading" type="button" style="left:15.43%;top:55.69%;width:68.93%;height:4.93%" aria-label="Your Tropical Reading">Your Tropical Reading</button>
+    <button class="hot" type="button" data-dash="ascendant"  style="left:15.43%;top:62.12%;width:68.93%;height:5.31%" aria-label="Your Ascendant">Your Ascendant</button>
+    <button class="hot" type="button" data-dash="transits" data-href="tropical-current-transits.html" style="left:15.43%;top:68.75%;width:68.93%;height:5.03%" aria-label="Your Current Transits">Your Current Transits</button>
+    <button class="hot" type="button" data-dash="birth-chart" data-href="tropical-birth-chart.html" style="left:15.43%;top:75.42%;width:68.93%;height:4.93%" aria-label="Your Birth Chart">Your Birth Chart</button>
+    <button class="hot" type="button" data-dash="home"    style="left:9.77%;top:94.83%;width:25.72%;height:3.15%" aria-label="Home">Home</button>
+    <button class="hot" type="button" data-dash="saved"   style="left:35.49%;top:94.83%;width:25.72%;height:3.15%" aria-label="Saved">Saved</button>
+    <button class="hot" type="button" data-dash="account" style="left:61.21%;top:94.83%;width:25.72%;height:3.15%" aria-label="Account">Account</button>
+  </div>
+</div>
+
+<!-- ===== REVEAL ===== -->
+<div class="reveal" id="reveal" role="dialog" aria-label="Opening your Tropical reading">
+  <div class="stage" id="revealStage">
+    <img class="stage-art" src="/Demo/tropical-dash.jpg?v=10" alt="" width="972" height="2128">
+    <video id="revealVideo" src="/Demo/tropical-reading-reveal-full.mp4?v=1080" muted playsinline preload="auto" aria-hidden="true"></video>
+    <div class="asc-patch asc-patch-glyph" aria-hidden="true"></div>
+    <div class="asc-patch asc-patch-text" aria-hidden="true"></div>
+    <div class="asc-glyph" aria-hidden="true"></div>
+    <div class="asc-label" aria-hidden="true"></div>
+  </div>
+  <div class="reveal-curtain" aria-hidden="true"></div>
+  <button class="reveal-back" id="revealBack" type="button" aria-label="Return to your Tropical dashboard">
+    <svg viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M29 10H2M9 3 2 10l7 7"/></svg>
+  </button>
+  <span class="sr-only" aria-live="polite" id="revealLive"></span>
+</div>
+
+<main class="vedic-reading-page" id="vedicPage">
+  <button class="vedic-back-button" id="vedicBack" type="button" aria-label="Back to your Tropical reading dashboard">
+    <svg viewBox="0 0 30 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M29 10H2M9 3 2 10l7 7"/>
+    </svg>
+  </button>
+  <div class="vedic-reading-content" id="vedicContent"></div>
+</main>
+
+
+<!-- ===== ASCENDANT EMERGENCE (from V2.5) ===== -->
+<div id="asqVeil" class="asq"></div>
+<div id="asqHero" class="asq"><div id="asqScale"><video id="asqVid" muted playsinline preload="auto"></video></div></div>
+<div id="asqContent" class="asq">
+  <div class="wrap">
+    <div class="eyebrow"><span id="asqEyebrow">Your Ascendant</span></div>
+    <div style="text-align:center;color:var(--asq-gold);font-size:10px;margin-top:6px">&#10022;</div>
+    <h1 id="asqTitle"></h1>
+    <div class="subtitle"><span class="orn">&#10087;</span><span id="asqSub">Your Inner Compass</span><span class="orn" style="transform:scaleX(-1) translateY(1px)">&#10087;</span></div>
+    <div class="head-rule"></div>
+    <div id="asqSections"></div>
+  </div>
+</div>
+<div id="cozFoot">
+  <div class="coz-foot-tag">CozAlyze helps you see it all</div>
+  <div class="coz-foot-links">
+    <a href="#" id="asqHome"><svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9h13v-9"/></svg>Home</a>
+    <a href="#" data-foot="saved"><svg viewBox="0 0 24 24"><path d="M7 4h10v16l-5-4-5 4z"/></svg>Saved</a>
+    <a href="#" data-foot="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.4 3.9-5 7-5s5.8 1.6 7 5"/></svg>Account</a>
+  </div>
+</div>
+
+<div class="vedic-stamp" aria-hidden="true">TROPICAL READING · T4.5 · NAV TEST N1.1</div>
+
+<script src="ascendant-library.js"></script>
+<script>
+/* ============================================================
+   SECTION DATA (spec, verbatim)
+   ============================================================ */
+const vedicReadingSections = [
+  { id: "at-your-core",            number: 1, title: "At Your Core",              nextLabel: "Love, Desire & Creativity" },
+  { id: "love-desire-creativity",  number: 2, title: "Love, Desire & Creativity", nextLabel: "Work, Money & Expression" },
+  { id: "work-money-expression",   number: 3, title: "Work, Money & Expression",  nextLabel: "Wisdom, Purpose & Legacy" },
+  { id: "wisdom-purpose-legacy",   number: 4, title: "Wisdom, Purpose & Legacy",  nextLabel: "Challenges & Resilience" },
+  { id: "challenges-resilience",   number: 5, title: "Challenges & Resilience",   nextLabel: "Your Essential Takeaway" },
+  { id: "essential-takeaway",      number: 6, title: "Your Essential Takeaway",   nextLabel: null }
+];
+const SECTION_TOTAL = String(vedicReadingSections.length).padStart(2, "0");
+
+/* ============================================================
+   READING SOURCE
+   The server-side generator supplies the reading in the spec's JSON
+   contract ({ system, title, subtitle, sections:[{id, number, title,
+   body[], sourceFactors[]}] }) as window.COZ_TROPICAL_READING or stored
+   in localStorage "cozTropicalReading". A flat { "<section id>": [...] }
+   shape is also accepted. sourceFactors are never rendered.
+   Anything carrying fixture: true is refused as customer content.
+   ============================================================ */
+/* ============================================================
+   >>> SAMPLE / FIXTURE CONTENT. NOT A CUSTOMER READING. <<<
+   This is a full-length sample written to the Tropical generator
+   specification so page length, scrolling, typography and navigation
+   can be tested at real size. It is written to a HYPOTHETICAL chart
+   (described in sourceFactors) and must never be shown as, stored as,
+   or mistaken for a personalized reading. It is used only when no
+   generated reading is present, and loadReading() refuses any stored
+   object that carries fixture: true.
+   ============================================================ */
+const COZ_TROPICAL_SAMPLE_READING = {
+  fixture: true,
+  sample: true,
+  customer: null,
+  system: "tropical",
+  title: "Your Tropical Reading",
+  subtitle: "Your Outer Expression",
+  sections: [
+    {
+      id: "at-your-core",
+      number: 1,
+      title: "At Your Core",
+      sourceFactors: [
+        "SAMPLE CHART (hypothetical): Leo Ascendant, chart ruler Sun",
+        "Sun Capricorn 6th conjunct Saturn Capricorn 6th",
+        "Moon Aries 9th square Sun and Saturn",
+        "Mercury, Uranus, Neptune in Capricorn 6th (earth emphasis)",
+        "Cardinal modality dominant; earth then fire by element",
+        "Jupiter Cancer 12th opposing Sun; Pluto Scorpio 4th near the IC"
+      ],
+      body: [
+        "The first thing people tend to meet in you is warmth with a spine in it. The way you carry yourself points toward presence, a readiness to be seen, an instinct to take up the room you are in rather than apologise for it. Yet the chart suggests that the engine underneath that presence runs on something cooler and more exacting. You may look like someone who leads with confidence while privately measuring yourself against a standard that rarely lets you rest.",
+        "That combination is the shape of your personality more than any single trait. The outward manner is generous and a little theatrical, quick to encourage and quick to take charge. The inner life is disciplined, task focused, and more anxious about getting it right than anyone watching would guess. When the two line up you can be formidable, a person who makes a promise in public and then quietly does the work to keep it. When they fall out of step you may feel like a performer who has forgotten why the show matters.",
+        "Emotionally, the chart points toward a temperament that is faster and hotter than the face you present. Feelings tend to arrive as sudden certainty, an impulse to act now, to say the thing, to fix it or leave. Because the rest of the chart prizes control and competence, you may have learned to sit on that heat, and the sitting can cost you. Irritability, restlessness and a sense of being held back are likely to be the signs that something has gone unspoken for too long.",
+        "There is a real contradiction here and it is worth naming plainly. Part of you wants to be recognised, to shine, to be the person others turn toward. Another part distrusts recognition that has not been earned, and can undercut your own moment by finding the flaw in it. You may be your own harshest reviewer, and the review often arrives while the applause is still going.",
+        "What makes you recognisable is the pairing of loyalty and standards. People are likely to experience you as someone who shows up, who remembers, who takes responsibility when it would be easier not to. They may also experience you as hard to please, not because you demand much of them, but because they can feel how much you demand of yourself and wonder whether they measure up.",
+        "You are likely to feel most authentic when the work in front of you is difficult enough to deserve your effort and visible enough to matter to someone. Praise for easy things may leave you cold. Respect for hard things done well tends to land. The conditions that suit you are ones where competence and warmth are both wanted, where you can be the steady one and the bright one at once, and where nobody asks you to choose between them."
+      ]
+    },
+    {
+      id: "love-desire-creativity",
+      number: 2,
+      title: "Love, Desire & Creativity",
+      sourceFactors: [
+        "Venus Sagittarius 5th trine Moon Aries 9th",
+        "Mars Virgo 2nd square Venus, trine Sun and Saturn",
+        "Moon Aries 9th square Saturn",
+        "7th house Aquarius, ruler Saturn in the 6th; Descendant Aquarius with North Node",
+        "8th house Pisces, ruler Jupiter in the 12th; Pluto Scorpio 4th",
+        "Pattern: fire in the houses of pleasure and the Moon, earth in the houses of work"
+      ],
+      body: [
+        "In love you may want two things that do not always agree: freedom and proof. The chart points toward a heart that is drawn to openness, adventure and a partner who is genuinely interesting, someone with opinions, plans and a life of their own. At the same time a more careful part of you watches for evidence, for reliability, for the small practical signs that a person means what they say. Attraction tends to start fast and then submit itself to inspection.",
+        "Desire here is warm, candid and a little idealistic. You are likely to fall for a mind as much as a body, and to find flirtation most enjoyable when it feels like a conversation you both want to continue. Pleasure and play matter to you, and you may be at your most charming when you are not trying, when a shared joke or a shared enthusiasm does the work that strategy never could.",
+        "The complication sits in how affection gets expressed. One part of the chart shows love through doing: fixing, organising, noticing what is needed and providing it before it is asked for. Another part wants love to feel like an adventure and can experience all that helpfulness as slightly deflating. You may swing between being the practical partner and wishing someone would sweep you off your feet, and a partner can be forgiven for not knowing which version they will meet.",
+        "Emotional needs, underneath, are direct. You want honesty, you want to be met with energy rather than caution, and you want disagreements to be had out loud and then finished. Sulking and slow freezes are likely to distress you more than a plain argument. What may take longer to admit is a need for reassurance, because asking for it feels like weakness to the part of you that prizes self-sufficiency.",
+        "Vulnerability tends to arrive through the body and through time. Physical closeness may open you when talking cannot, and long shared history tends to soften the inspecting eye. The chart suggests that intimacy deepens for you in private, away from the performance, and that you may guard that private self more fiercely than people expect from someone so outwardly open.",
+        "The relationship pattern to watch is criticism disguised as care. Your standards can turn on a partner as easily as on yourself, and helpful correction, offered often enough, can wear the shine off attraction. What is likely to support closeness is the reverse move: letting a partner do something their way, badly, and loving them anyway.",
+        "Creatively, you may make your best work in bursts of enthusiasm followed by long stretches of refinement. The spark is quick and the finishing is slow, and both are yours. Projects that let you enjoy the making, that have an audience in mind and a standard to meet, are likely to hold your attention longest. Play is not a break from your seriousness; it may be the door into it."
+      ]
+    },
+    {
+      id: "work-money-expression",
+      number: 3,
+      title: "Work, Money & Expression",
+      sourceFactors: [
+        "Mercury Capricorn 6th conjunct Uranus and Neptune",
+        "Sun and Saturn in the 6th; 6th house ruler Saturn in its own sign",
+        "Midheaven Taurus, ruler Venus in Sagittarius 5th",
+        "2nd house Virgo with Mars; 2nd ruler Mercury in the 6th",
+        "Jupiter Cancer 12th opposing Sun and Saturn",
+        "Pattern: identity, mind and discipline all concentrated in the house of work"
+      ],
+      body: [
+        "Work is not a compartment for you; the chart suggests it is where a large part of your identity actually lives. Your sense of self, your discipline and your way of thinking all gather in the same area of the chart, which points toward a person who is most fully themselves when they are being useful and good at something. The risk in that concentration is obvious: a bad month at work can feel like a bad month as a human being.",
+        "Your communication style is likely to be structured, economical and a little dry. You tend to think in systems and say what needs saying without decoration, and colleagues may come to you when they want a plan rather than a pep talk. There is a stranger, more original current underneath the practicality, a taste for unusual ideas and elegant solutions, and when you let it show your voice becomes far more distinctive than the careful version.",
+        "Skills tend to cluster around improvement. You may be the person who sees how a process could be better, who notices the inefficiency nobody else minds, who cannot leave a rough edge alone. That instinct is a genuine talent and a genuine liability. It makes you valuable and it can make you exhausting, to others and to yourself, when nothing is ever finished enough.",
+        "Your relationship with money is likely to be more anxious than your income would justify. Earning may come through diligence rather than luck, through being reliably competent over long periods, and security tends to matter to you at a level below reason. You may spend confidently on what you believe in and then lie awake over small sums. A stable base is not a luxury for you; it may be what allows the more adventurous parts of the chart to breathe at all.",
+        "Publicly, the chart points toward a professional identity built on steadiness and taste. People are likely to trust you with things that need to last. The Midheaven suggests that what you want to be known for is quality rather than speed, and that you may be quietly proud of work that nobody but you knows the effort behind.",
+        "The tension worth naming is between security, fulfilment and recognition. The part of you that wants a safe and orderly career, the part that wants work to feel like play, and the part that wants to be seen doing it are not always the same job. You may spend years serving one at the expense of the others before finding a role, or a way of working, where at least two of them can coexist.",
+        "Environments that suit you tend to combine high standards with genuine autonomy. Micromanagement is likely to make you rigid; total freedom without structure may make you scattered. Where you can set the standard yourself and be left to meet it, with people who respect craft and are not frightened of a blunt sentence, you are likely to do your most durable work."
+      ]
+    },
+    {
+      id: "wisdom-purpose-legacy",
+      number: 4,
+      title: "Wisdom, Purpose & Legacy",
+      sourceFactors: [
+        "Jupiter Cancer 12th opposing Sun and Saturn",
+        "Moon Aries in the 9th, ruler Mars in the 2nd",
+        "Saturn Capricorn in dignity in the 6th",
+        "North Node Aquarius 7th, South Node Leo 1st on the Ascendant",
+        "Midheaven Taurus; 11th house Gemini ruled by Mercury in the 6th",
+        "Pattern: self-reliance on the Ascendant side, collaboration on the growth side"
+      ],
+      body: [
+        "Meaning, for you, is likely to be something you fight for rather than inherit. The chart places your restless, questioning instincts in the area of belief and learning, which points toward a person who tests ideas hard, argues with them, and keeps only what survives. You may be impatient with received wisdom and drawn to teachers who can hold their ground, and you tend to learn best when something is at stake.",
+        "Faith, in the broad sense, may be a private matter. There is a strong suggestion that your most expansive feelings, the ones about hope, grace and being part of something larger, live in a hidden part of the chart, away from the public competence. You may be more spiritual, more sentimental or more moved by beauty than anyone at work would believe, and you may keep it that way on purpose.",
+        "Long-term maturation in this chart runs through discipline into softness. The strictness that serves you so well in work is likely to be the thing that, over decades, teaches you what it cannot do. Experiences that expand your perspective may be the ones where control fails and something better happens anyway: a loss that opens a door, a plan that collapses into a life you like more.",
+        "The developmental direction the chart points toward is collaboration. Your familiar pattern favours the self-reliant lead, the one who does it themselves and does it well. Growth, as this chart describes it, may lie in the other direction, toward partnership, toward groups, toward letting other people's ideas change the outcome. This is a direction, not a destiny. You are not being told to stop leading, only to notice how much more reaches you when you do not have to.",
+        "Knowledge, for you, tends to be practical before it is philosophical. You may collect ideas the way other people collect tools, for what they can do, and be quietly suspicious of any belief that cannot be used. Over time the chart suggests the reverse also becomes true: the things you have done well may start to teach you what you actually believe, and a philosophy assembled from experience tends to hold better than one adopted whole.",
+        "You are likely to influence others through standards and example rather than persuasion. People watch how you work and how you handle pressure and quietly raise their own bar. The legacy this suggests is less a monument than a method: a way of doing things properly that outlasts you in the people who learned it beside you.",
+        "What you may be learning to cultivate is trust in process, and specifically in processes you do not personally control. The chart gives you every tool for the solo effort. The contribution it points toward is the one that only becomes possible when your competence makes room for other people's, and when being right matters a little less to you than being in it together."
+      ]
+    },
+    {
+      id: "challenges-resilience",
+      number: 5,
+      title: "Challenges & Resilience",
+      sourceFactors: [
+        "Sun conjunct Saturn, both square Moon Aries",
+        "Mars Virgo 2nd square Venus Sagittarius 5th",
+        "Pluto Scorpio 4th near the IC, square Ascendant and Descendant",
+        "Jupiter 12th opposing the Sun and Saturn conjunction",
+        "6th house stellium; 8th ruler Jupiter in the 12th",
+        "Supports: Mars trine Sun and Saturn; Venus trine Moon"
+      ],
+      body: [
+        "The recurring pressure in your chart is the argument between what you feel and what you allow yourself to do about it. The emotional nature is fast and combative; the identity is disciplined and self-critical; the two sit at odds. In practice this may show up as a habit of suppressing your first reaction, then resenting the suppression, then acting on the resentment sideways, in irritability, in overwork, in a sharpness that surprises you.",
+        "A second pattern lives at the foundation of the chart, in the area of home and origins. Something there may run deep and intense, a family atmosphere or an early experience of power and secrecy that taught you to keep your own counsel. You may guard your private life with unusual force and find it hard to let anyone see the room where you actually live. This is not a flaw. It is a defence that once made sense and may now cost more than it protects.",
+        "Frustration tends to gather around control. When plans are disrupted, when someone else's carelessness undoes your careful work, when a situation asks you to wait without a timeline, the strain is likely to be disproportionate. You may experience delay as a personal insult and respond by tightening your grip, which tends to make the delay feel longer.",
+        "Your strengths are the kind that become excessive under pressure. Discipline hardens into rigidity, high standards into contempt, self-reliance into isolation, candour into cruelty. The chart is not suggesting you are cruel; it is suggesting that the same gifts, under enough load, have those shadows, and that knowing which one you reach for first is worth more than any resolution to be better.",
+        "Coping, for you, is likely to be active. When things go wrong you do something, you clean, you plan, you work later, you fix a thing that was not the thing. That instinct is sound as far as it goes. The part that may need attention is the feeling underneath the fixing, which tends to wait patiently until you stop moving and then arrive all at once.",
+        "Resilience in this chart is real and specific. There is a steady, practical strength that can outlast almost anything, a capacity to keep functioning when others fold, and a physical vitality that responds well to being used. Movement, exercise and tangible tasks are likely to regulate you better than talk. So is honest company, people who tend to tell you the truth without dressing it and who do not need you to be fine.",
+        "The constructive move the chart points toward is letting the heat out earlier. Saying the small true thing before it becomes the large resentful one. Asking for the reassurance before the argument. Letting someone see the private room while it is still tidy. None of this comes naturally to a chart built for control, which may be exactly why it helps."
+      ]
+    },
+    {
+      id: "essential-takeaway",
+      number: 6,
+      title: "Your Essential Takeaway",
+      sourceFactors: [
+        "Synthesis only. Repeating patterns: warmth over exacting standards; fast feeling against disciplined action; self-reliance against a growth direction of partnership"
+      ],
+      body: [
+        "Three patterns run through every part of this reading. The first is a warm, visible outer self carried by a cool, exacting inner one. The second is feeling that moves faster than you let it, and the friction that builds when it waits. The third is a chart built for self-reliance whose growth, again and again, points toward other people.",
+        "The central tension is between control and contact. Your gifts sit on the control side: discipline, standards, competence, the ability to hold things together and make them last. The potential the chart describes sits on the contact side: being met, being helped, being changed by someone else's way of doing things. Neither side is wrong. You have simply spent longer on one of them.",
+        "Your strengths are likely to include loyalty, craft, courage in the moment, and a presence people trust before they can say why. Your growth areas are likely to include letting the first feeling be spoken, letting a task be done imperfectly by someone else, and letting the private self be seen before it is perfect. None of these are verdicts. They describe where the chart's energy pools and where it may be asking to move.",
+        "If there is one thing to carry from this, it is that your standards may not be the problem they sometimes feel like. Turned inward alone they become a cage; turned toward the world and shared, they become the thing people are grateful to have stood beside. The work is not to lower them. It is to stop being the only one allowed inside them."
+      ]
+    }
+  ]
+};
+
+function readingFromContract(obj) {
+  if (!obj || typeof obj !== "object") return null;
+  if (Array.isArray(obj.sections)) {
+    const map = {};
+    obj.sections.forEach(sec => { if (sec && sec.id && Array.isArray(sec.body)) map[sec.id] = sec.body; });
+    return map;
+  }
+  return obj;
+}
+const params = new URLSearchParams(location.search);
+function isCustomerReading(obj) { return !!obj && typeof obj === "object" && obj.fixture !== true && obj.sample !== true; }
+
+/* T3.8 identity (Sep 21): the current chart run (runId + birth fingerprint) from the
+   shared pairing library. Everything personal on this page derives from it. */
+function currentRun() { try { return (window.COZ_ASC && COZ_ASC.currentRun) ? COZ_ASC.currentRun() : null; } catch (e) { return null; } }
+function nonEmpty(x) { return typeof x === "string" && x.trim().length > 0; }
+function runMatches(rec, run) {
+  return !!(rec && rec.run && run && nonEmpty(rec.run.runId) && nonEmpty(rec.run.fingerprint) &&
+            rec.run.runId === run.runId && rec.run.fingerprint === run.fingerprint);
+}
+/* A reading must carry the identity of the run it was written for. Readings without
+   identity metadata are reported as unverified, never shown as this person's. */
+function verifiedReading(obj, run) {
+  if (!isCustomerReading(obj)) return null;
+  if (!obj.run) { try { console.log("[TROPICAL READING] stored reading has no run identity; treated as unavailable"); } catch (e) {} return null; }
+  return runMatches(obj, run) ? obj : null;
+}
+const PREVIEW_SAMPLE = params.get("preview") === "sample";   /* explicit, labeled development preview only */
+/* a reading is complete only when every section has at least one non-empty paragraph */
+function completeReading(map) {
+  if (!map || typeof map !== "object") return false;
+  return vedicReadingSections.every(sec => Array.isArray(map[sec.id]) && map[sec.id].length > 0 &&
+    map[sec.id].every(p => typeof p === "string" && p.trim().length > 0));
+}
+/* returns { map, source } with source "personal" or "sample", or null when nothing valid is available */
+function loadReading() {
+  const run = currentRun();
+  const live = verifiedReading(window.COZ_TROPICAL_READING, run);
+  if (live) { const m = readingFromContract(live); if (completeReading(m)) return { map: m, source: "personal" }; try { console.log("[TROPICAL READING] verified reading is incomplete; treated as unavailable"); } catch (e) {} }
+  try {
+    const stored = JSON.parse(localStorage.getItem("cozTropicalReading") || "null");
+    const ok = verifiedReading(stored, run);
+    if (ok) { const m = readingFromContract(ok); if (completeReading(m)) return { map: m, source: "personal" }; try { console.log("[TROPICAL READING] stored reading is incomplete; treated as unavailable"); } catch (e) {} }
+  } catch (e) {}
+  if (PREVIEW_SAMPLE) return { map: readingFromContract(COZ_TROPICAL_SAMPLE_READING), source: "sample" };   /* labeled in renderSection */
+  return null;                                                                                               /* normal use: unavailable, never the sample */
+}
+const READING_UNAVAILABLE = "Your personalized Tropical reading is not available yet. It will appear here once it has been prepared for your chart.";
+/* T4.5 Stage 2A: until the complete reading is stored, sections come from the Tropical server job
+   for this run (coz-tropical-server.js): passed sections show their text, the others show the
+   approved status line. No server job for this run = the unavailable line, as before. */
+function serverParagraphs(id) {
+  const v = (window.CozTropicalServer && CozTropicalServer.sectionView) ? CozTropicalServer.sectionView(id) : null;
+  return v ? v.paragraphs : [READING_UNAVAILABLE];
+}
+function serverSignature(id) {
+  const v = (window.CozTropicalServer && CozTropicalServer.sectionView) ? CozTropicalServer.sectionView(id) : null;
+  return (loadReading() ? "final" : (v ? v.state : "none"));
+}
+const SAMPLE_LABEL = "Sample reading for demonstration only. This is not your chart.";
+
+/* ============================================================
+   NAVIGATION TARGETS
+   The dashboard lives in THIS document at #/dashboard, so going
+   back never leaves the page.
+   ============================================================ */
+const DASHBOARD_HREF = "#/dashboard";
+
+function goDashboard() {
+  if (idFromHash() === "dashboard") showFromHash(); else location.hash = DASHBOARD_HREF;
+}
+
+function finishReading() {
+  try { localStorage.setItem("cozTropicalReadingComplete", new Date().toISOString()); } catch (e) {}
+  try { window.dispatchEvent(new CustomEvent("COZ_TROPICAL_READING_COMPLETE")); } catch (e) {}
+  goDashboard();
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+const STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg>';
+const ARROW_L = '<svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 7H2M7 2 2 7l5 5"/></svg>';
+const ARROW_R = '<svg viewBox="0 0 22 14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 7h19M15 2l5 5-5 5"/></svg>';
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function sectionById(id) { return vedicReadingSections.find(s => s.id === id) || vedicReadingSections[0]; }
+
+function renderSection(section) {
+  const loaded = loadReading();
+  const paragraphs = loaded ? loaded.map[section.id] : serverParagraphs(section.id);
+  const sampleLabel = (loaded && loaded.source === "sample") ? `<p class="dev-label">${esc(SAMPLE_LABEL)}</p>` : "";
+  const sectionCounter = `${String(section.number).padStart(2, "0")} OF ${SECTION_TOTAL}`;
+  const titleClass = section.title.length > 22 ? "vedic-title vedic-title--long" : "vedic-title";
+  const next = section.nextLabel ? vedicReadingSections[section.number] : null;
+
+  const nextControl = next
+    ? `<a class="vedic-nav-next" href="#/${next.id}" data-next="${next.id}">Next: ${esc(section.nextLabel)} ${ARROW_R}</a>`
+    : `<button class="vedic-nav-next" type="button" id="vedicFinish">Finish Reading ${ARROW_R}</button>`;
+
+  const html = `
+    <header class="vedic-header">
+      <img class="vedic-logo" src="/Demo/vedic-logo.png" alt="CozAlyze" width="1000" height="1055">
+      <p class="vedic-eyebrow">Your Tropical Reading</p>
+      <p class="vedic-counter">${sectionCounter}</p>
+    </header>
+    <div class="vedic-divider" aria-hidden="true">${STAR_SVG}</div>
+    <h1 class="${titleClass}">${esc(section.title)}</h1>
+    <div class="vedic-divider" aria-hidden="true">${STAR_SVG}</div>
+    <section class="vedic-body">
+      ${sampleLabel}${paragraphs.map(p => `<p>${esc(p)}</p>`).join("")}
+    </section>
+    <nav class="vedic-nav" aria-label="Reading navigation">
+      <div class="vedic-nav-rule" aria-hidden="true">${STAR_SVG}</div>
+      <div class="vedic-nav-links">
+        <a href="#/dashboard" id="vedicNavBack">${ARROW_L} Back to Your Reading</a>
+        ${nextControl}
+      </div>
+    </nav>`;
+
+  const old = document.getElementById("vedicContent");
+  const fresh = old.cloneNode(false);      // fresh node so the fade re-runs on every section
+  fresh.innerHTML = html;
+  old.replaceWith(fresh);
+
+  document.title = `${section.title} · Your Tropical Reading · CozAlyze`;
+
+  const finish = document.getElementById("vedicFinish");
+  if (finish) finish.addEventListener("click", finishReading);
+}
+
+/* ============================================================
+   HISTORY / ROUTING  (#/<section id>)
+   ============================================================ */
+function idFromHash() {
+  const m = location.hash.match(/^#\/?([a-z0-9-]+)/i);
+  return m ? m[1] : null;
+}
+
+function showDashboard() {
+  document.body.dataset.view = "dashboard";
+  document.title = "Your Tropical Reading · CozAlyze";
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+function showFromHash() {
+  const id = idFromHash();
+  if (window.COZ_ASQ && id !== "ascendant") window.COZ_ASQ.exit();     /* leaving the ascendant route: full cleanup */
+  if (!id || id === "dashboard") {
+    if (id !== "dashboard") history.replaceState({ id: "dashboard" }, "", "#/dashboard");
+    showDashboard();
+    return;
+  }
+  if (id === "ascendant") {
+    if (window.COZ_ASQ) window.COZ_ASQ.enter(); else window.__asqPending = true;   /* module defined below */
+    return;
+  }
+  const section = sectionById(id);
+  if (id !== section.id) {
+    history.replaceState({ id: section.id }, "", `#/${section.id}`);
+  }
+  document.body.dataset.view = "reading";
+  renderSection(section);
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+
+document.getElementById("vedicBack").addEventListener("click", goDashboard);
+
+/* ============================================================
+   DASHBOARD
+   ============================================================ */
+const SIGNS = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const SAMPLE_SIGN_IN_ART = "Leo";   // baked into tropical-dash.jpg and the clip's first frames
+const RING_ICON = sign => `/Demo/ring-${sign.toLowerCase()}.png`;   // his 12 ring icons, in this repo
+
+function verifiedChart() {
+  let rec = null; try { rec = JSON.parse(localStorage.getItem("cozTropicalChartJSON") || "null"); } catch (e) {}
+  return runMatches(rec, currentRun()) ? rec : null;
+}
+function resolveAscendant() {
+  const pick = v => { if (!v) return null; v = String(v).trim(); v = v.charAt(0).toUpperCase() + v.slice(1).toLowerCase(); return SIGNS.includes(v) ? v : null; };
+  /* T3.8: the Tropical Ascendant comes from the current run's verified chart record.
+     The URL / stored sign is accepted only when it agrees with that record. With no
+     verified record the sign is unknown (null): never Leo, never a stale sign. */
+  const run = currentRun();
+  let rec = null; try { rec = JSON.parse(localStorage.getItem("cozTropicalChartJSON") || "null"); } catch (e) {}
+  if (!runMatches(rec, run) || !rec.angles || !rec.angles.ascendant) return null;
+  const verified = pick(rec.angles.ascendant.sign);
+  if (!verified) return null;
+  const hinted = pick(params.get("asc")) || pick(window.EMERGE_ASCENDANT_TROPICAL);
+  if (hinted && hinted !== verified) { try { console.log("[TROPICAL READING] ascendant hint " + hinted + " ignored; verified chart says " + verified); } catch (e) {} }
+  return verified;
+}
+
+function paintAscendant(stage, sign) {
+  const live = !!sign && sign !== SAMPLE_SIGN_IN_ART;
+  stage.dataset.ascLive = (sign && sign !== SAMPLE_SIGN_IN_ART) ? "1" : (sign ? "0" : "1");   /* unknown: hide the baked Leo, show nothing */
+  stage.querySelector(".asc-glyph").innerHTML = live ? `<img src="${RING_ICON(sign)}" alt="">` : "";
+  stage.querySelector(".asc-label").textContent = sign || "";
+}
+
+/* Entrance: the whole art is shown first, then it eases in slightly so the type reads larger.
+   Once per page load; the reveal's stage shares the variable so the clip matches. */
+function dashZoomIn() {
+  const target = getComputedStyle(document.documentElement).getPropertyValue("--dash-zoom-in").trim() || "1.12";
+  const go = () => document.documentElement.style.setProperty("--dash-zoom", target);
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { go(); return; }
+  const art = document.querySelector("#dashStage .stage-art");
+  const start = () => setTimeout(go, 1900);   /* Sep 1: the frame fades in first, so the whole art is seen before the ease-in */
+  if (art.complete) start(); else art.addEventListener("load", start, { once: true });
+}
+dashZoomIn();
+
+const ASC_SIGN = resolveAscendant();
+/* Chart recovery (Sep 22): if no chart record matches the current run (older record,
+   a fresh run, "Go to my chart"), ask the pairing library to calculate the missing side
+   with the real engine for the CURRENT birth data, then reload this page once so every
+   identity-checked part starts from the recovered record. Never a stale record. */
+(function recoverChart(){
+  if (ASC_SIGN) return;
+  const run = currentRun(); if (!run || !window.COZ_ASC || !COZ_ASC.ensurePair) return;
+  const key = "cozChartRecovery:" + run.runId;
+  try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, "1"); } catch (e) { return; }   /* once per run, no loops */
+  COZ_ASC.ensurePair().then(res => {
+    if (res && res.ok && verifiedChart()) { try { console.log("[READING] chart record recovered for the current run; reloading"); } catch (e) {} location.reload(); }
+    else { try { console.log("[READING] chart recovery not possible:", res && res.reason); } catch (e) {} }
+  }).catch(() => {});
+})();
+paintAscendant(document.getElementById("dashStage"), ASC_SIGN);
+paintAscendant(document.getElementById("revealStage"), ASC_SIGN);
+document.querySelector('[data-dash="ascendant"]').setAttribute("aria-label", ASC_SIGN ? `Your Ascendant, ${ASC_SIGN}` : "Your Ascendant");
+
+/* Reading readiness. A writer may set window.COZ_TROPICAL_READING_STATUS = "preparing"
+   to hold the reading door closed; anything else counts as ready. T4.5 Stage 2A: the
+   Tropical server adapter (coz-tropical-server.js) deliberately never sets it, so the
+   door stays open while the server writes and each section shows its own state (text,
+   still being written, or could not be completed). The reading is never regenerated
+   here, this page only reads what the server stored. */
+function readingReady() { return window.COZ_TROPICAL_READING_STATUS !== "preparing"; }
+function syncReadyState() {
+  const ready = readingReady();
+  const b = document.getElementById("hotReading");
+  b.disabled = !ready;
+  b.setAttribute("aria-label", ready ? "Your Tropical Reading" : "Preparing Your Reading…");
+  document.getElementById("dash").classList.toggle("dash-preparing", !ready);
+}
+syncReadyState();
+window.addEventListener("COZ_TROPICAL_READING_STATUS", syncReadyState);
+
+/* Other dashboard doors: not built yet. Each fires an event and follows a
+   data-href if one is set later, nothing else. Entitlement check hook for the
+   payment system goes here too, once one exists (never a URL parameter). */
+document.querySelectorAll(".hot[data-dash]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.dash;
+    try { window.dispatchEvent(new CustomEvent("COZ_TDASH_" + id.toUpperCase().replace(/-/g, "_"), { detail: { ascendant: ASC_SIGN } })); } catch (e) {}
+    if (btn.dataset.href) location.href = btn.dataset.href;
+  });
+});
+
+/* ============================================================
+   REVEAL  (tap → lock → play once → curtain → Page 01)
+   ============================================================ */
+const revealEl = document.getElementById("reveal");
+const revealVideo = document.getElementById("revealVideo");
+let revealActive = false, revealDone = false, revealTimers = [];
+/* warm the clip while the dashboard is up so the turn can start the moment it is tapped */
+try { revealVideo.load(); } catch (e) {}
+
+function lockScroll(on) { document.body.classList.toggle("scroll-locked", on); }
+
+function startReveal() {
+  if (revealActive || !readingReady()) return;
+  revealActive = true; revealDone = false;
+  document.getElementById("hotReading").disabled = true;
+  lockScroll(true);
+  try { window.dispatchEvent(new CustomEvent("COZ_TROPICAL_REVEAL_START", { detail: { ascendant: ASC_SIGN } })); } catch (e) {}
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduced) { finishReveal(true); return; }
+
+  revealEl.classList.remove("is-closing", "asc-off");
+  revealEl.classList.add("is-on");
+  document.getElementById("revealLive").textContent = "Opening your Tropical reading";
+
+  // if the clip cannot even start (no network, blocked), move on rather than trap anyone
+  revealTimers.push(setTimeout(() => { if (!revealStarted) finishReveal(false); }, 7000));
+
+  revealStarted = false;
+  try { revealVideo.currentTime = 0; } catch (e) {}
+  const p = revealVideo.play();
+  if (p && p.catch) p.catch(() => finishReveal(false));
+}
+
+/* timers that depend on the clip actually running start only once it is playing */
+let revealStarted = false;
+revealVideo.addEventListener("playing", () => {
+  if (revealStarted || !revealActive) return;
+  revealStarted = true;
+  // the live ascendant overlay stays while the buttons are still on screen, then lets go before the burst
+  revealTimers.push(setTimeout(() => revealEl.classList.add("asc-off"), 1450));
+  /* Sep 1 ruling: ONE motion. The drive into the sun begins while the burst is still
+     blooming, the light takes the screen while the stage is still growing, the page
+     lands under the light and the light clears. No hold anywhere. */
+  revealTimers.push(setTimeout(() => revealEl.classList.add("is-through"), 1500));
+  /* Sep 20: the reveal, the drive through the sun, the light and the space flight are now ONE clip
+     (tropical-reading-reveal-full.mp4). The page just plays it and lands when it ends. */
+  // hard cap a little past the clip's 2.5s so a stalled clip never traps anyone
+  revealTimers.push(setTimeout(() => finishReveal(false), 47000));   /* stall guard only: the clip runs 44.5s */
+  /* stall watchdog (Sep 21): if the clip stops advancing for 4s (buffering on
+     cellular), land on the reading instead of holding a black screen */
+  let lastT = -1, stuckSince = Date.now();
+  revealTimers.push(setInterval(() => {
+    if (!revealActive || revealDone) return;
+    const t = revealVideo.currentTime;
+    if (t !== lastT) { lastT = t; stuckSince = Date.now(); return; }
+    if (Date.now() - stuckSince > 4000) finishReveal(false);
+  }, 500));
+});
+
+function finishReveal(immediate) {
+  if (!revealActive || revealDone) return;   // ignore clip events while the reveal is not running
+  revealDone = true;
+  revealTimers.forEach(clearTimeout); revealTimers.forEach(clearInterval); revealTimers = [];
+  const land = () => {
+    location.hash = "#/at-your-core";          // its own history entry; renders via hashchange
+    revealEl.classList.remove("is-on", "is-closing", "asc-off", "is-through");   /* full reset so a second tap starts clean */
+    try { revealVideo.pause(); } catch (e) {}
+    lockScroll(false);
+    revealActive = false;
+    syncReadyState();
+  };
+  if (immediate === true) { land(); return; }
+  /* Sep 1 ruling: through the sun. Hold on the burst, then the camera drives into it, the light
+     fills the screen, the page lands underneath and the light clears to reveal the reading. */
+  if (immediate === "through"){
+    try { window.__cozLightIn(); } catch (e) {}
+    land();
+    revealEl.classList.remove("is-through");
+    setTimeout(() => { try { window.__cozLightOut(); } catch (e) {} }, 350);
+    return;
+  }
+  /* stall or error before the drive began: plain curtain */
+  revealEl.classList.add("is-closing");
+  setTimeout(land, 900);
+}
+
+function cancelReveal() {
+  if (!revealActive || revealDone) return;
+  revealDone = true;
+  revealTimers.forEach(clearTimeout); revealTimers.forEach(clearInterval); revealTimers = [];
+  try { revealVideo.pause(); revealVideo.currentTime = 0; } catch (e) {}
+  revealEl.classList.remove("is-on", "is-closing", "is-through", "asc-off");
+  lockScroll(false);
+  revealActive = false;
+  syncReadyState();
+}
+
+document.getElementById("hotReading").addEventListener("click", startReveal);
+document.getElementById("revealBack").addEventListener("click", cancelReveal);
+revealVideo.addEventListener("ended", () => finishReveal(true));   /* the clip ends on open space, the reading is already underneath */
+revealVideo.addEventListener("error", () => finishReveal(false));
+
+/* Section links are plain hash links: every section is its own history entry,
+   so the phone's back gesture steps through them, and back past Page 01 lands on the dashboard. */
+window.addEventListener("hashchange", showFromHash);
+/* T4.5 Stage 2A: redraw the open section only when its server state changes (text arrived,
+   finished or could not be completed); the dashboard and other views are never touched */
+let serverShown = null;
+window.addEventListener("COZ_TROPICAL_SERVER_UPDATE", () => {
+  if (document.body.dataset.view !== "reading") return;
+  const id = idFromHash(); if (!id || id === "dashboard" || id === "ascendant") return;
+  const section = sectionById(id), sig = section.id + ":" + serverSignature(section.id);
+  if (sig !== serverShown) { serverShown = sig; renderSection(section); }
+});
+showFromHash();
+
+/* ============================================================
+   ASCENDANT EMERGENCE (V2.5 sequence carried into this page).
+   Sign: this page's ASC_SIGN. Sound: the living frame's bed keeps playing
+   (never doubled, never cut); no cue of its own on this door.
+   ============================================================ */
+(function(){
+const SHARED = {
+  sidereal: [
+    "In Sidereal Vedic astrology, the Ascendant\u2014or Lagna\u2014is the starting point of your entire birth chart. It establishes the twelve houses and determines which planet becomes the ruler of your chart.",
+    "Rather than simply describing how you appear or express your personality, the Lagna reveals the orientation of your life: the path through which your experiences unfold, the qualities life continually asks you to develop, and the direction through which your Dharma takes form.",
+    "Your Lagna is the ground from which the rest of your chart is read."
+  ]
+};
+
+const SIGNS = {
+  aries: {
+    title: "ARIES RISING", loop: false, ruler: "Mars",
+    essence: [
+      "With Aries Rising, Mars becomes the ruler of your chart.",
+      "Your inner world is quick, hot, and direct. You feel the urge to act before you feel almost anything else, when something matters, you move. Waiting is the hardest thing life asks of you. There is a fire at your center that wants a challenge, a direction, something worth pushing against, and when it has none it turns restless, impatient, sometimes angry.",
+      "What guides you is instinct. Not planning, not permission, a gut signal that says now, go, begin. Your compass points toward the next threshold, and your life keeps asking one thing of you: choose your battles. Move with purpose, not just heat."
+    ],
+    dharma: [
+      "Your Dharma is to learn what is worth your fight.",
+      "With Mars ruling your chart, energy is your engine, and it needs direction more than it needs fuel. Life will keep putting you at the front, first to act, first to decide, first through the door, and testing whether you can lead without running over people, including yourself.",
+      "The lesson of Aries Lagna is simple: your fire is a gift. Aim it. Courage with direction builds things. Courage without it just burns."
+    ]
+  },
+  taurus: {
+    title: "TAURUS RISING", loop: false, ruler: "Venus",
+    essence: [
+      "With Taurus Rising, Venus becomes the ruler of your chart.",
+      "Your inner world is calm, steady, and rooted in what is real. You trust what you can touch, taste, build, and keep. Beauty matters to you, comfort matters, loyalty matters, and once something or someone is yours, you hold on. That steadiness is your strength, and also your trap, because you can keep holding long after it's time to let go.",
+      "What guides you is a quiet sense of worth. Not trends, not noise, a feel for what will still matter in ten years. Your compass points toward the solid and the lasting, and your life keeps asking one thing of you: know the difference between what grounds you and what just keeps you standing still."
+    ],
+    dharma: [
+      "Your Dharma is to build what deserves to last.",
+      "With Venus ruling your chart, you are here to create value, in your home, your work, your relationships, your own peace. Life moves slowly for you on purpose. It gives you time to build things properly, and it tests whether you can release what you've outgrown.",
+      "The lesson of Taurus Lagna is simple: security doesn't come from holding on. It comes from being someone things can grow around. Steady, patient, real."
+    ]
+  },
+  gemini: {
+    title: "GEMINI RISING", loop: false, ruler: "Mercury",
+    essence: [
+      "With Gemini Rising, Mercury becomes the ruler of your chart.",
+      "Your inner world is fast, bright, and full of voices. Questions, ideas, connections, your mind never really closes. You learn by talking, you think by moving, and you can see both sides of almost anything, which is a gift that sometimes leaves you unable to pick one. Boredom is your real enemy, scattered is your real risk.",
+      "What guides you is curiosity. Not certainty, the pull of what you don't know yet. Your compass points toward the next question, and your life keeps asking one thing of you: go deep, not just wide. Finish some of what you start."
+    ],
+    dharma: [
+      "Your Dharma is to turn what you learn into something people can use.",
+      "With Mercury ruling your chart, words and understanding are your tools. Life will keep placing you between, between people, between ideas, between sides that can't hear each other, and asking you to carry the message truly.",
+      "The lesson of Gemini Lagna is simple: a quick mind entertains. A focused one changes things. Choose what deserves your attention, and give it all of it."
+    ]
+  },
+  cancer: {
+    title: "CANCER RISING", loop: false, ruler: "Moon",
+    essence: [
+      "With Cancer Rising, the Moon becomes the ruler of your chart.",
+      "Your inner world moves like water, in tides. Feelings come in waves, memories stay alive in you, and you sense what people need before they say it. Home is not just a place for you, it's a need, somewhere, someone, something that feels safe. When life gets loud you pull inward, into your shell, and sometimes you stay there too long.",
+      "What guides you is feeling. Not analysis, a deep read of what is safe, what is true, who needs care. Your compass points toward protection, of your people, your history, your inner life, and your life keeps asking one thing of you: come out of the shell. Care without hiding."
+    ],
+    dharma: [
+      "Your Dharma is to make safety, for others and for yourself.",
+      "With the Moon ruling your chart, your emotions are not a weakness to manage, they are how you know things. Life will keep handing you someone or something to hold, a family, a home, a person in pain, and asking you to hold steady without drowning in it.",
+      "The lesson of Cancer Lagna is simple: the care you give others has to include you. A settled heart shelters everyone near it. Build yours first."
+    ]
+  },
+  leo: {
+    title: "LEO RISING", loop: false, ruler: "Sun",
+    essence: [
+      "With Leo Rising, the Sun becomes the ruler of your chart.",
+      "Your inner world has a center, and you feel it. A warmth, a pride, a sense that your life is supposed to mean something. You want to matter, not just to be seen, to stand for something that's genuinely yours. When that center is strong you light up a room without trying. When it's shaky, you reach for applause, and applause never quite fills it.",
+      "What guides you is heart. Not strategy, conviction, the feeling of being fully behind what you do. Your compass points toward what you can stand behind, and your life keeps asking one thing of you: lead from the heart, not for the audience."
+    ],
+    dharma: [
+      "Your Dharma is to find out what your light is for.",
+      "With the Sun ruling your chart, identity is your work, knowing who you are, standing behind it, and carrying it with dignity. Life will keep putting you where people look to you, to lead, to create, to decide, and testing whether you need their approval or your own.",
+      "The lesson of Leo Lagna is simple: real confidence doesn't come from being admired. It comes from knowing yourself and using what you've got for something bigger than being noticed."
+    ]
+  },
+  virgo: {
+    title: "VIRGO RISING", loop: false, ruler: "Mercury",
+    essence: [
+      "With Virgo Rising, Mercury becomes the ruler of your chart.",
+      "Your inner world is precise, watchful, and quietly devoted. You notice everything, what's off, what's missing, what could be better, and you can't fully rest until it's right. That same eye turns on you hardest of all. You worry, you refine, you hold yourself to a standard nobody set but you.",
+      "What guides you is the urge to make things right. Not attention, not credit, the quiet satisfaction of something done properly, something healed, something working. Your compass points toward what needs fixing, and your life keeps asking one thing of you: be as kind to yourself as you are useful to everyone else."
+    ],
+    dharma: [
+      "Your Dharma is to serve where your skill actually helps.",
+      "With Mercury ruling your chart, your mind is a fine instrument, made for craft, detail, and care. Life will keep handing you what's broken, messy, or unwell and asking you to set it right, without burning yourself out on what was never yours to fix.",
+      "The lesson of Virgo Lagna is simple: perfect isn't the goal, useful is. Done with love, small faithful work is one of the most powerful things a person can offer."
+    ]
+  },
+  libra: {
+    title: "LIBRA RISING", loop: true, ruler: "Venus",
+    essence: [
+      "With Libra Rising, Venus becomes the ruler of your chart.",
+      "Your inner world is tuned to other people. You feel imbalance the way others feel temperature, tension in a room, unfairness in a decision, the moment a relationship tips. You want peace, beauty, and things to be right between people, and you'll often trade away your own side to get it. That's the cost you know too well.",
+      "What guides you is balance. Not winning, a sense of what's fair, what's harmonious, what both sides need. Your compass points toward the meeting place, and your life keeps asking one thing of you: stay in the middle without losing yourself there."
+    ],
+    dharma: [
+      "Your Dharma is to make real peace, not just quiet.",
+      "With Venus ruling your chart, relationship is where your life happens, partnership, cooperation, the constant meeting of you and another. Life will keep placing you between people and asking you to be fair, even when fair costs you something.",
+      "The lesson of Libra Lagna is simple: peace that erases you isn't peace. Find your own center first, then the balance you create everywhere else actually holds."
+    ]
+  },
+  scorpio: {
+    title: "SCORPIO RISING", loop: false, ruler: "Mars",
+    essence: [
+      "With Scorpio Rising, Mars becomes the ruler of your chart.",
+      "Your inner world is deep, private, and intense. You feel things all the way down, and you show almost none of it. You read people beneath their words, you sense what's hidden, and you don't trust easily, because you know how much is at stake when you do. Half measures aren't in you. It's everything or nothing.",
+      "What guides you is truth, the real kind, under the surface. Your compass points into the deep end, and your life keeps asking one thing of you: let go. Of control, of old wounds, of what has already died. What you release is what sets you free."
+    ],
+    dharma: [
+      "Your Dharma is to transform, not just survive.",
+      "With Mars ruling your chart, your strength runs inward, courage for the things most people avoid, endings, crisis, the truth about yourself. Life will keep bringing you to points where something has to be released so something truer can live.",
+      "The lesson of Scorpio Lagna is simple: whatever you face honestly loses its power over you. Every time you rise from an ending, you come back stronger and cleaner than before."
+    ]
+  },
+  sagittarius: {
+    title: "SAGITTARIUS RISING", loop: false, ruler: "Jupiter",
+    essence: [
+      "With Sagittarius Rising, Jupiter becomes the ruler of your chart.",
+      "Your inner world is wide open and pointed at the horizon. You need meaning the way others need comfort, a reason, a direction, a bigger picture. You believe, in life, in better, in more, and that faith keeps you moving through things that would stop other people. Sitting still too long, in a place, a job, an idea, makes something in you start to pace.",
+      "What guides you is truth as you've lived it. Not borrowed answers, what you've tested and found real. Your compass points toward meaning, and your life keeps asking one thing of you: don't just chase the horizon. Bring something back."
+    ],
+    dharma: [
+      "Your Dharma is to live what you believe, out loud and in practice.",
+      "With Jupiter ruling your chart, you grow by seeking, and eventually by guiding. Life will keep raising the questions, what's true, what's right, what's it all for, and watching whether your answers show up in how you actually live.",
+      "The lesson of Sagittarius Lagna is simple: wisdom isn't what you've read or where you've been. It's what you do with it. A life that matches its beliefs teaches more than words ever will."
+    ]
+  },
+  capricorn: {
+    title: "CAPRICORN RISING", loop: false, ruler: "Saturn",
+    essence: [
+      "With Capricorn Rising, Saturn becomes the ruler of your chart.",
+      "Your inner world is serious, sturdy, and older than your years. You've likely carried responsibility since early on, and part of you is always measuring, the cost, the long game, what it will take. You don't need things to be easy, you need them to be worth it. The risk is that you get so good at carrying weight you forget you're allowed to put it down.",
+      "What guides you is duty, to your word, your work, the people counting on you. Your compass points up the mountain, and your life keeps asking one thing of you: climb without turning to stone. Let it cost effort, not your softness."
+    ],
+    dharma: [
+      "Your Dharma is to build things that outlast you.",
+      "With Saturn ruling your chart, time is your teacher and your tool. Life will keep giving you the long road, real responsibility, slow rewards, tests of patience, and shaping you into someone others can lean on.",
+      "The lesson of Capricorn Lagna is simple: what you build slowly and honestly is yours forever. Time isn't working against you. It's the whole point of your strength."
+    ]
+  },
+  aquarius: {
+    title: "AQUARIUS RISING", loop: true, ruler: "Saturn",
+    essence: [
+      "With Aquarius Rising, Saturn becomes the ruler of your chart.",
+      "Your inner world is cool, clear, and apart. You watch. Part of you stands slightly outside your own life, noticing patterns other people miss. You have felt different for as long as you can remember, and over time that difference has become your clarity: you see how things could work better, and you can't unsee it.",
+      "What guides you is truth, not approval. Your compass points ahead of your own time, and your life keeps asking one thing of you: stay connected. Be different without being alone."
+    ],
+    dharma: [
+      "Your Dharma is to build the better way you can see, not just imagine it.",
+      "With Saturn ruling your chart, your ideas are meant to be worked for. Life gives you the long road, slow progress, resistance, years between the vision and the result, and tests whether you can stay committed anyway.",
+      "The lesson of Aquarius Lagna is simple: your distance is not coldness, it is perspective. Add patience and warmth, and what sets you apart becomes exactly what makes you useful to everyone else."
+    ]
+  },
+  pisces: {
+    title: "PISCES RISING", loop: true, ruler: "Jupiter",
+    essence: [
+      "With Pisces Rising, Jupiter becomes the ruler of your chart.",
+      "Your inner world is soft, deep, and porous. Everything enters, other people's feelings, the mood of a room, things you can't explain but simply know. Your imagination is not a pastime, it's where you live. Dreams, images, music, and meaning move through you constantly, and underneath it all runs a quiet faith that life is more than what you can see.",
+      "What guides you is intuition. Not logic, not ambition, a felt sense of what is true and what is right. Your compass points toward the deep and the meaningful, and your life keeps asking one thing of you: stay open without getting lost."
+    ],
+    dharma: [
+      "Your Dharma is to bring what you imagine into real life.",
+      "With Jupiter ruling your chart, you are guided by faith and a strong inner sense of right and wrong. Life will keep placing you where someone needs compassion, and asking you to give it without losing yourself.",
+      "The lesson of Pisces Lagna is simple: your sensitivity is a gift, not a flaw. Ground it, and everything that moves through you, imagination, intuition, care, becomes something real that others can feel."
+    ]
+  }
+};
+
+/* ---------- TROPICAL RISING SIGN, DEVELOPMENT-ONLY (Sep 21 2026) ----------
+   Western astrology using the tropical zodiac. Three layers:
+     1. How You Meet the World: short fixed baseline per Rising Sign (this bank)
+     2. Your Chart Ruler: generated from the person's cozTropicalChartJSON
+        (ruler's sign, house, major aspects, bodies conjunct the Ascendant)
+     3. What to Notice: one reflection from the combined calculation
+   Ruler policy: the traditional ruler is the chart ruler; the modern ruler
+   is named alongside it for Scorpio, Aquarius and Pisces. Possibility
+   language only. Not approved until Western review. */
+const TROPICAL_BANK_STATUS = 'development-only (Western review pending)';
+const TROPICAL_SHARED = {
+  intro: [
+    "In Western astrology using the tropical zodiac, the Ascendant is the degree rising on the eastern horizon at the moment and place of birth. In this Placidus chart, it forms the cusp of the first house and determines the chart ruler.",
+    "The Rising Sign describes the style through which you approach new situations and the qualities other people may notice first. It is one part of the chart, not a complete personality description. Its expression becomes more specific when the chart ruler's sign, house and major aspects are considered."
+  ]
+};
+const TROPICAL_SIGNS = {
+  aries: { title: "ARIES RISING", traditionalRuler: "Mars", modernRuler: null,
+    meet: [
+      "With Aries Rising, you may initially come across as direct, energetic and quick to act. Others may notice that you start things readily and speak plainly. This Ascendant can emphasize independence, courage and a preference for moving rather than waiting.",
+      "One possible growth edge is follow-through: noticing when speed leaves something unfinished, or leaves other people behind."
+    ] },
+  taurus: { title: "TAURUS RISING", traditionalRuler: "Venus", modernRuler: null,
+    meet: [
+      "With Taurus Rising, you may initially come across as calm, grounded and unhurried. Others may notice a steady manner and an eye for comfort and quality. This Ascendant can emphasize patience, loyalty and a wish for things that last.",
+      "One possible growth edge is flexibility: telling the difference between being steady and being unwilling to change."
+    ] },
+  gemini: { title: "GEMINI RISING", traditionalRuler: "Mercury", modernRuler: null,
+    meet: [
+      "With Gemini Rising, you may initially come across as curious, quick and easy to talk to. Others may notice your questions and the way you connect one idea to another. This Ascendant can emphasize communication, variety and an active mind.",
+      "One possible growth edge is depth: staying with one subject or one task long enough to see it through."
+    ] },
+  cancer: { title: "CANCER RISING", traditionalRuler: "the Moon", modernRuler: null,
+    meet: [
+      "With Cancer Rising, you may initially come across as warm, attentive and somewhat reserved. Others may notice that you read a room by feel and pay attention to who needs support. This Ascendant can emphasize care, belonging and a need for emotional safety.",
+      "One possible growth edge is openness: staying present with people when you would rather withdraw."
+    ] },
+  leo: { title: "LEO RISING", traditionalRuler: "the Sun", modernRuler: null,
+    meet: [
+      "With Leo Rising, you may initially come across as warm, confident and noticeable. Others may notice a natural presence and a generous manner. This Ascendant can emphasize self-expression, loyalty and a wish to be appreciated for who you are.",
+      "One possible growth edge is ease: letting recognition come without needing it, and not taking every response personally."
+    ] },
+  virgo: { title: "VIRGO RISING", traditionalRuler: "Mercury", modernRuler: null,
+    meet: [
+      "With Virgo Rising, you may initially come across as observant, capable and modest. Others may notice that you catch details and prefer to be useful rather than impressive. This Ascendant can emphasize skill, care and a high personal standard.",
+      "One possible growth edge is gentleness: applying that standard to yourself and others with some room to spare."
+    ] },
+  libra: { title: "LIBRA RISING", traditionalRuler: "Venus", modernRuler: null,
+    meet: [
+      "With Libra Rising, you may initially come across as gracious, fair and easy to be around. Others may notice your tact and your interest in hearing both sides. This Ascendant can emphasize relationship, balance and an eye for what is pleasing.",
+      "One possible growth edge is directness: saying what you actually want, even when it disturbs the peace for a moment."
+    ] },
+  scorpio: { title: "SCORPIO RISING", traditionalRuler: "Mars", modernRuler: "Pluto",
+    meet: [
+      "With Scorpio Rising, you may initially come across as reserved, focused and hard to read. Others may notice that you observe closely and commit fully once you decide. This Ascendant can emphasize depth, privacy and a wish for what is real rather than surface.",
+      "One possible growth edge is trust: allowing trust to develop gradually while keeping boundaries that feel right for you."
+    ] },
+  sagittarius: { title: "SAGITTARIUS RISING", traditionalRuler: "Jupiter", modernRuler: null,
+    meet: [
+      "With Sagittarius Rising, you may initially come across as open, upbeat and candid. Others may notice your humor and your interest in the bigger picture. This Ascendant can emphasize exploration, honesty and a need for room to move.",
+      "One possible growth edge is commitment: matching your enthusiasm at the start with the same energy at the finish."
+    ] },
+  capricorn: { title: "CAPRICORN RISING", traditionalRuler: "Saturn", modernRuler: null,
+    meet: [
+      "With Capricorn Rising, you may initially come across as composed, capable and serious about what matters. Others may notice that you can be relied on and that you do not waste words. This Ascendant can emphasize responsibility, patience and long-term effort.",
+      "One possible growth edge is lightness: letting others carry some of the weight, and allowing rest before it is earned."
+    ] },
+  aquarius: { title: "AQUARIUS RISING", traditionalRuler: "Saturn", modernRuler: "Uranus",
+    meet: [
+      "With Aquarius Rising, you may initially come across as friendly, original and a little detached. Others may notice that you think for yourself and are at ease with many kinds of people. This Ascendant can emphasize independence, principle and interest in the wider group.",
+      "One possible growth edge is closeness: staying warm with individuals while you keep your wider view."
+    ] },
+  pisces: { title: "PISCES RISING", traditionalRuler: "Jupiter", modernRuler: "Neptune",
+    meet: [
+      "With Pisces Rising, you may initially come across as gentle, receptive and hard to pin down. Others may notice that you pick up the mood of a room and the feeling behind the words. This Ascendant can emphasize imagination, compassion and sensitivity to surroundings.",
+      "One possible growth edge is definition: keeping a clear sense of where you end and other people begin."
+    ] }
+};
+/* ---- layer 2 banks: the chart ruler's placement ---- */
+const RULER_SIGN = {
+  Aries: "through direct action and initiative", Taurus: "through steadiness, patience and practical values", Gemini: "through curiosity, conversation and exchange",
+  Cancer: "through care, memory and emotional connection", Leo: "through warmth, confidence and self-expression", Virgo: "through attention to detail and useful work",
+  Libra: "through relationship, fairness and a sense of balance", Scorpio: "through intensity, depth and focus", Sagittarius: "through exploration, belief and a wide view",
+  Capricorn: "through discipline, structure and long effort", Aquarius: "through independent thinking and a wider social view", Pisces: "through imagination, compassion and sensitivity"
+};
+const RULER_HOUSE = {
+  1: "your own body, manner and personal direction", 2: "money, possessions and what you value", 3: "communication, learning, siblings and your local world",
+  4: "home, family and private life", 5: "creativity, romance, children and play", 6: "daily work, routines and health habits",
+  7: "partnership and one-to-one relationships", 8: "shared resources, intimacy and deep change", 9: "travel, higher learning and belief",
+  10: "career, reputation and public life", 11: "friends, groups and future goals", 12: "rest, solitude and what happens behind the scenes"
+};
+const ASPECT_WORD = { conjunction: "joined with", opposition: "opposite", square: "in a square to", trine: "in a trine to", sextile: "in a sextile to" };
+const ASPECT_TONE = {
+  conjunction: "which can blend that planet's qualities directly into how you come across",
+  opposition: "which can bring its themes in through other people and ask for balance",
+  square: "which can add friction that pushes you to act or adjust",
+  trine: "which can give its themes an easy, natural flow",
+  sextile: "which can open opportunities that respond to effort"
+};
+const PLANET_THEME = {
+  Sun: "identity and vitality", Moon: "feeling and habit", Mercury: "thought and speech", Venus: "affection and values", Mars: "drive and assertion",
+  Jupiter: "growth and confidence", Saturn: "structure and caution", Uranus: "independence and change", Neptune: "imagination and sensitivity", Pluto: "intensity and transformation",
+  "North Node": "the direction of growth", "South Node": "familiar habits"
+};
+const NOTICE_HOUSE = {
+  1: "how you present yourself in new situations", 2: "how you handle money and what you decide is worth keeping", 3: "how you communicate and what you are curious about",
+  4: "how home and family shape your sense of security", 5: "what you create and what brings you joy", 6: "your daily routines and the work you do for others",
+  7: "what you look for in a partner and how you handle one-to-one relationships", 8: "how you deal with shared resources and deep change", 9: "what you believe and where you want to explore",
+  10: "your ambitions and how you are seen publicly", 11: "your friendships and the goals you share with others", 12: "your need for rest, privacy and reflection"
+};
+/* Natal contact policy for bodies on the Ascendant. Mirrors the conjunction orb
+   of the Tropical engine's natal ASPECT_DEFS (8 degrees, its default orb policy,
+   pending approval). Angles and nodes have no separate rule yet; until one is
+   approved, nodes are excluded from Ascendant contacts. Never the transit policy. */
+const TROPICAL_NATAL_POLICY = { version: 'tropical natal aspects, default orb policy (pending approval)', ascendantConjunctionOrb: 8, nodesOnAscendant: false };
+const TBODY_NAME = { sun:"Sun", moon:"Moon", mercury:"Mercury", venus:"Venus", mars:"Mars", jupiter:"Jupiter", saturn:"Saturn", uranus:"Uranus", neptune:"Neptune", pluto:"Pluto",
+  northNode:"North Node", southNode:"South Node", NNode:"North Node", SNode:"South Node" };
+function tName(k){ return TBODY_NAME[k] || (String(k).charAt(0).toUpperCase() + String(k).slice(1)); }
+function plain(n){ return String(n).replace(/^the /,''); }
+function art(n){ return (n === 'Sun' || n === 'Moon') ? 'the ' + n : n; }
+function ordT(n){ var s=['th','st','nd','rd'], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
+/* Reads the person's Tropical chart record (never recalculated here) and returns
+   { ruler:[paras], notice:[paras], trace:[factors] } or null when the record is missing. */
+function tropicalRulerLayer(sign){
+  var T = TROPICAL_SIGNS[sign]; if (!T) return null;
+  /* identity: the record must belong to the current chart run (runId + birth
+     fingerprint via the shared pairing library), never matched by sign alone */
+  var run = (window.COZ_ASC && COZ_ASC.currentRun) ? COZ_ASC.currentRun() : null;
+  var t = null; try { t = JSON.parse(localStorage.getItem('cozTropicalChartJSON') || 'null'); } catch(e){}
+  if (!run || !t || !t.run || typeof t.run.runId !== 'string' || !t.run.runId || typeof t.run.fingerprint !== 'string' || !t.run.fingerprint ||
+      t.run.runId !== run.runId || t.run.fingerprint !== run.fingerprint || !t.run.engineVersion) return { unavailable: 'identity' };
+  if (!Array.isArray(t.bodies) || !t.angles || !t.angles.ascendant) return { unavailable: 'record' };
+  var ascSign = typeof t.angles.ascendant.sign === 'string' ? t.angles.ascendant.sign.toLowerCase() : '';
+  if (ascSign !== sign) return { unavailable: 'sign' };
+  var num = function(x){ return typeof x === 'number' && isFinite(x); };
+  var rulerName = plain(T.traditionalRuler);
+  var body = t.bodies.filter(function(b){ return b && tName(b.id) === rulerName; })[0];
+  if (!body || !body.position || typeof body.position.sign !== 'string' || !RULER_SIGN[body.position.sign]) return { unavailable: 'ruler' };
+  var house = Number.isInteger(body.house) && body.house >= 1 && body.house <= 12 ? body.house : null;
+  var trace = ['asc_' + sign, 'ruler_' + rulerName];
+  var ruler = [], notice = [];
+  var p1 = rulerName === 'Sun' || rulerName === 'Moon' ? 'The ' + rulerName : rulerName;
+  p1 += ' is the traditional ruler of your chart.';
+  if (T.modernRuler) p1 += ' Modern Western astrology also associates ' + T.title.split(' ')[0].charAt(0) + T.title.split(' ')[0].slice(1).toLowerCase() + ' with ' + T.modernRuler + '.';
+  p1 += ' In your chart, ' + art(rulerName) + ' is in ' + body.position.sign + (house ? ' in the ' + ordT(house) + ' house' : '') + '.';
+  ruler.push(p1);
+  var p2 = 'With your chart ruler in ' + body.position.sign + ', the qualities of your Rising Sign may be expressed ' + RULER_SIGN[body.position.sign] + '.';
+  trace.push('ruler_sign_' + body.position.sign);
+  if (house){ p2 += ' Its place in the ' + ordT(house) + ' house points to ' + RULER_HOUSE[house] + ' as an area where these themes may become noticeable.'; trace.push('ruler_house_' + house); }
+  if (typeof body.motion === 'string' && /retro/i.test(body.motion)) { p2 += ' ' + art(rulerName).charAt(0).toUpperCase() + art(rulerName).slice(1) + ' was retrograde at your birth, which some astrologers read as a more inward, reconsidering expression of these themes.'; trace.push('ruler_retrograde'); }
+  ruler.push(p2);
+  /* provisional selection: the three tightest major aspects to the ruler, listed
+     separately. Not an approved weighting and not a synthesis yet. */
+  var asp = (Array.isArray(t.aspects) ? t.aspects : []).filter(function(a){
+      if (!a || !ASPECT_WORD[a.type] || !num(a.orbDegrees) || a.orbDegrees < 0 || typeof a.orbDisplay !== 'string' || !a.orbDisplay.trim()) return false;
+      var A = tName(a.bodyA), B = tName(a.bodyB);
+      if (A !== rulerName && B !== rulerName) return false;
+      var other = A === rulerName ? B : A;
+      return !!PLANET_THEME[other] && other !== rulerName;
+    }).sort(function(a,b){ return a.orbDegrees - b.orbDegrees; }).slice(0,3);
+  if (asp.length){
+    var parts = asp.map(function(a){ var other = tName(tName(a.bodyA) === rulerName ? a.bodyB : a.bodyA); trace.push('aspect_' + a.type + '_' + other);
+      return art(rulerName) + ' is ' + ASPECT_WORD[a.type] + ' ' + art(other) + ' (orb ' + a.orbDisplay + '), ' + ASPECT_TONE[a.type] + ', bringing ' + PLANET_THEME[other] + ' into the picture'; });
+    var p3 = parts.map(function(s,i){ return (i ? s : s.charAt(0).toUpperCase() + s.slice(1)) + '.'; }).join(' ');
+    ruler.push(p3);
+  }
+  /* bodies conjunct the Ascendant (same 8 degree conjunction orb as the chart's own aspect policy) */
+  var ascLon = t.angles.ascendant.longitude, conj = [], orb = TROPICAL_NATAL_POLICY.ascendantConjunctionOrb;
+  if (num(ascLon)) t.bodies.forEach(function(b){
+    if (!b || !b.position || !num(b.position.longitude)) return;
+    var name = tName(b.id); if (!PLANET_THEME[name]) return;
+    if (!TROPICAL_NATAL_POLICY.nodesOnAscendant && /Node$/.test(name)) return;
+    var d = Math.abs(b.position.longitude - ascLon) % 360; if (d > 180) d = 360 - d;
+    if (d <= orb) conj.push({ name: name, d: d });
+  });
+  if (conj.length){ conj.sort(function(a,b){ return a.d - b.d; }); ruler.push((conj.length === 1 ? art(conj[0].name).charAt(0).toUpperCase() + art(conj[0].name).slice(1) + ' sits close to your Ascendant, so ' + PLANET_THEME[conj[0].name] + ' may be part of your first impression as well.'
+    : conj.map(function(c){ return art(c.name); }).join(' and ') + ' sit close to your Ascendant, so their themes may be part of your first impression as well.')); conj.forEach(function(c){ trace.push('conj_asc_' + c.name); }); }
+  /* layer 3 */
+  var n1 = 'You might notice ' + (house ? NOTICE_HOUSE[house] : 'how the style of your Rising Sign shows up in daily life') + '. This is one area where your Rising Sign and its ruler may both be at work.';
+  notice.push(n1);
+  notice.push(T.meet[1]);
+  notice.push('These themes describe possible patterns, not fixed outcomes.');
+  return { ruler: ruler, notice: notice, trace: trace, status: TROPICAL_BANK_STATUS, policy: TROPICAL_NATAL_POLICY.version };
+}
+  window.COZ_TROPICAL_RISING = { shared: TROPICAL_SHARED.intro, signs: TROPICAL_SIGNS, rulerLayer: tropicalRulerLayer };
+  const MODE = "tropical";
+  const key = ASC_SIGN ? String(ASC_SIGN).toLowerCase() : "";
+  const S = SIGNS[key] || null;
+  const veil = document.getElementById("asqVeil"), hero = document.getElementById("asqHero"),
+        sVid = document.getElementById("asqVid"), content = document.getElementById("asqContent");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let settled = false, entered = false;
+  function once(fn){ let ran = false; return () => { if (!ran){ ran = true; fn(); } }; }
+  function fill(id, paragraphs){ const el = document.getElementById(id); el.innerHTML = ""; paragraphs.forEach(t => { const p = document.createElement("p"); p.textContent = t; if (/^Development version/.test(t)) p.className = "dev-label"; el.appendChild(p); }); }
+  function asqNextLink(){
+    /* the Tropical chain is Ascendant then Current Transits. That page is not built yet,
+       so the label stands and the link returns to the dashboard until the door has a
+       destination; nothing else needs changing when it is built. */
+    const tr = document.querySelector('.hot[data-dash="transits"]');
+    const href = tr && tr.dataset.href ? tr.dataset.href : "#/dashboard";
+    return '<a class="vedic-nav-next" href="' + href + '">Next: Your Current Transits ' + ARROW_R + '</a>';
+  }
+  function buildCopy(){
+    const host = document.getElementById("asqSections"); host.innerHTML = "";
+    document.getElementById("asqTitle").textContent = S ? S.title : (key.charAt(0).toUpperCase() + key.slice(1) + " Rising").toUpperCase();
+    if (MODE === "vedic"){
+      document.getElementById("asqEyebrow").textContent = "Your Ascendant";
+      document.getElementById("asqSub").textContent = "Your Inner Compass";
+      host.innerHTML = '<section><h2>Sidereal Perspective</h2><div id="asqSecSidereal" class="reading-copy"></div></section><div class="divider"></div>' +
+        '<section><h2>The Essence of You</h2><div id="asqSecEssence" class="reading-copy"></div></section><div class="divider"></div>' +
+        '<section><h2>Your Dharmic Path</h2><div id="asqSecDharma" class="reading-copy"></div></section>';
+      fill("asqSecSidereal", SHARED.sidereal);
+      if (S){ fill("asqSecEssence", S.essence); fill("asqSecDharma", S.dharma); }
+    } else {
+      /* tropical: three layers (development-only bank above): fixed baseline,
+         chart-ruler layer generated from the person's own Tropical chart record,
+         and one reflection. Never recalculated here. */
+      const T = TROPICAL_SIGNS[key] || null;
+      document.getElementById("asqEyebrow").textContent = "Your Rising Sign";
+      document.getElementById("asqSub").textContent = "Your Conscious Expression";
+      document.getElementById("asqTitle").textContent = T ? T.title : "NOT AVAILABLE";
+      if (!T){
+        host.innerHTML = '<section><div id="asqSecMissing" class="reading-copy"></div></section>' +
+          '<nav class="vedic-nav" aria-label="Ascendant navigation"><div class="vedic-nav-rule" aria-hidden="true">' + STAR_SVG + '</div>' +
+          '<div class="vedic-nav-links"><a href="#/dashboard" id="asqNavBack">' + ARROW_L + ' Back to Your Tropical Reading</a></div></nav>';
+        fill("asqSecMissing", ["Your Rising Sign could not be verified for this chart. Run your chart again to see it here."]);
+        return;
+      }
+      host.innerHTML = '<section><h2>Tropical Perspective</h2><div id="asqSecTropical" class="reading-copy"></div></section><div class="divider"></div>' +
+        '<section><h2>How You Meet the World</h2><div id="asqSecMeet" class="reading-copy"></div></section><div class="divider"></div>' +
+        '<section><h2>Your Chart Ruler</h2><div id="asqSecRuler" class="reading-copy"></div></section><div class="divider"></div>' +
+        '<section><h2>What to Notice</h2><div id="asqSecNotice" class="reading-copy"></div></section>' +
+        /* same pager as the reading pages. Next follows the Tropical chain: Current Transits
+           (from the dashboard door's data-href once that page exists), otherwise the next
+           built step, the Birth Chart. */
+        '<nav class="vedic-nav" aria-label="Ascendant navigation"><div class="vedic-nav-rule" aria-hidden="true">' + STAR_SVG + '</div>' +
+        '<div class="vedic-nav-links"><a href="#/dashboard" id="asqNavBack">' + ARROW_L + ' Back to Your Tropical Reading</a>' + asqNextLink() + '</div></nav>';
+      fill("asqSecTropical", TROPICAL_SHARED.intro);
+      if (T){
+        fill("asqSecMeet", [T.meet[0]]);
+        const L = tropicalRulerLayer(key);
+        const devLabel = 'Development version, pending Western review.';
+        if (L && !L.unavailable){
+          fill("asqSecRuler", L.ruler.concat([devLabel])); fill("asqSecNotice", L.notice);
+          try { console.log('[TROPICAL RISING] ' + L.status + ' | ' + L.policy + ' | factors: ' + L.trace.join(', ')); } catch(e){}
+        } else {
+          /* no verified record for this person: say so, never show another chart's placements */
+          const r = T.traditionalRuler === 'the Sun' || T.traditionalRuler === 'the Moon' ? 'The ' + T.traditionalRuler.slice(4) : T.traditionalRuler;
+          fill("asqSecRuler", [r + ' is the traditional ruler of your chart.' + (T.modernRuler ? ' Modern Western astrology also associates this sign with ' + T.modernRuler + '.' : ''),
+            'Its placement in your chart is not available right now. Run your chart again to see it here.', devLabel]);
+          fill("asqSecNotice", [T.meet[1], 'These themes describe possible patterns, not fixed outcomes.']);
+          try { console.log('[TROPICAL RISING] chart ruler layer unavailable: ' + (L ? L.unavailable : 'no sign')); } catch(e){}
+        }
+      }
+    }
+  }
+  /* Each opening gets a generation number and its own AbortController. Every timer,
+     animation frame, listener and play() promise checks that it still belongs to the
+     current opening, so an earlier opening can never settle or modify a later one. */
+  let gen = 0, ac = null;
+  const asqTimers = [], asqFrames = [];
+  const alive = g => g === gen && entered;
+  const later = (fn, ms) => { const g = gen; const t = setTimeout(() => { if (alive(g)) fn(); }, ms); asqTimers.push(t); return t; };
+  const frame = fn => { const g = gen; const id = requestAnimationFrame(() => { if (alive(g)) fn(); }); asqFrames.push(id); return id; };
+  const on = (el, ev, fn, opts) => { const g = gen; el.addEventListener(ev, e => { if (alive(g)) fn(e); }, Object.assign({}, opts || {}, { signal: ac.signal })); };
+  function enter(){
+    if (entered) return; entered = true; settled = false; gen++; ac = new AbortController();
+    try { window.parent !== window && window.parent.EMERGE_SOUND && window.parent.EMERGE_SOUND.loop("ambient"); } catch(_){}
+    buildCopy();
+    document.body.dataset.view = "ascendant";
+    window.scrollTo(0, 0);
+    try { window.dispatchEvent(new CustomEvent("COZ_ASQ_ENTER")); } catch(_){}
+    if (!key){                                   /* no verified sign: no clip, straight to the message */
+      hero.classList.add("playing"); settle(); return;
+    }
+    sVid.src = "/Demo/" + key + ".mp4"; if (S && S.loop) sVid.loop = true; sVid.load();
+    document.body.classList.add("asq-locked");
+    veil.classList.add("on");
+    later(() => { playSign(); later(() => veil.classList.remove("on"), 150); }, 300);   // black beat, then the swell
+  }
+  /* exit: everything enter/playSign/settle set up is undone, so the door can be reopened */
+  function exit(){
+    if (!entered) return;
+    entered = false; settled = false; gen++;
+    try { ac && ac.abort(); } catch(_){}
+    asqTimers.splice(0).forEach(clearTimeout);
+    asqFrames.splice(0).forEach(cancelAnimationFrame);
+    try { sVid.pause(); sVid.removeAttribute("src"); sVid.load(); } catch(_){}
+    document.body.classList.remove("asq-locked", "asq-done");
+    veil.classList.remove("on");
+    hero.classList.remove("bloom", "playing", "grown", "settling"); hero.style.height = "";
+    content.classList.remove("rising"); content.style.transform = "";
+    document.documentElement.style.removeProperty("--settled-h");
+    document.querySelectorAll(".coz-skip.asq").forEach(el => el.classList.remove("on"));
+  }
+  window.COZ_ASQ = { enter: enter, exit: exit };
+  function playSign(){
+    hero.classList.add("bloom");
+    void sVid.offsetWidth;                                    // commit scale .06 before growing
+    frame(() => { hero.classList.add("playing"); hero.classList.add("grown"); });
+    const arm = once(scheduleSettle);
+    on(sVid, "loadedmetadata", arm);
+    if (sVid.readyState >= 1) arm();
+    on(sVid, "error", () => settle());
+    const g = gen; sVid.play().catch(() => { if (alive(g)) settle(); });
+    later(() => { if (!settled) settle(); }, 9000);
+  }
+  function scheduleSettle(){
+    const dur = (sVid.duration && isFinite(sVid.duration)) ? sVid.duration : 5;
+    if (S && S.loop){ later(settle, Math.max(1000, dur * 1000)); }
+    else {
+      on(sVid, "ended", settle, { once:true });
+      on(sVid, "timeupdate", function(){ if (sVid.currentTime >= dur - 1.0) settle(); });
+      later(() => { if (!settled) settle(); }, dur * 1000 + 1500);
+    }
+  }
+  function settle(){
+    if (settled) return; settled = true;
+    const vw = document.documentElement.clientWidth;
+    const ar = (sVid.videoWidth && sVid.videoHeight) ? sVid.videoWidth / sVid.videoHeight : 1.25;
+    /* Sep 1 ruling: after the full-screen emergence the sign settles into the top third of the
+       screen (never taller), so the reading beneath it is easy to read; the clip keeps playing */
+    const settledH = Math.min(Math.round(vw / ar), Math.round(window.innerHeight * 0.36));
+    document.documentElement.style.setProperty("--settled-h", settledH + "px");
+    const finish = once(() => {
+      document.body.classList.add("asq-done"); document.body.classList.remove("asq-locked");
+      hero.classList.remove("settling"); content.classList.remove("rising");
+      hero.style.height = ""; content.style.transform = "";
+      if (key) { try { window.dispatchEvent(new CustomEvent("EMERGE_ASCENDANT_SETTLED", { detail:{ sign:key } })); } catch(_){} }   /* a real emergence only */
+    });
+    if (reduced){ finish(); return; }
+    content.style.transform = "translateY(" + window.innerHeight + "px)";
+    content.classList.add("rising");
+    frame(() => frame(() => {
+      hero.classList.add("settling"); hero.style.height = settledH + "px";
+      content.style.transform = "translateY(" + settledH + "px)";
+    }));
+    on(content, "transitionend", finish, { once:true });
+    later(finish, 3000);
+  }
+  document.querySelector('.hot[data-dash="ascendant"]').addEventListener("click", function(){ location.hash = "#/ascendant"; });   /* its own history entry */
+  /* SKIP (Sep 1 ruling): from the second emergence on this device, a subtle Skip
+     appears a moment into the swell and jumps to the settled reading */
+  (function(){
+    var KEY = "cozSeenAsc_" + MODE, seen = false;
+    try { seen = localStorage.getItem(KEY) === "1"; } catch(_){}
+    var el = document.createElement("button"); el.type = "button"; el.className = "coz-skip asq"; el.textContent = "Skip"; el.setAttribute("aria-label", "Skip to the reading");
+    document.body.appendChild(el);
+    window.addEventListener("EMERGE_ASCENDANT_SETTLED", function(){ seen = true; try { localStorage.setItem(KEY, "1"); } catch(_){} el.classList.remove("on"); });
+    el.addEventListener("click", function(){ el.classList.remove("on"); hero.classList.remove("bloom"); hero.classList.add("playing"); settle(); });
+    window.addEventListener("COZ_ASQ_ENTER", function(){ if (seen) later(function(){ if (!settled) el.classList.add("on"); }, 1800); });
+  })();
+  document.getElementById("asqHome").addEventListener("click", function(e){ e.preventDefault(); location.hash = "#/dashboard"; });
+  document.addEventListener("click", function(e){
+    const back = e.target.closest && e.target.closest("#asqNavBack");
+    if (!back) return;
+    e.preventDefault(); location.hash = "#/dashboard";
+  });
+  if (window.__asqPending){ window.__asqPending = false; enter(); }   /* page opened directly on #/ascendant */
+  /* Saved and Account mirror the dashboard hotspots, same events, until those screens exist */
+  document.querySelectorAll('#cozFoot a[data-foot]').forEach(function(a){
+    a.addEventListener('click', function(ev){
+      ev.preventDefault();
+      try { window.dispatchEvent(new CustomEvent('COZ_TDASH_' + a.dataset.foot.toUpperCase())); } catch (e) {}
+    });
+  });
+})();
+
+/* ---------- dashboard pinch zoom (Sep 1) ---------- */
+(function(){
+  const dash = document.getElementById("dash"), root = document.documentElement;
+  let active = false, startD = 0, startZ = 1, maxZ = 1.3;
+  const cur = () => parseFloat(getComputedStyle(root).getPropertyValue("--dash-zoom")) || 1;
+  const dist = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  dash.addEventListener("touchstart", e => {
+    if (e.touches.length !== 2) return;
+    active = true; startD = dist(e) || 1; startZ = cur();
+    maxZ = parseFloat(getComputedStyle(root).getPropertyValue("--dash-zoom-in")) || 1.3;
+    dash.classList.add("pinching"); window.__dashZoomed = true;
+  }, { passive:true });
+  dash.addEventListener("touchmove", e => {
+    if (!active || e.touches.length !== 2) return;
+    e.preventDefault();
+    const z = Math.min(maxZ, Math.max(1, startZ * (dist(e) / startD)));
+    root.style.setProperty("--dash-zoom", z.toFixed(3));
+  }, { passive:false });
+  const end = () => { if (!active) return; active = false; dash.classList.remove("pinching"); };
+  dash.addEventListener("touchend", end); dash.addEventListener("touchcancel", end);
+})();
+
+/* ---------- reveal sound (Sep 1): the reading tap fires the app's harmony cue through
+   the living frame's engine and re-asserts the bed, the same way the old Vedic page did ---------- */
+document.getElementById("hotReading").addEventListener("click", function(){
+  try {
+    const snd = (window.parent !== window) ? window.parent.EMERGE_SOUND : null;
+    if (snd){ snd.loop("ambient"); snd.play("harmony"); }
+  } catch(_){}
+});
+
+
+/* zoom lock (Sep 1): iOS lets a two-finger pinch zoom the whole page even with
+   user-scalable=no, and that zoom survives a reload, which is what threw the globe
+   off on the second run. Native page zoom is refused here; the dashboards keep
+   their own two-finger art zoom. */
+(function(){
+  ['gesturestart','gesturechange','gestureend'].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); }, { passive:false }); });
+  document.addEventListener('touchmove', function(e){ if (e.touches && e.touches.length > 1) e.preventDefault(); }, { passive:false });
+})();
+
+/* ---------- one-finger pan on the zoomed dashboard (Sep 1) ---------- */
+(function(){
+  const dash = document.getElementById("dash"), stage = document.getElementById("dashStage"), root = document.documentElement;
+  let panning = false, startY = 0, startPan = 0, moved = false;
+  const zoom = () => parseFloat(getComputedStyle(root).getPropertyValue("--dash-zoom")) || 1;
+  const pan = () => parseFloat(getComputedStyle(root).getPropertyValue("--dash-pan")) || 0;
+  const limit = () => Math.max(0, (stage.offsetHeight * zoom() - window.innerHeight) / 2);
+  dash.addEventListener("touchstart", e => {
+    if (e.touches.length !== 1 || zoom() <= 1.001) return;
+    panning = true; moved = false; startY = e.touches[0].clientY; startPan = pan();
+  }, { passive:true });
+  dash.addEventListener("touchmove", e => {
+    if (!panning || e.touches.length !== 1) return;
+    const dy = e.touches[0].clientY - startY;
+    if (Math.abs(dy) > 6) moved = true;
+    if (!moved) return;
+    e.preventDefault(); dash.classList.add("panning");
+    const L = limit(); const y = Math.max(-L, Math.min(L, startPan + dy));
+    root.style.setProperty("--dash-pan", y.toFixed(1) + "px");
+  }, { passive:false });
+  const end = () => { panning = false; dash.classList.remove("panning"); };
+  dash.addEventListener("touchend", end); dash.addEventListener("touchcancel", end);
+  /* a real drag must not count as a tap on the hotspot underneath */
+  dash.addEventListener("click", e => { if (moved){ e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+})();
+
+
+/* ---------- through the sun + text zoom (Sep 1) ---------- */
+(function(){
+  const light = document.createElement("div"); light.id = "cozLight"; document.body.appendChild(light);
+  window.__cozLightIn  = () => { light.classList.add("on"); };
+  window.__cozLightOut = () => { requestAnimationFrame(() => requestAnimationFrame(() => light.classList.remove("on"))); };
+})();
+(function(){
+  const root = document.documentElement;
+  let active = false, startD = 0, startZ = 1;
+  const inText = () => document.body.dataset.view === "reading" || document.body.dataset.view === "ascendant";
+  const cur = () => parseFloat(getComputedStyle(root).getPropertyValue("--coz-text-zoom")) || 1;
+  const dist = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+  document.addEventListener("touchstart", e => { if (!inText() || e.touches.length !== 2) return; active = true; startD = dist(e) || 1; startZ = cur(); }, { passive:true });
+  document.addEventListener("touchmove", e => {
+    if (!active || e.touches.length !== 2) return;
+    e.preventDefault();
+    const z = Math.min(2, Math.max(1, startZ * (dist(e) / startD)));
+    root.style.setProperty("--coz-text-zoom", z.toFixed(3));
+  }, { passive:false });
+  const end = () => { active = false; };
+  document.addEventListener("touchend", end); document.addEventListener("touchcancel", end);
+})();
+
+
+/* Sep 20: un-zoom the reveal stage during the gold light (3.6s in), restore on exit. */
+(function () {
+  var st = document.querySelector(".reveal .stage");
+  if (!st) return;
+  var t = null;
+  var vid = document.querySelector(".reveal video");
+  if (!vid) return;
+  function unzoom() {
+    var w = st.offsetWidth, h = st.offsetHeight;
+    if (!w || !h) return;
+    /* Sep 22: the whole clip frame stays visible during the flight (no cropping of the
+       planets), so the stage returns to exactly 1 rather than a screen-covering scale */
+    st.style.setProperty("--reveal-zoom", String(Math.max(innerWidth / w, innerHeight / h) * 1.002)
+ );
+  }
+  function reset() { clearTimeout(t); st.style.removeProperty("--reveal-zoom"); }
+  vid.addEventListener("playing", function () { clearTimeout(t); t = setTimeout(unzoom, 3600); });
+  vid.addEventListener("ended", reset);
+  vid.addEventListener("error", reset);
+  vid.addEventListener("pause", function () { if (vid.currentTime === 0) reset(); });
+})();
+</script>
+</body>
+</html>

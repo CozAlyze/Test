@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!-- NAV TEST N1.1 r2 (CozAlyze/Test only): the test storage guard (test-storage.js, pasted here so it always runs first):
+     storage under cozTEST:, no reading servers, art from /Demo/ -->
+<script>
+/* COZ TEST STORAGE · NAV TEST N1.1 r2 (Oct 14 2026) · CozAlyze/Test/tropical-nav only, never the Demo
+   The build pastes this file, unchanged, as the first script inside every page in this folder except
+   test-setup.html, so it cannot fail to load (a missing or late separate file would let a page run on the
+   Demo's own storage). This copy is the readable source; no page loads it as a separate file.
+   The Test and the Demo are on the same site (cozalyze.github.io), so they share the phone's storage.
+   This keeps the test pages away from the Demo's data and from the reading servers.
+
+   1. STORAGE. Every localStorage and sessionStorage read and write made on a test page, including by
+      the scripts these pages load, goes to keys that start with "cozTEST:". A test page never sees or
+      changes a Demo key (saved charts, the current chart, readings, the tester password). Those scripts
+      use getItem / setItem / removeItem / key / length / clear only; no property-style access (checked
+      when this test was built; the three engine scripts are pinned copies in this folder).
+   2. ROOM FOR THE DEMO. A test write that would take the site's stored data past about 4 MB is refused
+      (QuotaExceededError, which the pages already handle as "not enough space"), so the test can never
+      crowd the Demo out of the phone's storage.
+   3. NETWORK. A test page may request files from this site and from the font and script hosts the pages
+      already use. Anything else is refused before it is sent: the reading servers (*.netlify.app) and the
+      model (api.anthropic.com) included. No reading can be started, continued or paid for from a test page.
+   4. FRAMES AND WINDOWS. A frame may only open a page from this test folder (or a blank page); a new
+      window only a page from this test folder. Never a Demo page, which would use the Demo's own storage.
+
+   Art and video load from the Demo folder on the same site (window.COZ_TEST_ASSETS).
+   Anything refused is listed in window.__cozTestBlocked and the console. */
+(function () {
+  if (window.__cozTestStorage) return;
+  window.__cozTestStorage = "N1.1";
+  var P = "cozTEST:";
+
+  /* ---------- 1. storage ---------- */
+  var proto = Storage.prototype;
+  var g = proto.getItem, s = proto.setItem, r = proto.removeItem, k = proto.key;
+  var lenDesc = Object.getOwnPropertyDescriptor(proto, "length");
+  function rawLen(st) { return lenDesc.get.call(st); }
+  function testKeys(st) {
+    var out = [], n = rawLen(st), i, key;
+    for (i = 0; i < n; i++) { key = k.call(st, i); if (key && key.indexOf(P) === 0) out.push(key.slice(P.length)); }
+    return out;
+  }
+  /* ---------- 2. room for the Demo (localStorage is shared with it; sessionStorage is per tab) ---------- */
+  var CAP = 4.0 * 1048576;                                          /* estimated bytes, 2 per character */
+  var LOCAL = null; try { LOCAL = window.localStorage; } catch (e) {}
+  function usedBytes(st) {
+    var n = rawLen(st), t = 0, i, key, v;
+    for (i = 0; i < n; i++) { key = k.call(st, i); v = key == null ? null : g.call(st, key); t += ((key ? key.length : 0) + (v ? v.length : 0)) * 2; }
+    return t;
+  }
+  proto.getItem = function (key) { return g.call(this, P + key); };
+  proto.setItem = function (key, v) {
+    var pk = P + key;
+    if (this === LOCAL) {
+      var old = g.call(this, pk), add = (pk.length + String(v).length) * 2 - (old != null ? (pk.length + old.length) * 2 : 0);
+      if (add > 0 && usedBytes(this) + add > CAP) {
+        try { console.warn("[COZ TEST] write refused: it would crowd the Demo's storage (" + key + ")"); } catch (e) {}
+        throw new DOMException("The CozAlyze test keeps room free for the Demo.", "QuotaExceededError");
+      }
+    }
+    return s.call(this, pk, v);
+  };
+  proto.removeItem = function (key) { return r.call(this, P + key); };
+  proto.key = function (i) { var a = testKeys(this); i = Math.floor(Number(i)); return i >= 0 && i < a.length ? a[i] : null; };
+  proto.clear = function () { var st = this; testKeys(st).forEach(function (key) { r.call(st, P + key); }); };
+  Object.defineProperty(proto, "length", { configurable: true, enumerable: true, get: function () { return testKeys(this).length; } });
+
+  /* ---------- 3. network ---------- */
+  var blocked = window.__cozTestBlocked = [];
+  var HOSTS = /^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdn\.jsdelivr\.net|cdnjs\.cloudflare\.com|unpkg\.com)\//;
+  function abs(u) { try { return new URL(String(u), location.href); } catch (e) { return null; } }
+  function allowed(u) {
+    var a = abs(u); if (!a) return false;
+    if (a.protocol === "data:" || a.protocol === "blob:") return true;
+    return a.origin === location.origin || HOSTS.test(a.href);
+  }
+  function refuse(u, via) {
+    var a = abs(u), where = a ? a.origin + a.pathname : String(u);
+    blocked.push({ via: via, url: where, at: new Date().toISOString() });
+    try { console.warn("[COZ TEST] refused " + via + " to " + where + " (test pages never contact the reading servers)"); } catch (e) {}
+    return new TypeError("The CozAlyze test refused a request to " + where + ".");
+  }
+  if (window.fetch) {
+    var nf = window.fetch;
+    window.fetch = function (input, init) {
+      var u = typeof input === "string" ? input : (input && input.url) || String(input);
+      if (!allowed(u)) return Promise.reject(refuse(u, "fetch"));
+      return nf.apply(this, arguments);
+    };
+  }
+  if (window.XMLHttpRequest) {
+    var xo = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function (m, u) { if (!allowed(u)) throw refuse(u, "xhr"); return xo.apply(this, arguments); };
+  }
+  if (window.EventSource) {
+    var ES = window.EventSource;
+    var ESW = function (u, o) { if (!allowed(u)) throw refuse(u, "eventsource"); return new ES(u, o); };
+    ESW.prototype = ES.prototype; window.EventSource = ESW;
+  }
+  if (window.WebSocket) {
+    var WS = window.WebSocket;
+    var WSW = function (u) { throw refuse(u, "websocket"); };
+    WSW.prototype = WS.prototype; window.WebSocket = WSW;
+  }
+  if (navigator.sendBeacon) {
+    var sb = navigator.sendBeacon.bind(navigator);
+    navigator.sendBeacon = function (u, d) { if (!allowed(u)) { refuse(u, "beacon"); return false; } return sb(u, d); };
+  }
+
+  /* ---------- 4. frames and windows ---------- */
+  var DIR = location.pathname.replace(/[^\/]*$/, "");              /* this test folder, e.g. /Test/tropical-nav/ */
+  function inFolder(u) { var a = abs(u); return !!a && a.origin === location.origin && a.pathname.indexOf(DIR) === 0; }
+  function frameOK(u) { var a = abs(u); return !!a && (a.href === "about:blank" || inFolder(u)); }
+  var fd = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, "src");
+  if (fd && fd.set) {
+    Object.defineProperty(HTMLIFrameElement.prototype, "src", { configurable: true, enumerable: fd.enumerable, get: fd.get,
+      set: function (v) { if (!frameOK(v)) { refuse(v, "frame"); v = "about:blank"; } fd.set.call(this, v); } });
+  }
+  var sa = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function (n, v) {
+    if (this instanceof HTMLIFrameElement && String(n).toLowerCase() === "src" && !frameOK(v)) { refuse(v, "frame"); v = "about:blank"; }
+    return sa.call(this, n, v);
+  };
+  var wo = window.open;
+  window.open = function (u) { if (!inFolder(u == null ? "" : u) || String(u) === "") { refuse(u, "window"); return null; } return wo.apply(window, arguments); };
+
+  window.COZ_TEST_ASSETS = "/Demo/";
+  try { console.log("[COZ TEST] storage isolated under " + P + "; reading servers and the model are refused"); } catch (e) {}
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tropical Birth Chart</title>
+<!--
+  COZALYZE · TROPICAL BIRTH CHART · TBC1.9 birth details (Oct 6 2026, presentation fixes P1, local build for review)
+  TBC1.9: date and time shown as "August 20, 1977" and "9:30 PM" (display only, stored values unchanged).
+  TBC1.8: ?saved=1&id=<compare record>&in=compare renders the chart only, inside the saved comparison
+  (saved-compare-document.html): no toolbar, no Saved Readings links, no footer nav, no build stamp,
+  transparent page. Data path unchanged (the record's own snapshot chart); saved-tropical-library.js
+  is read-only in this mode (TL1.2). Every other mode unchanged.
+  TBC1.7 saved mode
+  TBC1.5: ?saved=1&id=<record> renders the selected cozSavedCharts record (Tropical Saved
+  Library landing page): same renderer, data from the saved snapshot, toolbar becomes
+  "Saved Charts" + Print / Save PDF, bottom Saved Readings links. Print opens at top level
+  when framed. Without ?saved=1 the page behaves exactly as before.
+  Direct Western/Tropical twin of vedic-birth-chart.html (BC2.1), same shell,
+  tokens, accordion, print behavior. Only the astrology-specific chart,
+  labels, fields and interpretations differ. See that file's own header
+  comment for the shared-shell rationale; not repeated here.
+
+  DATA CONTRACT (localStorage key "cozTropicalChartJSON", written by the
+  master tropical-reveal exporter at TROPICAL v18.88 — renderer only, this
+  page never calculates astronomy):
+  {
+    documentId, generatedAt,
+    client: { displayName, birthDate, birthTime, locationLabel,
+              timezoneAbbreviation, utcOffset },
+    settings: { zodiac:"Tropical", requestedHouseSystem:"Placidus",
+                resolvedHouseSystem:"Placidus"|"Whole Sign",
+                usedHouseFallback: bool, nodeType:"Mean"|"True" },
+    angles: { ascendant, descendant, midheaven, imumCoeli } (each a Position),
+    bodies: [ { id, position, house, motion } ... ] (sun..pluto, northNode,
+             southNode, chiron when present — Position = {longitude, sign,
+             degree, minute} ),
+    houseCusps: [ { house 1-12, position } ] (empty on whole-sign fallback),
+    aspects: [ { bodyA, bodyB, type, orbDegrees, orbDisplay } ],
+    balance: { element:{result,counts}, modality:{result,counts},
+               emphasis:{labels,trace} } | null,
+    interpretations: {}  // filled by the approved copy source, never here
+  }
+  FLAGGED, carried straight from the exporter: nodeType currently ships
+  "Mean" — the engine has only mean-node math built, the handoff spec calls
+  for True Node. Aspect orbs use a DEFAULT flat policy pending approval
+  (see tropical-reveal.html v18.87 comment). Chart Emphasis has no approved
+  vocabulary yet, so that row is omitted rather than invented.
+  Demo data renders ONLY via ?chart=demo or ?chart=stellium, never as a
+  fallback for a real visitor.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* TBC1.5 saved mode */
+body.saved-mode .toolbar-left p{display:none}
+.saved-readings{margin-top:2rem}
+.saved-readings-links{display:grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); gap:.75rem}
+.saved-readings-links a{display:flex; align-items:center; justify-content:space-between; gap:.6rem; min-height:3.1rem; padding:.7rem .9rem; border:1px solid var(--coz-rule); border-radius:.4rem; color:var(--coz-ink); font-size:.9rem; text-decoration:none; background:rgb(255 255 255 / .35)}
+.saved-readings-links a span{color:var(--coz-gold)}
+.saved-readings-links a.unavailable{color:var(--coz-ink-soft); pointer-events:none}
+.saved-readings-links a.unavailable small{display:block; margin-top:.15rem; font-size:.68rem; letter-spacing:.06em; text-transform:uppercase}
+:root{
+  --background:#061326; --foreground:#f7f1e7;
+  --coz-paper:#f7f1e7; --coz-ink:#07162b; --coz-ink-soft:#314456;
+  --coz-gold:#b88a55; --coz-rose:#a66559; --coz-rule:#d6c4a7;
+  --chart-aspect-blue:#315bd8; --chart-aspect-red:#c95650;
+  --font-sans:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--background)}
+body{
+  min-width:320px; margin:0;
+  background:
+    radial-gradient(circle at 50% 10%, rgb(37 74 111 / .5), transparent 38rem),
+    linear-gradient(180deg,#061326 0%,#020914 100%);
+  color:var(--foreground); font-family:var(--font-sans);
+}
+button{font:inherit}
+.report-shell{width:100%; min-height:100vh; padding:2rem 1rem 4rem}
+.report-toolbar{display:flex; align-items:center; justify-content:space-between; gap:1rem; width:min(100%,56rem); margin:0 auto 1rem}
+.report-toolbar p{margin:0; color:#d8c4a4; font-size:.8rem; letter-spacing:.11em; text-transform:uppercase}
+.toolbar-left{display:flex; align-items:center; gap:1rem; min-width:0}
+.back-button svg{width:1.1rem; height:1.1rem}
+.print-button{
+  display:inline-flex; align-items:center; gap:.5rem;
+  min-height:2.75rem; padding:.45rem 1rem; cursor:pointer;
+  border:1px solid rgb(217 184 129 / .6); border-radius:.4rem;
+  background:rgb(4 17 34 / .84); color:#f7f1e7; font-size:.88rem;
+}
+.print-button:hover{background:#122b48; color:#fffaf2}
+.print-button:focus-visible{outline:2px solid var(--coz-gold); outline-offset:2px}
+.print-button svg{width:1rem; height:1rem}
+.sample-banner{
+  width:min(100%,56rem); margin:0 auto .8rem; padding:.55rem .9rem;
+  border:1px solid rgb(184 138 85 / .55); border-radius:.4rem;
+  background:rgb(184 138 85 / .14); color:#e8d5b4;
+  font-size:.74rem; letter-spacing:.09em; text-transform:uppercase; text-align:center;
+}
+.empty-card{
+  width:min(100%,34rem); margin:4rem auto; padding:2rem 1.6rem; text-align:center;
+  border:1px solid rgb(217 184 129 / .5); background:rgb(4 17 34 / .7); color:#e9ddc8;
+  font-size:.95rem; line-height:1.6;
+}
+.empty-card h2{margin:0 0 .6rem; font-family:Georgia,"Times New Roman",serif; font-weight:400; font-size:1.35rem; color:#f7f1e7}
+.birth-report{
+  position:relative; width:min(100%,56rem); margin:0 auto; overflow:hidden;
+  border:1px solid var(--coz-rule);
+  background:linear-gradient(rgb(184 138 85 / .035) 1px, transparent 1px), var(--coz-paper);
+  background-size:100% 1.55rem;
+  box-shadow:0 2rem 5rem rgb(0 0 0 / .38);
+  color:var(--coz-ink);
+}
+.birth-report::before{position:absolute; inset:.75rem; border:1px solid rgb(184 138 85 / .48); content:""; pointer-events:none}
+.report-inner{position:relative; padding:2.5rem 3rem 2rem}
+.report-header,.section-heading,.report-footer{display:flex; align-items:flex-end; justify-content:space-between; gap:1rem}
+.wordmark{margin:0; color:var(--coz-gold); font-family:Georgia,"Times New Roman",serif; font-size:.85rem; letter-spacing:.18em}
+.report-header h1{margin:.45rem 0 0; font-family:Georgia,"Times New Roman",serif; font-size:clamp(2rem,5vw,3.25rem); font-weight:400; letter-spacing:-.03em; line-height:1}
+.chart-type{margin:0; color:var(--coz-gold); font-size:.8rem; letter-spacing:.14em; text-transform:uppercase}
+.birth-identity{display:grid; grid-template-columns:minmax(12rem,.8fr) 1.7fr; gap:2rem; margin-top:1.75rem; padding:1.2rem 0; border-block:1px solid var(--coz-rule)}
+.birth-identity.no-person{grid-template-columns:1fr}
+.birth-identity h2{margin:0; font-family:Georgia,"Times New Roman",serif; font-size:1.45rem; font-weight:400}
+.birth-identity p{margin:.35rem 0 0; color:var(--coz-ink-soft); font-size:.78rem}
+.birth-identity dl{display:grid; grid-template-columns:1fr .8fr 1.4fr; gap:1rem; margin:0}
+.birth-identity dl div{min-width:0}
+.birth-identity dt,.calculation-strip span{color:var(--coz-gold); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase}
+.birth-identity dd{margin:.35rem 0 0; font-size:.9rem; line-height:1.45}
+.birth-timezone{display:block; margin-top:.12rem; color:var(--coz-ink-soft); font-size:.72rem}
+.ornamental-rule{width:100%; height:1px; margin:1.75rem 0; background:linear-gradient(90deg,transparent,var(--coz-gold),transparent)}
+.report-section{margin-top:2rem}
+.chart-section{margin-top:0}
+.section-heading{margin-bottom:.8rem; padding-bottom:.65rem; border-bottom:1px solid var(--coz-rule)}
+.section-heading h2{margin:.18rem 0 0; font-family:Georgia,"Times New Roman",serif; font-size:1.55rem; font-weight:400}
+.section-heading > p,.section-kicker{margin:0; color:var(--coz-gold); font-size:.72rem; letter-spacing:.1em; text-transform:uppercase}
+
+/* ---- Western wheel (new, tropical-only) ---- */
+.chart-frame{position:relative; width:min(100%,31rem); margin:1.35rem auto 0; padding:1rem; border:1px solid rgb(184 138 85 / .72); background:rgb(255 252 246 / .46)}
+.chart-frame::before,.chart-frame::after{position:absolute; top:-.3rem; width:.55rem; height:.55rem; transform:rotate(45deg); border:1px solid var(--coz-gold); background:var(--coz-paper); content:""}
+.chart-frame::before{left:1.5rem}
+.chart-frame::after{right:1.5rem}
+.western-wheel{display:block; width:100%; color:var(--coz-ink)}
+.wheel-ring{fill:none; stroke:currentColor; stroke-width:.6; opacity:.6}
+.wheel-cusp{fill:none; stroke:currentColor; stroke-width:.5; opacity:.55}
+.wheel-axis{fill:none; stroke:var(--coz-rose); stroke-width:1.1; opacity:.85}
+.wheel-signdiv{fill:none; stroke:currentColor; stroke-width:.4; opacity:.4}
+.wheel-sign{text-anchor:middle; dominant-baseline:middle; font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols2",var(--font-sans); font-size:6.4px; font-weight:600; fill:rgb(7 22 43 / .8)}
+.wheel-housenum{text-anchor:middle; dominant-baseline:middle; font-family:var(--font-sans); font-size:5px; fill:rgb(49 68 86 / .78)}
+.wheel-anglelabel{text-anchor:middle; dominant-baseline:middle; font-family:var(--font-sans); font-size:5.6px; font-weight:600; fill:var(--coz-rose)}
+.wheel-angledeg{text-anchor:middle; dominant-baseline:middle; font-family:var(--font-sans); font-size:4.6px; fill:var(--coz-rose)}
+.wheel-planet{text-anchor:middle; dominant-baseline:middle; font-family:"Apple Symbols","Segoe UI Symbol","Noto Sans Symbols2",var(--font-sans); font-size:7px; font-weight:600; fill:var(--coz-ink)}
+.wheel-leader{fill:none; stroke:rgb(7 22 43 / .35); stroke-width:.3}
+.wheel-tick{stroke:rgb(7 22 43 / .55); stroke-width:.5}
+.wheel-aspect-blue{stroke:var(--chart-aspect-blue); stroke-width:.45; opacity:.7}
+.wheel-aspect-red{stroke:var(--chart-aspect-red); stroke-width:.45; opacity:.7}
+.wheel-aspect-gold{stroke:var(--coz-gold); stroke-width:.45; opacity:.6}
+
+.accordion-heading{margin-bottom:0}
+.insight-list{border-bottom:1px solid var(--coz-rule)}
+.insight-item{border-top:1px solid var(--coz-rule)}
+.insight-h{margin:0}
+.insight-trigger{
+  display:grid; grid-template-columns:minmax(10rem,.65fr) minmax(0,1.35fr) 1rem;
+  align-items:center; gap:1rem; width:100%; min-height:4.25rem; padding:.85rem .25rem;
+  border:0; background:none; text-align:left; color:var(--coz-ink); cursor:pointer;
+}
+.insight-trigger.insight-static{cursor:default}
+.insight-trigger:focus-visible{outline:2px solid var(--coz-gold); outline-offset:-2px}
+.insight-trigger > svg{width:1rem; height:1rem; color:var(--coz-gold); transition:transform .2s ease}
+.insight-trigger[aria-expanded="true"] > svg{transform:rotate(180deg)}
+.insight-label{color:var(--coz-gold); font-size:.75rem; font-weight:500; letter-spacing:.09em; line-height:1.35; text-transform:uppercase}
+.insight-answer{display:flex; align-items:center; flex-wrap:wrap; gap:.5rem; font-family:Georgia,"Times New Roman",serif; font-size:1.18rem; font-weight:400; line-height:1.3}
+.aspect-glyphs{display:inline-flex; gap:.15rem; font-size:1rem; color:var(--coz-rose)}
+.insight-content{margin-left:calc(32.5% + .5rem); padding:0 2rem .85rem 0; color:var(--coz-ink-soft); font-size:.92rem; line-height:1.65}
+.insight-content p{margin:0}
+.insight-content span{display:block; margin-top:.45rem; color:rgb(49 68 86 / .74); font-size:.76rem}
+@media screen{
+  .insight-content[hidden]{display:none}
+}
+.positions-scroll{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch}
+.positions-table{width:100%; min-width:39rem; border-collapse:collapse; font-size:.86rem}
+.positions-table th,.positions-table td{padding:.65rem .55rem; border-bottom:1px solid rgb(214 196 167 / .63); text-align:left}
+.positions-table thead th{color:var(--coz-gold); font-size:.7rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase}
+.positions-table tbody th{color:var(--coz-rose); font-weight:500}
+
+/* ---- House Cusps two-column table (new, tropical-only) ---- */
+.cusps-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 1.5rem}
+.cusps-table{width:100%; border-collapse:collapse; font-size:.86rem}
+.cusps-table th,.cusps-table td{padding:.55rem .4rem; border-bottom:1px solid rgb(214 196 167 / .63); text-align:left}
+.cusps-table thead th{color:var(--coz-gold); font-size:.68rem; font-weight:500; letter-spacing:.08em; text-transform:uppercase}
+.cusps-table tbody th{color:var(--coz-rose); font-weight:500; font-size:.78rem}
+
+.calculation-strip{display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; padding:1.1rem 0; border-block:1px solid var(--coz-rule)}
+.calculation-strip div{min-width:0}
+.calculation-strip strong{display:block; margin-top:.35rem; font-size:.82rem; font-weight:500; line-height:1.4}
+.report-footer{margin-top:1.5rem; color:rgb(49 68 86 / .76); font-size:.72rem; line-height:1.5}
+.report-footer p{margin:0}
+.report-footer p:first-child{max-width:34rem}
+.report-footer p:last-child{flex:0 0 auto; text-align:right}
+.build-stamp{position:fixed; right:.55rem; bottom:.4rem; z-index:60; color:rgb(184 138 85 / .5); font-size:.58rem; letter-spacing:.08em; pointer-events:none}
+@media (max-width:700px){
+  .report-shell{padding:1rem .5rem 3rem}
+  .report-toolbar{padding-inline:.4rem; justify-content:flex-end}
+  .toolbar-left p{display:none}
+  .report-inner{padding:2rem 1.5rem 1.5rem}
+  .birth-identity{grid-template-columns:1fr; gap:1rem}
+  .birth-identity dl{grid-template-columns:1fr .8fr 1.4fr}
+  .insight-trigger{grid-template-columns:minmax(7.5rem,.7fr) minmax(0,1.3fr) 1rem; gap:.75rem}
+  .insight-content{margin-left:calc(35% + .35rem); padding-right:1.2rem}
+  .calculation-strip{grid-template-columns:1fr 1fr}
+  .cusps-grid{grid-template-columns:1fr}
+  .report-footer{display:block}
+  .report-footer p:last-child{margin-top:.7rem; text-align:left}
+}
+@media (max-width:460px){
+  .report-header{align-items:flex-start}
+  .report-header h1{font-size:2rem}
+  .report-inner{padding-inline:1.15rem}
+  .birth-identity dl{grid-template-columns:1fr 1fr}
+  .birth-identity dl div:last-child{grid-column:1 / -1}
+  .section-heading{align-items:flex-start}
+  .section-heading > p{text-align:right}
+  .chart-frame{padding:.6rem}
+  .insight-trigger{grid-template-columns:minmax(0,1fr) 1rem; gap:.35rem .75rem; min-height:5rem}
+  .insight-label,.insight-answer{grid-column:1}
+  .insight-trigger > svg{grid-column:2; grid-row:1 / 3}
+  .insight-content{margin-left:0; padding-right:1.6rem}
+}
+@page{size:Letter; margin:.35in}
+/* compare embed (in=compare): the chart only, framed by saved-compare-document.html */
+body.embed-compare .report-toolbar,body.embed-compare #cozFoot,body.embed-compare .saved-readings,body.embed-compare .build-stamp,body.embed-compare .sample-banner{display:none !important}
+body.embed-compare,html.embed-compare{background:transparent !important}
+body.embed-compare .report-shell{min-height:0; padding:0 0 1rem}
+@media print{
+  :root{--background:#ffffff; --foreground:#07162b}
+  html,body{background:#ffffff !important}
+  .screen-only,.report-toolbar,.sample-banner,.build-stamp,.saved-readings{display:none !important}
+  .report-shell{min-height:0; padding:0}
+  .birth-report{width:100%; max-width:none; overflow:visible; border:0; box-shadow:none; print-color-adjust:exact; -webkit-print-color-adjust:exact}
+  .birth-report::before{inset:.2in}
+  .report-inner{padding:.3in .42in}
+  .report-section,.birth-identity,.calculation-strip{break-inside:avoid}
+  .chart-frame{width:3.9in; margin-top:.1in; padding:.09in}
+  .ornamental-rule{margin-block:.16in}
+  .report-section{margin-top:.2in}
+  .section-heading{margin-bottom:.04in; padding-bottom:.05in}
+  .insight-trigger{min-height:0; padding-block:.07in}
+  .insight-trigger > svg{display:none}
+  .insight-content{display:block !important}
+  .insight-content[hidden]{display:block !important}
+  .insight-content{padding-bottom:.08in; font-size:.72rem; line-height:1.45}
+  .positions-scroll{overflow:visible}
+  .positions-table{min-width:0; font-size:.69rem}
+  .positions-table th,.positions-table td{padding:.05in .04in}
+  .cusps-table{font-size:.66rem}
+  .report-footer{font-size:.6rem}
+}
+</style>
+<!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
+<script src="coz-saved.js?v=10"></script>
+<script src="saved-tropical-library.js?v=3"></script>
+</head>
+<body>
+<div class="report-shell">
+  <div class="report-toolbar">
+    <div class="toolbar-left">
+      <button type="button" class="print-button back-button" id="backBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+        Back to Reading
+      </button>
+      <p>BIRTH-CHART PRINT PREVIEW</p>
+    </div>
+    <button type="button" class="print-button" id="printBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z"/></svg>
+      Print / Save PDF
+    </button>
+  </div>
+  <div class="sample-banner" id="sampleBanner" hidden>Sample report · Illustrative data for design review</div>
+  <div id="reportMount"></div>
+</div>
+<div class="build-stamp">BIRTH CHART · TBC1.9 · NAV TEST N1.1</div>
+<script>
+"use strict";
+/* Renderer only. This page never calculates astronomy; every value comes from
+   the cozTropicalChartJSON payload written by the master engine, or from the
+   explicit non-production fixtures below. */
+
+var SIGN_NAMES = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+var SIGN_GLYPH = ["\u2648\uFE0E","\u2649\uFE0E","\u264A\uFE0E","\u264B\uFE0E","\u264C\uFE0E","\u264D\uFE0E","\u264E\uFE0E","\u264F\uFE0E","\u2650\uFE0E","\u2651\uFE0E","\u2652\uFE0E","\u2653\uFE0E"];
+var BODY_ORDER = ["sun","moon","mercury","venus","mars","jupiter","saturn","uranus","neptune","pluto","northNode","southNode","chiron"];
+var BODY_LABEL = {sun:"Sun",moon:"Moon",mercury:"Mercury",venus:"Venus",mars:"Mars",jupiter:"Jupiter",saturn:"Saturn",uranus:"Uranus",neptune:"Neptune",pluto:"Pluto",northNode:"North Node",southNode:"South Node",chiron:"Chiron"};
+var BODY_GLYPH = {sun:"\u2609\uFE0E",moon:"\u263D\uFE0E",mercury:"\u263F\uFE0E",venus:"\u2640\uFE0E",mars:"\u2642\uFE0E",jupiter:"\u2643\uFE0E",saturn:"\u2644\uFE0E",uranus:"\u2645\uFE0E",neptune:"\u2646\uFE0E",pluto:"\u2647\uFE0E",northNode:"\u260A\uFE0E",southNode:"\u260B\uFE0E",chiron:"\u26B7\uFE0E"};
+var ASPECT_GLYPH = {conjunction:"\u260C\uFE0E",opposition:"\u260D\uFE0E",trine:"\u25B3\uFE0E",square:"\u25A1\uFE0E",sextile:"\u2736\uFE0E"};
+var ASPECT_LABEL = {conjunction:"conjunct",opposition:"opposite",trine:"trine",square:"square",sextile:"sextile"};
+var MOTION_LABEL = {direct:"Direct",retrograde:"Retrograde",stationary:"Stationary",not_applicable:"\u2014"};
+var DISCLOSURE = "Astrological information for reflection and entertainment. It is not scientific, medical, legal or financial advice.";
+
+function mod(n,m){return ((n%m)+m)%m;}
+function pad2(n){return (n<10?"0":"")+n;}
+function fmtDegree(deg,min){return pad2(deg)+"\u00B0"+pad2(min)+"\u2032";}
+function fmtPosition(p){ return p.degree+"\u00B0"+pad2(p.minute)+"\u2032 "+p.sign; }
+
+/* ---------- Fixtures (explicit non-production preview only) ---------- */
+var DEMO_TROPICAL_CHART = {
+  documentId:"DEMO-T01-001", generatedAt:new Date().toISOString(),
+  client:{displayName:"Sample Client", birthDate:"December 1, 1978", birthTime:"5:45 AM",
+          locationLabel:"Rochester, New York", timezoneAbbreviation:"EST", utcOffset:"UTC\u221205:00"},
+  settings:{zodiac:"Tropical", requestedHouseSystem:"Placidus", resolvedHouseSystem:"Placidus", usedHouseFallback:false, nodeType:"Mean"},
+  angles:{
+    ascendant:{longitude:229.05,sign:"Scorpio",degree:19,minute:3},
+    descendant:{longitude:49.05,sign:"Taurus",degree:19,minute:3},
+    midheaven:{longitude:147,sign:"Leo",degree:27,minute:0},
+    imumCoeli:{longitude:327,sign:"Aquarius",degree:27,minute:0}
+  },
+  bodies:[
+    {id:"sun",position:{longitude:249.05,sign:"Sagittarius",degree:9,minute:3},house:1,motion:"direct"},
+    {id:"moon",position:{longitude:264.02,sign:"Sagittarius",degree:24,minute:1},house:2,motion:"direct"},
+    {id:"mercury",position:{longitude:259.08,sign:"Sagittarius",degree:19,minute:5},house:1,motion:"direct"},
+    {id:"venus",position:{longitude:217.67,sign:"Scorpio",degree:7,minute:40},house:12,motion:"direct"},
+    {id:"mars",position:{longitude:261.68,sign:"Sagittarius",degree:21,minute:41},house:2,motion:"direct"},
+    {id:"jupiter",position:{longitude:129.17,sign:"Leo",degree:9,minute:10},house:9,motion:"retrograde"},
+    {id:"saturn",position:{longitude:163.6,sign:"Virgo",degree:13,minute:36},house:10,motion:"direct"},
+    {id:"uranus",position:{longitude:227.0,sign:"Scorpio",degree:17,minute:0},house:12,motion:"direct"},
+    {id:"neptune",position:{longitude:257.0,sign:"Sagittarius",degree:17,minute:0},house:1,motion:"direct"},
+    {id:"pluto",position:{longitude:198.0,sign:"Libra",degree:18,minute:0},house:11,motion:"direct"},
+    {id:"northNode",position:{longitude:173.0,sign:"Virgo",degree:23,minute:0},house:10,motion:"retrograde"},
+    {id:"southNode",position:{longitude:353.0,sign:"Pisces",degree:23,minute:0},house:4,motion:"retrograde"}
+  ],
+  houseCusps:[
+    {house:1,position:{longitude:229.05,sign:"Scorpio",degree:19,minute:3}},
+    {house:2,position:{longitude:258.43,sign:"Sagittarius",degree:18,minute:26}},
+    {house:3,position:{longitude:290.23,sign:"Capricorn",degree:20,minute:14}},
+    {house:4,position:{longitude:327.0,sign:"Aquarius",degree:27,minute:0}},
+    {house:5,position:{longitude:359.2,sign:"Pisces",degree:29,minute:12}},
+    {house:6,position:{longitude:28.1,sign:"Aries",degree:28,minute:6}},
+    {house:7,position:{longitude:49.05,sign:"Taurus",degree:19,minute:3}},
+    {house:8,position:{longitude:78.43,sign:"Gemini",degree:18,minute:26}},
+    {house:9,position:{longitude:110.23,sign:"Cancer",degree:20,minute:14}},
+    {house:10,position:{longitude:147.0,sign:"Leo",degree:27,minute:0}},
+    {house:11,position:{longitude:179.2,sign:"Virgo",degree:29,minute:12}},
+    {house:12,position:{longitude:208.1,sign:"Libra",degree:28,minute:6}}
+  ],
+  aspects:[
+    {bodyA:"sun",bodyB:"mercury",type:"conjunction",orbDegrees:10.05,orbDisplay:"10\u00B003\u2032"},
+    {bodyA:"moon",bodyB:"jupiter",type:"trine",orbDegrees:14.85,orbDisplay:"14\u00B051\u2032"},
+    {bodyA:"venus",bodyB:"saturn",type:"square",orbDegrees:6.93,orbDisplay:"6\u00B056\u2032"},
+    {bodyA:"mars",bodyB:"pluto",type:"sextile",orbDegrees:3.68,orbDisplay:"3\u00B041\u2032"}
+  ],
+  balance:{element:{result:"Fire",counts:{Fire:4,Earth:1,Air:0,Water:5}}, modality:{result:"Mutable",counts:{Cardinal:1,Fixed:4,Mutable:5}}, emphasis:{labels:[],trace:[]}},
+  interpretations:{}
+};
+var STELLIUM_QA = (function(){
+  var d = JSON.parse(JSON.stringify(DEMO_TROPICAL_CHART));
+  d.documentId = "QA-STELLIUM-001";
+  d.client = Object.assign({}, d.client, {displayName:"Collision QA"});
+  d.bodies = [
+    {id:"sun",position:{longitude:11.0,sign:"Aries",degree:11,minute:2},house:2,motion:"direct"},
+    {id:"moon",position:{longitude:19.7,sign:"Aries",degree:19,minute:44},house:2,motion:"direct"},
+    {id:"mercury",position:{longitude:3.1,sign:"Aries",degree:3,minute:8},house:2,motion:"direct"},
+    {id:"venus",position:{longitude:27.5,sign:"Aries",degree:27,minute:31},house:2,motion:"direct"},
+    {id:"mars",position:{longitude:135.0,sign:"Leo",degree:15,minute:0},house:5,motion:"retrograde"},
+    {id:"jupiter",position:{longitude:280.0,sign:"Capricorn",degree:10,minute:0},house:10,motion:"direct"},
+    {id:"saturn",position:{longitude:283.0,sign:"Capricorn",degree:13,minute:0},house:10,motion:"stationary"},
+    {id:"uranus",position:{longitude:286.0,sign:"Capricorn",degree:16,minute:0},house:10,motion:"direct"},
+    {id:"neptune",position:{longitude:340.0,sign:"Pisces",degree:10,minute:0},house:12,motion:"direct"},
+    {id:"pluto",position:{longitude:70.0,sign:"Gemini",degree:10,minute:0},house:3,motion:"direct"},
+    {id:"northNode",position:{longitude:190.0,sign:"Libra",degree:10,minute:0},house:6,motion:"retrograde"},
+    {id:"southNode",position:{longitude:10.0,sign:"Aries",degree:10,minute:0},house:2,motion:"retrograde"}
+  ];
+  return d;
+})();
+
+/* ---------- Payload validation ---------- */
+function validPos(p){ return p && typeof p.longitude === "number" && p.sign && (p.degree>=0) && (p.minute>=0); }
+function validatePayload(c){
+  var errs = [];
+  if (!c || typeof c !== "object") return ["no payload"];
+  if (!c.client || !c.client.birthDate || !c.client.birthTime || !c.client.locationLabel) errs.push("client birth facts incomplete");
+  if (!c.settings || c.settings.zodiac !== "Tropical") errs.push("settings.zodiac must be Tropical");
+  if (!c.angles || !validPos(c.angles.ascendant) || !validPos(c.angles.midheaven)) errs.push("angles incomplete");
+  if (!Array.isArray(c.bodies) || c.bodies.length < 10) errs.push("bodies must include at least the 10 classical planets");
+  else c.bodies.forEach(function(b){
+    if (BODY_ORDER.indexOf(b.id) < 0) errs.push("unknown body " + b.id);
+    if (!validPos(b.position)) errs.push(b.id + " position invalid");
+    if (!(b.house >= 1 && b.house <= 12)) errs.push(b.id + " house invalid");
+  });
+  return errs;
+}
+
+/* ---------- Rendering ---------- */
+function el(tag,cls,text){
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+}
+function svgEl(tag,attrs){
+  var n = document.createElementNS("http://www.w3.org/2000/svg",tag);
+  for (var k in attrs) n.setAttribute(k,attrs[k]);
+  return n;
+}
+
+/* ---------- Western wheel geometry ----------
+   Ascendant fixed at the 9 o'clock point; the zodiac runs counterclockwise
+   from there (standard chart convention). theta(lon) is a plain math angle
+   (0=3 o'clock, increasing counterclockwise); converted to SVG x/y with
+   y flipped since SVG's y-axis points down. */
+function wheelPoint(lon, asc, cx, cy, r){
+  var offset = mod(lon - asc, 360);
+  var theta = mod(180 + offset, 360) * Math.PI / 180;
+  return { x: cx + r * Math.cos(theta), y: cy - r * Math.sin(theta) };
+}
+function wheelTheta(lon, asc){ return mod(180 + mod(lon - asc, 360), 360); }
+
+function renderWheel(chart){
+  var frame = el("div","chart-frame");
+  var cx = 150, cy = 150;
+  var rOuter = 122, rSignRing = 108, rHouseRing = 92, rPlanetTrue = 82, rPlanetLabel = 66, rAspect = 56, rInner = 56;
+  var asc = chart.angles.ascendant.longitude;
+  var svg = svgEl("svg",{class:"western-wheel", viewBox:"0 0 300 300", role:"img",
+    "aria-label":"Circular Western natal chart with the Ascendant in " + chart.angles.ascendant.sign});
+
+  svg.appendChild(svgEl("circle",{class:"wheel-ring", cx:cx, cy:cy, r:rOuter}));
+  svg.appendChild(svgEl("circle",{class:"wheel-ring", cx:cx, cy:cy, r:rSignRing}));
+  svg.appendChild(svgEl("circle",{class:"wheel-ring", cx:cx, cy:cy, r:rHouseRing}));
+  svg.appendChild(svgEl("circle",{class:"wheel-ring", cx:cx, cy:cy, r:rInner}));
+
+  /* 12 sign boundary lines + glyphs at each sign's midpoint */
+  for (var s = 0; s < 12; s++){
+    var signStart = s * 30;
+    var p1 = wheelPoint(signStart, asc, cx, cy, rSignRing);
+    var p2 = wheelPoint(signStart, asc, cx, cy, rOuter);
+    svg.appendChild(svgEl("line",{class:"wheel-signdiv", x1:p1.x, y1:p1.y, x2:p2.x, y2:p2.y}));
+    var mid = wheelPoint(signStart + 15, asc, cx, cy, (rSignRing + rOuter) / 2);
+    var glyph = svgEl("text",{class:"wheel-sign", x:mid.x, y:mid.y});
+    glyph.textContent = SIGN_GLYPH[s];
+    svg.appendChild(glyph);
+  }
+
+  /* house cusps: true Placidus cusps when available, else the 12 equal
+     whole-sign boundaries (already the sign lines above, cusps skipped) */
+  var cusps = (chart.houseCusps && chart.houseCusps.length === 12) ? chart.houseCusps : null;
+  if (cusps){
+    var byHouse = {}; cusps.forEach(function(c){ byHouse[c.house] = c.position.longitude; });
+    for (var h = 1; h <= 12; h++){
+      var lon = byHouse[h];
+      var isAngle = (h === 1 || h === 4 || h === 7 || h === 10);
+      var q1 = wheelPoint(lon, asc, cx, cy, rInner);
+      var q2 = wheelPoint(lon, asc, cx, cy, isAngle ? rOuter : rSignRing);
+      svg.appendChild(svgEl("line",{class: isAngle ? "wheel-axis" : "wheel-cusp", x1:q1.x, y1:q1.y, x2:q2.x, y2:q2.y}));
+      var nextLon = byHouse[(h % 12) + 1];
+      var span = mod(nextLon - lon, 360); if (span === 0) span = 30;
+      var numPt = wheelPoint(lon + span/2, asc, cx, cy, rInner - 8);
+      var num = svgEl("text",{class:"wheel-housenum", x:numPt.x, y:numPt.y});
+      num.textContent = String(h);
+      svg.appendChild(num);
+    }
+    /* angle labels (ASC/DSC/MC/IC) just outside the sign ring */
+    [["ASC","1","ascendant"],["DSC","7","descendant"],["MC","10","midheaven"],["IC","4","imumCoeli"]].forEach(function(a){
+      var pos = chart.angles[a[2]];
+      var lp = wheelPoint(pos.longitude, asc, cx, cy, rOuter + 16);
+      var t1 = svgEl("text",{class:"wheel-anglelabel", x:lp.x, y:lp.y - 4});
+      t1.textContent = a[0];
+      var t2 = svgEl("text",{class:"wheel-angledeg", x:lp.x, y:lp.y + 4});
+      t2.textContent = fmtDegree(pos.degree, pos.minute);
+      svg.appendChild(t1); svg.appendChild(t2);
+    });
+  }
+
+  /* aspect lines, drawn at true positions before any collision displacement */
+  var byId = {}; chart.bodies.forEach(function(b){ byId[b.id] = b; });
+  (chart.aspects || []).forEach(function(a){
+    var A = byId[a.bodyA], B = byId[a.bodyB];
+    if (!A || !B) return;
+    var pa = wheelPoint(A.position.longitude, asc, cx, cy, rAspect);
+    var pb = wheelPoint(B.position.longitude, asc, cx, cy, rAspect);
+    var cls = (a.type === "trine" || a.type === "sextile") ? "wheel-aspect-blue"
+            : (a.type === "square" || a.type === "opposition") ? "wheel-aspect-red"
+            : "wheel-aspect-gold";
+    svg.appendChild(svgEl("line",{class:cls, x1:pa.x, y1:pa.y, x2:pb.x, y2:pb.y}));
+  });
+
+  /* planet glyphs: deterministic collision handling.
+     Method: find the single largest circular gap between consecutive true
+     angles and treat that as the "seam" — cut the circle open there and
+     unroll it into a straight line (always safe, since nothing needs to be
+     placed inside that gap). On that line, run the standard label-declutter
+     pass: walk forward pushing anything closer than MIN_SEP to the right,
+     then walk backward doing the same to the left, and average the two so
+     a cluster spreads from its own center rather than piling to one side.
+     This always converges in two passes, no oscillation possible — unlike
+     naive pairwise repulsion, which can deadlock a 3+ body cluster.
+     A thin leader line always connects true position to a displaced label
+     so nothing silently drops. */
+  var MIN_SEP = 9;
+  var raw = chart.bodies
+    .filter(function(b){ return b.id !== "northNode" && b.id !== "southNode"; }) /* nodes shown in tables, not crowding the glyph ring */
+    .map(function(b){ return { id:b.id, trueAngle: wheelTheta(b.position.longitude, asc) }; })
+    .sort(function(x,y){ return x.trueAngle - y.trueAngle; });
+  var n = raw.length;
+  var items = [];
+  if (n > 0){
+    var bestGapIdx = 0, bestGap = -1;
+    for (var gi = 0; gi < n; gi++){
+      var g = mod(raw[(gi+1)%n].trueAngle - raw[gi].trueAngle, 360);
+      if (g > bestGap){ bestGap = g; bestGapIdx = gi; }
+    }
+    /* unroll starting just after the largest gap; add 360*k to keep it linear */
+    var lin = [];
+    for (var k = 0; k < n; k++){
+      var src = raw[(bestGapIdx + 1 + k) % n];
+      var base = src.trueAngle + (src.trueAngle < raw[(bestGapIdx+1)%n].trueAngle ? 360 : 0);
+      lin.push({ id: src.id, trueAngle: src.trueAngle, lin: base });
+    }
+    /* re-derive strictly increasing lin values (handles the wrap cleanly) */
+    for (var m = 1; m < n; m++){ if (lin[m].lin < lin[m-1].lin) lin[m].lin += 360; }
+    var fwd = lin.map(function(x){ return x.lin; });
+    for (var f = 1; f < n; f++){ if (fwd[f] < fwd[f-1] + MIN_SEP) fwd[f] = fwd[f-1] + MIN_SEP; }
+    var bwd = lin.map(function(x){ return x.lin; });
+    for (var b2 = n - 2; b2 >= 0; b2--){ if (bwd[b2] > bwd[b2+1] - MIN_SEP) bwd[b2] = bwd[b2+1] - MIN_SEP; }
+    for (var z = 0; z < n; z++){
+      items.push({ id: lin[z].id, trueAngle: lin[z].trueAngle, renderAngle: mod((fwd[z] + bwd[z]) / 2, 360) });
+    }
+  }
+  items.forEach(function(it){
+    var truePt = wheelPoint$(it.trueAngle, cx, cy, rPlanetTrue);
+    var labelPt = wheelPoint$(it.renderAngle, cx, cy, rPlanetLabel);
+    var displaced = Math.abs(mod(it.renderAngle - it.trueAngle + 180, 360) - 180) > 0.5;
+    svg.appendChild(svgEl("circle",{class:"wheel-tick", cx:truePt.x, cy:truePt.y, r:1.1}));
+    if (displaced) svg.appendChild(svgEl("line",{class:"wheel-leader", x1:truePt.x, y1:truePt.y, x2:labelPt.x, y2:labelPt.y}));
+    var g = svgEl("text",{class:"wheel-planet", x:labelPt.x, y:labelPt.y});
+    g.textContent = BODY_GLYPH[it.id] || "?";
+    svg.appendChild(g);
+  });
+
+  frame.appendChild(svg);
+  return frame;
+
+  /* local helper: same math as wheelPoint but takes a pre-computed theta-space
+     angle (already the "180+offset" wheel angle) instead of a raw longitude */
+  function wheelPoint$(wheelAngleDeg, cx, cy, r){
+    var theta = wheelAngleDeg * Math.PI / 180;
+    return { x: cx + r * Math.cos(theta), y: cy - r * Math.sin(theta) };
+  }
+}
+
+function sectionHeading(kicker,title,id,side,sideScreenOnly){
+  var head = el("div","section-heading" + (sideScreenOnly ? " accordion-heading" : ""));
+  var left = el("div");
+  left.appendChild(el("p","section-kicker",kicker));
+  var h2 = el("h2",null,title); h2.id = id;
+  left.appendChild(h2);
+  head.appendChild(left);
+  var p = el("p",sideScreenOnly ? "screen-only" : null,side);
+  head.appendChild(p);
+  return head;
+}
+
+var accordionSeq = 0;
+function renderInsightList(items,prefix){
+  var list = el("div","insight-list");
+  items.forEach(function(item){
+    var wrap = el("div","insight-item");
+    var hasBody = !!(item.explanation || item.meta);
+    var answer = el("span","insight-answer");
+    if (item.answerNode) answer.appendChild(item.answerNode);
+    else answer.appendChild(document.createTextNode(item.value));
+    if (hasBody){
+      var cid = prefix + "-c" + (++accordionSeq);
+      var h3 = el("h3","insight-h");
+      var btn = el("button","insight-trigger");
+      btn.type = "button";
+      btn.setAttribute("aria-expanded","false");
+      btn.setAttribute("aria-controls",cid);
+      btn.appendChild(el("span","insight-label",item.label));
+      btn.appendChild(answer);
+      var chev = svgEl("svg",{viewBox:"0 0 24 24",fill:"none",stroke:"currentColor","stroke-width":"2","aria-hidden":"true"});
+      chev.appendChild(svgEl("path",{d:"M6 9l6 6 6-6"}));
+      btn.appendChild(chev);
+      h3.appendChild(btn);
+      wrap.appendChild(h3);
+      var content = el("div","insight-content");
+      content.id = cid;
+      content.hidden = true;
+      if (item.explanation) content.appendChild(el("p",null,item.explanation));
+      if (item.meta) content.appendChild(el("span",null,item.meta));
+      wrap.appendChild(content);
+      btn.addEventListener("click",function(){
+        var open = btn.getAttribute("aria-expanded") === "true";
+        list.querySelectorAll('.insight-trigger[aria-expanded="true"]').forEach(function(other){
+          other.setAttribute("aria-expanded","false");
+          document.getElementById(other.getAttribute("aria-controls")).hidden = true;
+        });
+        if (!open){
+          btn.setAttribute("aria-expanded","true");
+          content.hidden = false;
+        }
+      });
+    } else {
+      var row = el("div","insight-trigger insight-static");
+      row.setAttribute("aria-label", item.label + ": " + (item.value || ""));
+      row.appendChild(el("span","insight-label",item.label));
+      row.appendChild(answer);
+      row.appendChild(el("span"));
+      wrap.appendChild(row);
+    }
+    list.appendChild(wrap);
+  });
+  return list;
+}
+
+function renderReport(chart){
+  var article = el("article","birth-report");
+  article.setAttribute("aria-label","Tropical birth chart report");
+  var inner = el("div","report-inner");
+
+  var header = el("header","report-header");
+  var hl = el("div");
+  hl.appendChild(el("p","wordmark","COZALYZE"));
+  hl.appendChild(el("h1",null,"Tropical Birth Chart"));
+  header.appendChild(hl);
+  header.appendChild(el("p","chart-type","Western \u00B7 Natal"));
+  inner.appendChild(header);
+
+  var hasPerson = !!(chart.client && chart.client.displayName);
+  var identity = el("section","birth-identity" + (hasPerson ? "" : " no-person"));
+  identity.setAttribute("aria-label","Verified birth information");
+  if (hasPerson){
+    var who = el("div");
+    who.appendChild(el("h2",null,chart.client.displayName));
+    identity.appendChild(who);
+  }
+  var dl = el("dl");
+  var tzLine = [chart.client.timezoneAbbreviation, chart.client.utcOffset].filter(Boolean).join(" \u00B7 ");
+  var P1_MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var dm = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(chart.client.birthDate || ""));
+  var dateShown = dm && +dm[2] >= 1 && +dm[2] <= 12 ? P1_MONTHS[+dm[2] - 1] + " " + (+dm[3]) + ", " + dm[1] : chart.client.birthDate;   /* TBC1.9 */
+  var timeShown = String(chart.client.birthTime || "").replace(/^0(\d:\d\d)/, "$1");                                                 /* TBC1.9 */
+  [["Date",dateShown,null],["Time",timeShown,tzLine],["Location",chart.client.locationLabel,null]].forEach(function(row){
+    var d = el("div");
+    d.appendChild(el("dt",null,row[0]));
+    var dd = el("dd",null,row[1]);
+    if (row[2]) dd.appendChild(el("span","birth-timezone",row[2]));
+    d.appendChild(dd);
+    dl.appendChild(d);
+  });
+  identity.appendChild(dl);
+  inner.appendChild(identity);
+
+  inner.appendChild(el("div","ornamental-rule"));
+
+  var chartSec = el("section","chart-section report-section");
+  chartSec.setAttribute("aria-labelledby","chart-heading");
+  chartSec.appendChild(sectionHeading("Your celestial blueprint","Natal Chart","chart-heading","Circular Western format",false));
+  chartSec.appendChild(renderWheel(chart));
+  inner.appendChild(chartSec);
+
+  /* Core Placements */
+  var byId = {}; chart.bodies.forEach(function(b){ byId[b.id] = b; });
+  var interp = chart.interpretations || {};
+  var core = el("section","report-section");
+  core.setAttribute("aria-labelledby","core-heading");
+  core.appendChild(sectionHeading("The foundations of your chart","Core Placements","core-heading","Select a line for its meaning",true));
+  var coreItems = [];
+  if (byId.sun) coreItems.push({label:"Sun Sign", value:fmtPosition(byId.sun.position), explanation:interp.sun});
+  if (byId.moon) coreItems.push({label:"Moon Sign", value:fmtPosition(byId.moon.position), explanation:interp.moon});
+  coreItems.push({label:"Rising Sign", value:fmtPosition(chart.angles.ascendant), explanation:interp.rising});
+  coreItems.push({label:"Midheaven", value:fmtPosition(chart.angles.midheaven), explanation:interp.midheaven});
+  core.appendChild(renderInsightList(coreItems,"core"));
+  inner.appendChild(core);
+
+  /* Element & Modality Balance */
+  if (chart.balance){
+    var bal = el("section","report-section");
+    bal.setAttribute("aria-labelledby","balance-heading");
+    bal.appendChild(sectionHeading("The overall chart pattern","Element & Modality Balance","balance-heading","",true));
+    var balItems = [
+      {label:"Dominant Element", value:chart.balance.element.result, explanation:chart.balance.element.interpretation},
+      {label:"Dominant Mode", value:chart.balance.modality.result, explanation:chart.balance.modality.interpretation}
+    ];
+    if (chart.balance.emphasis && chart.balance.emphasis.labels && chart.balance.emphasis.labels.length){
+      balItems.push({label:"Chart Emphasis", value:chart.balance.emphasis.labels.join(" \u00B7 "), explanation:chart.balance.emphasis.interpretation});
+    }
+    bal.appendChild(renderInsightList(balItems,"balance"));
+    inner.appendChild(bal);
+  }
+
+  /* Major Aspects */
+  if (chart.aspects && chart.aspects.length){
+    var asp = el("section","report-section");
+    asp.setAttribute("aria-labelledby","aspects-heading");
+    asp.appendChild(sectionHeading("Planetary relationships","Major Aspects","aspects-heading","Principal aspects only",true));
+    var aspItems = chart.aspects.map(function(a){
+      var A = byId[a.bodyA], B = byId[a.bodyB];
+      var labelText = (BODY_LABEL[a.bodyA]||a.bodyA) + " " + ASPECT_LABEL[a.type] + " " + (BODY_LABEL[a.bodyB]||a.bodyB);
+      var glyphSpan = el("span","aspect-glyphs");
+      glyphSpan.textContent = (BODY_GLYPH[a.bodyA]||"") + " " + (ASPECT_GLYPH[a.type]||"") + " " + (BODY_GLYPH[a.bodyB]||"");
+      var answerNode = document.createDocumentFragment();
+      answerNode.appendChild(glyphSpan);
+      answerNode.appendChild(document.createTextNode(" " + labelText + " (orb " + a.orbDisplay + ")"));
+      return {label:"Aspect", value:labelText, answerNode:answerNode, explanation: (chart.interpretations && chart.interpretations["aspect_"+a.bodyA+"_"+a.bodyB]) || null};
+    });
+    asp.appendChild(renderInsightList(aspItems,"aspect"));
+    inner.appendChild(asp);
+  }
+
+  /* Planetary Positions */
+  var pos = el("section","report-section positions-section");
+  pos.setAttribute("aria-labelledby","positions-heading");
+  pos.appendChild(sectionHeading("Reference data","Planetary Positions","positions-heading","Natal positions",false));
+  var scroll = el("div","positions-scroll");
+  var table = el("table","positions-table");
+  var thead = el("thead"); var trh = el("tr");
+  ["Body","Sign & Degree","House","Motion"].forEach(function(t){
+    var th = el("th",null,t); th.setAttribute("scope","col"); trh.appendChild(th);
+  });
+  thead.appendChild(trh); table.appendChild(thead);
+  var tbody = el("tbody");
+  var ascRow = el("tr");
+  var ascTh = el("th",null,"Ascendant"); ascTh.setAttribute("scope","row"); ascRow.appendChild(ascTh);
+  ascRow.appendChild(el("td",null,fmtPosition(chart.angles.ascendant)));
+  ascRow.appendChild(el("td",null,"1"));
+  ascRow.appendChild(el("td",null,"\u2014"));
+  tbody.appendChild(ascRow);
+  BODY_ORDER.forEach(function(id){
+    if (id === "chiron" && !byId.chiron) return; /* Chiron only when the engine supplies it */
+    var b = byId[id];
+    if (!b) return;
+    var tr = el("tr");
+    var th = el("th",null,BODY_LABEL[id]); th.setAttribute("scope","row"); tr.appendChild(th);
+    tr.appendChild(el("td",null,fmtPosition(b.position)));
+    tr.appendChild(el("td",null,String(b.house)));
+    tr.appendChild(el("td",null,MOTION_LABEL[b.motion] || "\u2014"));
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  scroll.appendChild(table);
+  pos.appendChild(scroll);
+  inner.appendChild(pos);
+
+  /* House Cusps & Angles */
+  if (chart.houseCusps && chart.houseCusps.length === 12){
+    var hc = el("section","report-section");
+    hc.setAttribute("aria-labelledby","cusps-heading");
+    hc.appendChild(sectionHeading("House reference","House Cusps & Angles","cusps-heading","",false));
+    var grid = el("div","cusps-grid");
+    var ANGLE_LABEL = {1:"1 (Ascendant)", 4:"4 (Imum Coeli)", 7:"7 (Descendant)", 10:"10 (Midheaven)"};
+    [[1,6],[7,12]].forEach(function(range){
+      var t = el("table","cusps-table");
+      var th = el("thead"); var tr0 = el("tr");
+      ["House","Sign & Degree"].forEach(function(txt){ var thc = el("th",null,txt); thc.setAttribute("scope","col"); tr0.appendChild(thc); });
+      th.appendChild(tr0); t.appendChild(th);
+      var tb = el("tbody");
+      var cuspByHouse = {}; chart.houseCusps.forEach(function(c){ cuspByHouse[c.house] = c.position; });
+      for (var hh = range[0]; hh <= range[1]; hh++){
+        var trr = el("tr");
+        var rowTh = el("th",null, ANGLE_LABEL[hh] || String(hh)); rowTh.setAttribute("scope","row"); trr.appendChild(rowTh);
+        trr.appendChild(el("td",null, cuspByHouse[hh] ? fmtPosition(cuspByHouse[hh]) : "\u2014"));
+        tb.appendChild(trr);
+      }
+      t.appendChild(tb);
+      grid.appendChild(t);
+    });
+    hc.appendChild(grid);
+    inner.appendChild(hc);
+  }
+
+  var calc = el("section","calculation-strip report-section");
+  calc.setAttribute("aria-label","Calculation settings");
+  var houseLabel = chart.settings.usedHouseFallback ? (chart.settings.resolvedHouseSystem + " (fallback)") : chart.settings.resolvedHouseSystem;
+  var nodeLabel = chart.settings.nodeType === "True" ? "True North & South Node" : "Mean North & South Node";
+  [["Zodiac","Tropical"],["Houses",houseLabel],["Nodes",nodeLabel],["Time zone",tzLine || "\u2014"]].forEach(function(row){
+    var d = el("div");
+    d.appendChild(el("span",null,row[0]));
+    d.appendChild(el("strong",null,row[1]));
+    calc.appendChild(d);
+  });
+  inner.appendChild(calc);
+
+  var footer = el("footer","report-footer");
+  footer.appendChild(el("p",null,DISCLOSURE));
+  footer.appendChild(el("p",null,"Generated by CozAlyze \u00B7 " + chart.documentId));
+  inner.appendChild(footer);
+
+  article.appendChild(inner);
+  return article;
+}
+
+function renderEmptyState(){
+  var card = el("div","empty-card");
+  card.appendChild(el("h2",null,"No saved birth chart yet"));
+  card.appendChild(el("p",null,"Your chart is saved to this device when your reading is prepared. Open your reading first, then return here for your printable birth chart."));
+  return card;
+}
+
+/* Print / Save PDF: iOS Safari ignores window.print() from inside the app frame, so a
+   framed page opens itself at top level with ?print=1 and prints there. */
+function cozPrint(){
+  var framed = false; try { framed = window.top !== window; } catch (e) { framed = true; }
+  if (framed) { var u = new URL(location.href); u.searchParams.set("print", "1"); window.open(u.href, "_blank"); return; }
+  window.print();
+}
+function cozAutoPrint(){
+  if (!/[?&]print=1\b/.test(location.search)) return;
+  var go = function(){ setTimeout(function(){ window.print(); }, 250); };
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); else go();
+}
+/* TBC1.5: the Saved Readings links, appended in saved mode only.
+   TBC1.7 (Sep 24): Your Current Transits opens the cream document
+   (saved-tropical-document.html?view=transits), which recalculates the transits for this
+   saved chart at that moment; a transit snapshot is never stored. */
+function renderSavedReadings(lib){
+  var sec = el("section","report-section saved-readings");
+  sec.setAttribute("aria-labelledby","saved-readings-heading");
+  sec.appendChild(sectionHeading("Quick access to other views for this chart","Saved Readings","saved-readings-heading","",false));
+  var grid = el("div","saved-readings-links");
+  [["Your Tropical Reading","reading",lib.has.reading,"Not finished when saved"],
+   ["Your Ascendant","ascendant",lib.has.ascendant,"Not saved with this chart"],
+   ["Your Current Transits","transits",lib.has.transits,"Chart not saved"]].forEach(function(row){
+    var a = el("a", row[2] ? null : "unavailable");
+    a.appendChild(el("span",null,row[0])); a.firstChild.style.color = "";
+    if (row[2]){ a.href = "saved-tropical-document.html?view=" + row[1] + "&id=" + encodeURIComponent(lib.id); a.appendChild(el("span",null,"\u203A")); }
+    else { a.setAttribute("aria-disabled","true"); a.appendChild(el("small",null,row[3])); }
+    grid.appendChild(a);
+  });
+  sec.appendChild(grid);
+  return sec;
+}
+
+/* ---------- Boot ---------- */
+(function(){
+  var mount = document.getElementById("reportMount");
+  var banner = document.getElementById("sampleBanner");
+  document.getElementById("printBtn").addEventListener("click",cozPrint);
+  document.getElementById("backBtn").addEventListener("click",function(){ location.href = /\bsaved=1\b/.test(location.search) ? "saved-charts.html" : (/\bfrom=compare\b/.test(location.search) ? "compare-birth-charts.html" : "tropical-reading.html"); });
+  /* Points at tropical-reveal.html for now — a confirmed-working page. Swap this
+     one line if a dedicated tropical dashboard page (parallel to vedic-reading.html)
+     turns out to exist or gets built under a different filename later. */
+
+  var qp = new URLSearchParams(location.search);
+  var chart = null, isSample = false;
+
+  /* TBC1.5 saved mode: data from the selected saved record, never from the live keys */
+  var savedLib = null;
+  if (qp.get("saved") === "1"){
+    document.body.classList.add("saved-mode");
+    if (qp.get("in") === "compare"){ document.body.classList.add("embed-compare"); document.documentElement.classList.add("embed-compare"); }   /* TBC1.8 */
+    document.getElementById("backBtn").lastChild.textContent = " Saved Charts";
+    savedLib = window.CozSavedTropical ? window.CozSavedTropical.load() : null;
+    if (!savedLib || !savedLib.chart){
+      var card = el("div","empty-card");
+      card.appendChild(el("h2",null,"This saved chart could not be opened"));
+      card.appendChild(el("p",null,"It may have been removed from this device. Open Saved Charts to choose another."));
+      mount.appendChild(card); return;
+    }
+    chart = savedLib.chart;
+  }
+  else if (qp.get("chart") === "demo"){ chart = DEMO_TROPICAL_CHART; isSample = true; }
+  else if (qp.get("chart") === "stellium"){ chart = STELLIUM_QA; isSample = true; }
+  else {
+    var raw = null;
+    try { raw = localStorage.getItem("cozTropicalChartJSON"); } catch(e){}
+    if (raw){
+      try {
+        var parsed = JSON.parse(raw);
+        var errs = validatePayload(parsed);
+        if (errs.length === 0) chart = parsed;
+        else if (window.console) console.warn("cozTropicalChartJSON rejected: " + errs.join("; "));
+      } catch(e){ if (window.console) console.warn("cozTropicalChartJSON unreadable"); }
+    }
+  }
+
+  if (!chart){ mount.appendChild(renderEmptyState()); return; }
+  var errsFinal = validatePayload(chart);
+  if (errsFinal.length){ mount.appendChild(renderEmptyState()); return; }
+  if (isSample) banner.hidden = false;
+  var report = renderReport(chart);
+  if (savedLib && qp.get("in") !== "compare"){ var innerEl = report.querySelector(".report-inner"); innerEl.insertBefore(renderSavedReadings(savedLib), innerEl.querySelector(".report-footer")); }
+  mount.appendChild(report);
+  cozAutoPrint();
+})();
+
+</script>
+</body>
+</html>
