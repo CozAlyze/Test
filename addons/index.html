@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Add-ons Preview · CozAlyze Test</title>
 <!--
-  ADD-ONS PREVIEW · P0.1 (Oct 15 2026) · CozAlyze/Test/addons only, never the Demo.
+  ADD-ONS PREVIEW · P0.2 (Oct 15 2026) · CozAlyze/Test/addons only, never the Demo.
+  P0.2: the $94 package (one full reading + Compare) is approved, so no price is marked proposed any more.
   Front end only, for reviewing the post-purchase add-on screen and its wording on the phone.
   No payment, no sign-in, no Stripe, no account. Nothing is stored: the purchase state lives in the page
   address (#/...) only, so the page never reads or writes the phone's storage and never touches the Demo's data.
@@ -17,12 +18,11 @@
      available for what they now own. Built only from Jason's Saved Charts pieces (header art and heading,
      divider, message panel strip, text styles, pill buttons); nothing new drawn. The final look is his.
 
-  Prices (base prices unchanged; add-on prices follow the package totals in the Oct 15 proposal):
-    owned:  one full reading $49 · Compare $75 · both full readings $88 · one full reading + Compare $94 (PROPOSED;
-            alternative $89) · all three $113. An add-on costs the difference.
+  Prices (base prices unchanged; add-on prices follow the package totals approved Oct 15):
+    owned:  one full reading $49 · Compare $75 · both full readings $88 · one full reading + Compare $94 ·
+            all three $113. An add-on costs the difference.
     Compatibility $25, outside the package totals, after any first purchase.
-  Every add-on price is marked on the screen as a preview price; the ones that depend on the $94 proposal
-  are marked proposed.
+  Every add-on price is marked on the screen as a preview price (no payment exists yet).
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -85,7 +85,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
 (function(){
   "use strict";
   var NAME = { v: "Your Vedic Reading", t: "Your Tropical Reading", c: "Your Comparison Reading", x: "Your Compatibility Reading" };
-  /* package totals by what is owned (Oct 15 proposal; one full reading + Compare = $94 is PROPOSED, alternative $89) */
+  /* package totals by what is owned (approved Oct 15) */
   var TOTAL = { "": 0, v: 49, t: 49, c: 75, vt: 88, vc: 94, tc: 94, vtc: 113 };
   var COMPAT = 25;
   var STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg>';
@@ -100,8 +100,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     if (add === "x") return { mark: "Preview price" };
     if (!key(own)) return { mark: "Base price" };
     if ((add === "v" || add === "t") && key(own).length === 1 && own.indexOf("c") < 0) return { save: "$10 off", mark: "Preview price" };   /* the decided $39 */
-    if (add === "c" && readings(own).length === 2) return { mark: "Preview price" };                                                     /* $25 after both readings */
-    return { mark: "Proposed price" };                                                                                                    /* depends on the $94 proposal */
+    return { mark: "Preview price" };                                                     /* every other add-on price */
   }
   /* the add-ons offered for what the customer now owns */
   function offers(own){
@@ -129,7 +128,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
   /* ---------- test control ---------- */
   function control(own){
     var h = '<div class="ctl"><h1>Add-ons Preview</h1>' +
-      '<p class="muted">Test only. Front end only: no payment, no sign-in, nothing saved. Prices marked Proposed aren’t approved yet.</p>' +
+      '<p class="muted">Test only. Front end only: no payment, no sign-in, nothing saved.</p>' +
       '<h2>1. What the customer already owns</h2><div class="box">' +
       ["v", "t", "c"].map(function(k){ return '<label><input type="checkbox" data-own="' + k + '"' + (own.indexOf(k) >= 0 ? " checked" : "") + '> ' + NAME[k] + '</label>'; }).join("") +
       '<p class="muted">Paid so far: $' + TOTAL[key(own)] + '</p></div>' +
@@ -143,10 +142,10 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     });
     h += '<p class="muted">After the mock purchase you see the add-on screen the customer would see.</p></div>' +
       '<h2>Package totals</h2><div class="box"><table>' +
-      [["One full reading", 49], ["Compare only", 75], ["Both full readings", 88], ["One full reading + Compare (proposed; alternative $89)", 94], ["All three", 113]]
+      [["One full reading", 49], ["Compare only", 75], ["Both full readings", 88], ["One full reading + Compare", 94], ["All three", 113]]
         .map(function(r){ return '<tr><td>' + r[0] + '</td><td>$' + r[1] + '</td></tr>'; }).join("") +
       '</table><p class="muted">An add-on costs the difference. Compatibility is $25, after any first purchase.</p></div>' +
-      '<p class="stamp2">ADD-ONS PREVIEW · P0.1</p></div>';
+      '<p class="stamp2">ADD-ONS PREVIEW · P0.2</p></div>';
     app.innerHTML = h;
     Array.prototype.forEach.call(app.querySelectorAll("[data-own]"), function(cb){
       cb.addEventListener("change", function(){
@@ -174,7 +173,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     });
     h += '<section class="panel"><div class="div" aria-hidden="true">' + STAR + '</div>' +
       '<a class="pill" href="#/?own=' + own + '">Not Now</a>' +
-      '<div class="stamp">ADD-ONS PREVIEW · P0.1 · NO PAYMENT</div></section></main>';
+      '<div class="stamp">ADD-ONS PREVIEW · P0.2 · NO PAYMENT</div></section></main>';
     app.innerHTML = h;
     Array.prototype.forEach.call(app.querySelectorAll("[data-add]"), function(b){
       b.addEventListener("click", function(){ buy(own, b.getAttribute("data-add")); });
