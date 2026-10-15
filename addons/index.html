@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Add-ons Preview · CozAlyze Test</title>
+<!--
+  ADD-ONS PREVIEW · P0.1 (Oct 15 2026) · CozAlyze/Test/addons only, never the Demo.
+  Front end only, for reviewing the post-purchase add-on screen and its wording on the phone.
+  No payment, no sign-in, no Stripe, no account. Nothing is stored: the purchase state lives in the page
+  address (#/...) only, so the page never reads or writes the phone's storage and never touches the Demo's data.
+  It requests nothing but the fonts and two of the Demo's Saved Charts art files (/Demo/sc-top.jpg, /Demo/sc-mid.png).
+
+  Two views:
+  1. Test control (#/): choose what the customer already owns, then make a mock purchase. Test page only.
+  2. Add-on screen (#/thanks?own=..&new=..): what the customer sees after the purchase. Shows only the add-ons
+     available for what they now own. Built only from Jason's Saved Charts pieces (header art and heading,
+     divider, message panel strip, text styles, pill buttons); nothing new drawn. The final look is his.
+
+  Prices (base prices unchanged; add-on prices follow the package totals in the Oct 15 proposal):
+    owned:  one full reading $49 · Compare $75 · both full readings $88 · one full reading + Compare $94 (PROPOSED;
+            alternative $89) · all three $113. An add-on costs the difference.
+    Compatibility $25, outside the package totals, after any first purchase.
+  Every add-on price is marked on the screen as a preview price; the ones that depend on the $94 proposal
+  are marked proposed.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;500&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root{ --cream:#EEE7D8; --gold:#F2C898; --line:#C9A27C; --navy:#02040c; --muted:#b9ae9a;
+  --head:"Bodoni Moda",Georgia,serif; --sans:"Montserrat","Helvetica Neue",Arial,sans-serif; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--navy);color:var(--cream);-webkit-text-size-adjust:100%;overflow-x:hidden}
+body{padding-bottom:env(safe-area-inset-bottom)}
+
+/* ---------- add-on screen: Saved Charts S1.4 pieces only ---------- */
+.page{position:relative;width:100%;max-width:640px;margin:0 auto;container-type:inline-size}
+.page,.page *{--K:calc(100cqw / 1185)}
+.art{display:block;width:100%;height:auto;pointer-events:none;user-select:none;-webkit-user-select:none}
+.top{position:relative}
+.head{position:absolute;left:0;right:0;top:calc(418 * var(--K));text-align:center}
+h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)));line-height:1.05;color:var(--cream);letter-spacing:.005em}
+.lead{font-family:var(--sans);font-weight:300;font-size:max(14px,calc(40 * var(--K)));line-height:1.35;margin-top:calc(22 * var(--K));padding:0 calc(60 * var(--K))}
+.div{display:flex;align-items:center;height:calc(30 * var(--K));margin:calc(30 * var(--K)) calc(231 * var(--K)) 0}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--line)}
+.div svg{width:calc(28 * var(--K));height:calc(28 * var(--K));margin:0 calc(12 * var(--K));color:var(--gold);flex:none}
+.panel{position:relative;background:url("/Demo/sc-mid.png?v=1") center top/100% 1px repeat-y #00050f;text-align:center;
+  padding:calc(40 * var(--K)) calc(120 * var(--K)) calc(50 * var(--K))}
+.panel .div{margin:0 calc(111 * var(--K)) calc(50 * var(--K))}   /* same width as the heading's divider (231 less the panel's 120 padding) */
+.ttl{font-family:var(--head);font-weight:500;font-size:max(20px,calc(58 * var(--K)));line-height:1.15;color:var(--cream)}
+.sub{font-family:var(--sans);font-weight:300;font-size:max(13px,calc(33 * var(--K)));line-height:1.4;color:var(--cream);margin-top:calc(16 * var(--K))}
+.price{font-family:var(--head);font-weight:500;font-size:max(20px,calc(58 * var(--K)));line-height:1.1;color:var(--cream);margin-top:calc(30 * var(--K))}
+.save{font-family:var(--sans);font-weight:300;font-size:max(13px,calc(33 * var(--K)));line-height:1.3;color:var(--cream);margin-top:calc(8 * var(--K))}
+.mark{font-family:var(--sans);font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.6);margin-top:calc(10 * var(--K));text-transform:uppercase}
+.pill{position:relative;font-family:var(--sans);font-weight:300;font-size:max(12px,calc(30 * var(--K)));line-height:1;color:var(--cream);background:none;cursor:pointer;
+  border:1.5px solid var(--line);border-radius:999px;height:calc(59 * var(--K));min-height:26px;padding:0 calc(36 * var(--K));
+  display:inline-flex;align-items:center;margin-top:calc(30 * var(--K));-webkit-tap-highlight-color:transparent;text-decoration:none}
+.pill::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:44px;transform:translateY(-50%)}      /* 44 px tap area, nothing drawn */
+.pill:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
+.stamp{position:absolute;right:6px;bottom:4px;font-family:var(--sans);font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);pointer-events:none}
+
+/* ---------- test control: test page only (same plain style as test-setup.html) ---------- */
+.ctl{max-width:560px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 28px) 20px 40px;font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.5}
+.ctl h1{font-size:28px;line-height:1.15}
+.ctl h2{font-family:var(--head);font-weight:500;font-size:20px;margin:28px 0 8px;color:var(--gold)}
+.ctl p{margin-top:8px}
+.ctl .muted{color:var(--muted);font-size:14px}
+.ctl .box{border:1px solid rgba(201,162,124,.45);border-radius:14px;padding:6px 16px 14px;margin-top:10px}
+.ctl label{display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer}
+.ctl input[type=checkbox]{width:20px;height:20px;accent-color:#C9A27C}
+.ctl button{font-family:var(--sans);font-weight:400;font-size:15px;color:var(--cream);background:none;border:1.5px solid var(--line);
+  border-radius:999px;padding:12px 20px;margin-top:12px;width:100%;min-height:44px;cursor:pointer;text-align:left;display:flex;justify-content:space-between;gap:10px;
+  -webkit-tap-highlight-color:transparent}
+.ctl button small{color:var(--muted);font-size:12px;white-space:nowrap;align-self:center}
+.ctl table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+.ctl td{padding:7px 0;border-bottom:1px solid rgba(201,162,124,.25)}
+.ctl td:last-child{text-align:right;white-space:nowrap}
+.ctl .stamp2{margin-top:36px;font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);text-align:right}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+(function(){
+  "use strict";
+  var NAME = { v: "Your Vedic Reading", t: "Your Tropical Reading", c: "Your Comparison Reading", x: "Your Compatibility Reading" };
+  /* package totals by what is owned (Oct 15 proposal; one full reading + Compare = $94 is PROPOSED, alternative $89) */
+  var TOTAL = { "": 0, v: 49, t: 49, c: 75, vt: 88, vc: 94, tc: 94, vtc: 113 };
+  var COMPAT = 25;
+  var STAR = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg>';
+  var app = document.getElementById("app");
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+  function key(own){ return ["v", "t", "c"].filter(function(k){ return own.indexOf(k) >= 0; }).join(""); }
+  function priceOf(own, add){ return add === "x" ? COMPAT : TOTAL[key(own + add)] - TOTAL[key(own)]; }
+  function readings(own){ return ["v", "t"].filter(function(k){ return own.indexOf(k) >= 0; }); }
+  /* what the price is, for the marks under it */
+  function kind(own, add){
+    if (add === "x") return { mark: "Preview price" };
+    if (!key(own)) return { mark: "Base price" };
+    if ((add === "v" || add === "t") && key(own).length === 1 && own.indexOf("c") < 0) return { save: "$10 off", mark: "Preview price" };   /* the decided $39 */
+    if (add === "c" && readings(own).length === 2) return { mark: "Preview price" };                                                     /* $25 after both readings */
+    return { mark: "Proposed price" };                                                                                                    /* depends on the $94 proposal */
+  }
+  /* the add-ons offered for what the customer now owns */
+  function offers(own){
+    var out = [], r = readings(own), hasC = own.indexOf("c") >= 0;
+    if (r.length === 1) {
+      var other = r[0] === "v" ? "t" : "v";
+      out.push({ add: other, ttl: "See Yourself Through Another Perspective", sub: NAME[other] + ", from the same birth details." });
+    } else if (r.length === 0 && hasC) {
+      out.push({ add: "v", ttl: NAME.v, sub: "The complete six-part Vedic reading of your chart." });
+      out.push({ add: "t", ttl: NAME.t, sub: "The complete six-part Tropical reading of your chart." });
+    }
+    if (!hasC && r.length) out.push({ add: "c", ttl: NAME.c, sub: "Where your Vedic and Tropical charts agree, differ and complement each other." });
+    if (key(own)) out.push({ add: "x", ttl: NAME.x, sub: "Your chart and one other person’s, read together." });
+    return out;
+  }
+  function parse(){
+    var m = /^#\/(thanks)?(?:\?(.*))?$/.exec(location.hash || "#/") || [];
+    var q = {}; (m[2] || "").split("&").forEach(function(p){ var i = p.indexOf("="); if (i > 0) q[p.slice(0, i)] = p.slice(i + 1); });
+    var own = key((q.own || "").replace(/[^vtc]/g, ""));
+    return { view: m[1] ? "thanks" : "control", own: own, nw: /^[vtcx]$/.test(q["new"] || "") ? q["new"] : "" };
+  }
+  function go(view, own, nw){ location.hash = view === "thanks" ? "#/thanks?own=" + own + "&new=" + nw : "#/?own=" + own; }
+  function buy(own, add){ go("thanks", add === "x" ? own : key(own + add), add); }
+
+  /* ---------- test control ---------- */
+  function control(own){
+    var h = '<div class="ctl"><h1>Add-ons Preview</h1>' +
+      '<p class="muted">Test only. Front end only: no payment, no sign-in, nothing saved. Prices marked Proposed aren’t approved yet.</p>' +
+      '<h2>1. What the customer already owns</h2><div class="box">' +
+      ["v", "t", "c"].map(function(k){ return '<label><input type="checkbox" data-own="' + k + '"' + (own.indexOf(k) >= 0 ? " checked" : "") + '> ' + NAME[k] + '</label>'; }).join("") +
+      '<p class="muted">Paid so far: $' + TOTAL[key(own)] + '</p></div>' +
+      '<h2>2. Mock purchase</h2><div class="box">';
+    var left = ["v", "t", "c"].filter(function(k){ return own.indexOf(k) < 0; });
+    if (key(own)) left.push("x");
+    if (!left.length) h += '<p class="muted">Nothing left to buy.</p>';
+    left.forEach(function(k){
+      var p = priceOf(own, k), m = kind(own, k);
+      h += '<button type="button" data-buy="' + k + '"><span>Buy ' + NAME[k] + ' · $' + p + '</span><small>' + (m.save ? m.save + ' · ' : '') + m.mark + '</small></button>';
+    });
+    h += '<p class="muted">After the mock purchase you see the add-on screen the customer would see.</p></div>' +
+      '<h2>Package totals</h2><div class="box"><table>' +
+      [["One full reading", 49], ["Compare only", 75], ["Both full readings", 88], ["One full reading + Compare (proposed; alternative $89)", 94], ["All three", 113]]
+        .map(function(r){ return '<tr><td>' + r[0] + '</td><td>$' + r[1] + '</td></tr>'; }).join("") +
+      '</table><p class="muted">An add-on costs the difference. Compatibility is $25, after any first purchase.</p></div>' +
+      '<p class="stamp2">ADD-ONS PREVIEW · P0.1</p></div>';
+    app.innerHTML = h;
+    Array.prototype.forEach.call(app.querySelectorAll("[data-own]"), function(cb){
+      cb.addEventListener("change", function(){
+        var o = Array.prototype.filter.call(app.querySelectorAll("[data-own]"), function(x){ return x.checked; }).map(function(x){ return x.getAttribute("data-own"); }).join("");
+        go("control", key(o));
+      });
+    });
+    Array.prototype.forEach.call(app.querySelectorAll("[data-buy]"), function(b){
+      b.addEventListener("click", function(){ buy(own, b.getAttribute("data-buy")); });
+    });
+  }
+
+  /* ---------- add-on screen ---------- */
+  function thanks(own, nw){
+    var list = offers(own), h = '<main class="page">' +
+      '<div class="top"><img class="art" src="/Demo/sc-top.jpg?v=1" alt=""><div class="head">' +
+      '<h1>Thank You</h1><p class="lead">' + esc(NAME[nw]) + ' is ready.</p>' +
+      '<div class="div" aria-hidden="true">' + STAR + '</div></div></div>';
+    list.forEach(function(o, i){
+      var p = priceOf(own, o.add), m = kind(own, o.add);
+      h += '<section class="panel" data-offer="' + o.add + '">' + (i ? '<div class="div" aria-hidden="true">' + STAR + '</div>' : '') +
+        '<p class="ttl">' + esc(o.ttl) + '</p><p class="sub">' + esc(o.sub) + '</p>' +
+        '<p class="price">$' + p + '</p>' + (m.save ? '<p class="save">' + m.save + '</p>' : '') + '<p class="mark">' + m.mark + '</p>' +
+        '<button type="button" class="pill" data-add="' + o.add + '" aria-label="Add ' + esc(NAME[o.add]) + ' for $' + p + '">Add</button></section>';
+    });
+    h += '<section class="panel"><div class="div" aria-hidden="true">' + STAR + '</div>' +
+      '<a class="pill" href="#/?own=' + own + '">Not Now</a>' +
+      '<div class="stamp">ADD-ONS PREVIEW · P0.1 · NO PAYMENT</div></section></main>';
+    app.innerHTML = h;
+    Array.prototype.forEach.call(app.querySelectorAll("[data-add]"), function(b){
+      b.addEventListener("click", function(){ buy(own, b.getAttribute("data-add")); });
+    });
+  }
+
+  function render(){
+    var s = parse();
+    if (s.view === "thanks" && s.nw && (s.nw === "x" ? !!s.own : s.own.indexOf(s.nw) >= 0)) thanks(s.own, s.nw); else control(s.own);
+    window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", render);
+  render();
+})();
+</script>
+</body>
+</html>
