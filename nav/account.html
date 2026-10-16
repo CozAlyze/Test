@@ -219,6 +219,8 @@ body{padding-bottom:env(safe-area-inset-bottom)}
 .tap44{height:44px !important}
 .nav a{position:absolute;display:block;-webkit-tap-highlight-color:transparent}
 .stamp{position:absolute;right:6px;bottom:4px;font-family:var(--sans);font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);pointer-events:none}
+.addons-acct{position:absolute;left:calc(451 * var(--K));top:calc(1975 * var(--K));width:calc(280 * var(--K));margin:0;
+  background:#D6B98C;border-color:#D6B98C;color:#040B18;font-weight:400;text-decoration:none}   /* ADD-ONS A1.2: solid, it sits on the water */
 </style>
 </head>
 <body>
@@ -240,6 +242,8 @@ body{padding-bottom:env(safe-area-inset-bottom)}
     style="left:calc(83 * var(--K));top:calc(1358 * var(--K));width:calc(1040 * var(--K));height:calc(169 * var(--K))"></button>
   <button class="hot" type="button" data-need="account" aria-label="Privacy and Data"
     style="left:calc(83 * var(--K));top:calc(1547 * var(--K));width:calc(1040 * var(--K));height:calc(168 * var(--K))"></button>
+  <!-- ADD-ONS A1.2 (Test only): opens the Add-ons preview with no reading selected -->
+  <a class="pill addons-acct" href="addons.html#/?from=a">Add-ons</a>
   <!-- Sign Out (border x 287-919, y 1757-1841); Terms (x 475-549) and Privacy (x 644-732), text y 1884-1912.
        Tap areas meet halfway between them (y 1862) and use the empty space around them, so none overlaps. -->
   <button class="hot" type="button" data-need="signout" aria-label="Sign Out"

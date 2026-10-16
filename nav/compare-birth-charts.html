@@ -252,6 +252,11 @@ h1{font-family:var(--head);font-weight:500;font-size:max(24px,calc(66 * var(--k)
   -webkit-tap-highlight-color:transparent;overflow-wrap:anywhere}
 .door:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
 .stamp{position:fixed;right:6px;bottom:2px;z-index:2;font:8px/1 var(--sans);letter-spacing:.08em;color:rgba(204,164,102,.45);pointer-events:none}
+.chart-end{display:flex;justify-content:center;gap:calc(40 * var(--k));margin-top:calc(46 * var(--k))}   /* ADD-ONS A1.2: solid, they sit on the water */
+.chart-end .pl{font-family:var(--sans);font-weight:400;font-size:max(13px,calc(30 * var(--k)));line-height:1;color:#040B18;background:#D6B98C;
+  border:1.5px solid #D6B98C;border-radius:999px;height:max(40px,calc(78 * var(--k)));padding:0 calc(48 * var(--k));display:inline-flex;align-items:center;
+  text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chart-end .pl:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
 </style>
 <!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
 <script src="coz-saved.js?v=20"></script>
@@ -266,9 +271,10 @@ h1{font-family:var(--head);font-weight:500;font-size:max(24px,calc(66 * var(--k)
   <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
   <a class="door" href="compare-system.html?sys=tropical">YOUR TROPICAL BIRTH CHART</a>
   <div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div>
+  <!-- ADD-ONS A1.2 (Test only): Save Chart saves the Compare record (coz-saved.js, data-coz-save); Add-ons opens the preview -->
+  <div class="chart-end"><button type="button" class="pl" data-coz-save>Save Chart</button><a class="pl" href="addons.html#/?from=c&amp;own=c">Add-ons</a></div>
   <nav class="pager" aria-label="Page navigation">
     <a href="compare-reading.html">&lsaquo; COMPARE</a>
-    <a href="addons-thanks.html#/?from=c&amp;own=c">FINISH READING &rsaquo;</a><!-- ADD-ONS A1.1 (Test only): the end of the Compare chain opens the preview Thank You screen -->
   </nav>
  </div>
  <div class="art-bottom">
@@ -279,6 +285,6 @@ h1{font-family:var(--head);font-weight:500;font-size:max(24px,calc(66 * var(--k)
   </nav>
  </div>
 </main>
-<div class="stamp">BIRTH CHARTS · BCH2.1 · NAV TEST N2.0 · ADD-ONS A1.1</div>
+<div class="stamp">BIRTH CHARTS · BCH2.1 · NAV TEST N2.0 · ADD-ONS A1.2</div>
 </body>
 </html>

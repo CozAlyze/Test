@@ -241,6 +241,10 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
 .bottom .nav .acct{left:calc(807 * var(--K));width:calc(250 * var(--K))}
 .open:focus-visible,.pill:focus-visible,.mark:focus-visible,.create:focus-visible,.nav a:focus-visible{outline:1px solid var(--gold);outline-offset:2px}
 .stamp{position:absolute;right:6px;bottom:4px;font-family:var(--sans);font-size:9px;letter-spacing:.08em;color:rgba(214,185,140,.45);pointer-events:none}
+.addons-row{background:url("/Demo/sc-mid.png?v=1") center top/100% 1px repeat-y;text-align:center;padding:0 0 calc(70 * var(--K))}   /* ADD-ONS A1.2 */
+.addons-row .div{margin:0 calc(231 * var(--K)) calc(46 * var(--K));padding-top:calc(20 * var(--K))}
+.addons-row .pill{position:relative;text-decoration:none}
+.addons-row .pill::after{content:"";position:absolute;left:-6px;right:-6px;top:50%;height:44px;transform:translateY(-50%)}   /* 44 px tap area, nothing drawn */
 </style>
 </head>
 <body>
@@ -254,6 +258,8 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     </div>
   </div>
   <div id="records" aria-live="polite"><div class="state">Loading your saved charts…</div></div>
+  <!-- ADD-ONS A1.2 (Test only): Add-ons below the saved list. A saved chart is never treated as paid: the Add-ons screen opens with no reading selected. -->
+  <div class="addons-row"><div class="div" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div><a class="pill" href="addons.html#/?from=s">Add-ons</a></div>
   <div class="bottom">
     <img class="art" src="/Demo/sc-bottom.jpg?v=1" alt="">
     <button class="create" type="button" id="create">Create a New Chart</button>
@@ -262,7 +268,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
       <a class="saved" href="saved-charts.html" aria-label="Saved Charts" aria-current="page"></a>
       <a class="acct" href="account.html" aria-label="Account"></a>
     </nav>
-    <div class="stamp">S1.4 · NAV TEST N2.0</div>
+    <div class="stamp">S1.4 · NAV TEST N2.0 · ADD-ONS A1.2</div>
   </div>
 </main>
 <script>

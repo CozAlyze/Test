@@ -430,9 +430,18 @@ body.embed-compare .report-shell{min-height:0; padding:0 0 1rem}
   .positions-table th,.positions-table td{padding:.05in .04in}
   .report-footer{font-size:.6rem}
 }
+.chart-end{text-align:center;padding:34px 0 10px}   /* ADD-ONS A1.2 */
+.chart-end .dv{display:flex;align-items:center;margin:0 18% 26px}.chart-end .dv::before,.chart-end .dv::after{content:"";flex:1;height:1px;background:#C9A27C}
+.chart-end .dv svg{width:12px;height:12px;margin:0 8px;color:#F2C898}
+.chart-end .row{display:flex;justify-content:center;gap:16px}
+.chart-end .pl{font-family:"Montserrat","Helvetica Neue",Arial,sans-serif;font-weight:300;font-size:14px;line-height:1;color:#EEE7D8;background:none;border:1.5px solid #C9A27C;
+  border-radius:999px;height:40px;padding:0 24px;display:inline-flex;align-items:center;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.chart-end .pl:focus-visible{outline:1px solid #F2C898;outline-offset:3px}
+@media print{.chart-end{display:none !important}}
 </style>
 <!-- Oct 2: ?v=5 so this page loads coz-saved.js CS1.6, not a cached copy -->
 <script src="coz-saved.js?v=20"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
 <script src="saved-vedic-library.js?v=2"></script>
 </head>
 <body>
@@ -452,6 +461,20 @@ body.embed-compare .report-shell{min-height:0; padding:0 0 1rem}
   </div>
   <div class="sample-banner" id="sampleBanner" hidden>Sample report · Illustrative data for design review</div>
   <div id="reportMount"></div>
+  <!-- ADD-ONS A1.2 (Test only): Save Chart (coz-saved.js, data-coz-save) and Add-ons at the end of the chart. Not shown inside Compare. -->
+  <div class="chart-end" id="cozChartEnd"><div class="dv" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0 13.6 10.4 24 12 13.6 13.6 12 24 10.4 13.6 0 12 10.4 10.4Z"/></svg></div><div class="row"><button class="pl" type="button" data-coz-save>Save Chart</button><a class="pl" id="cozAddons" href="addons.html#/?from=v&amp;own=v">Add-ons</a></div></div>
+  <script>
+  /* ADD-ONS A1.2: inside Compare (from=compare, in=compare) the chart has no end buttons. A saved chart (saved=1) opens
+     Add-ons with no reading selected: a saved chart is never treated as a paid reading. */
+  (function(){
+    var q = location.search, end = document.getElementById("cozChartEnd");
+    if (/[?&](from|in)=compare\b/.test(q)) { end.parentNode.removeChild(end); return; }
+    if (/[?&]saved=1\b/.test(q)) {
+      var m = /[?&]id=([A-Za-z0-9_-]+)/.exec(q);
+      document.getElementById("cozAddons").href = "addons.html#/?from=vs" + (m ? "&id=" + m[1] : "");
+    }
+  })();
+  </script>
 </div>
 <div id="cozFoot">
   <div class="coz-foot-tag">CozAlyze helps you see it all</div>
@@ -461,7 +484,7 @@ body.embed-compare .report-shell{min-height:0; padding:0 0 1rem}
     <a href="#" data-foot="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 19.5c1.2-3.4 3.9-5 7-5s5.8 1.6 7 5"/></svg>Account</a>
   </div>
 </div>
-<div class="build-stamp">BIRTH CHART · BC2.7 · NAV TEST N2.0</div>
+<div class="build-stamp">BIRTH CHART · BC2.7 · NAV TEST N2.0 · ADD-ONS A1.2</div>
 <script>
 "use strict";
 /* Renderer only. This page never calculates astronomy; every value comes from
