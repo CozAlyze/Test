@@ -324,7 +324,11 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     var m = /^#\/?(?:\?(.*))?$/.exec(location.hash || "#/") || [];
     var q = {}; (m[1] || "").split("&").forEach(function(p){ var i = p.indexOf("="); if (i > 0) q[p.slice(0, i)] = p.slice(i + 1); });
     var from = /^(v|t|c|vs|ts|s|a)$/.test(q.from || "") ? q.from : "s";
-    return { from: from, id: /^[A-Za-z0-9_-]{1,80}$/.test(q.id || "") ? q.id : "", own: key((q.own || "").replace(/[^vtc]/g, "")),
+    /* A1.4 (Jason, Oct 15): the Add-ons page is always the add-on view. Opened from Saved Charts, Account or a saved Vedic
+       chart it simulates Your Vedic Reading (a saved Tropical chart: Your Tropical Reading), labelled "Simulated", so
+       nothing claims a purchase. An address that already says what is simulated (own=) keeps it. */
+    var dflt = { s: "v", a: "v", vs: "v", ts: "t" }[from] || "";
+    return { from: from, id: /^[A-Za-z0-9_-]{1,80}$/.test(q.id || "") ? q.id : "", own: key(("own" in q ? q.own : dflt).replace(/[^vtc]/g, "")),
              x: q.x === "1", nw: /^[vtcx]$/.test(q["new"] || "") ? q["new"] : "" };
   }
   function go(st){ location.hash = "#/?from=" + st.from + (st.id ? "&id=" + st.id : "") + "&own=" + st.own + (st.x ? "&x=1" : "") + (st.nw ? "&new=" + st.nw : ""); }
@@ -372,7 +376,7 @@ h1{font-family:var(--head);font-weight:500;font-size:max(30px,calc(98 * var(--K)
     });
     h += '<section class="panel"><div class="div" aria-hidden="true">' + STAR + '</div>' +
       '<a class="pill solid" href="' + back(st) + '">Not Now</a>' +
-      '<div class="stamp">ADD-ONS · A1.3 · NO PAYMENT</div></section></main>';
+      '<div class="stamp">ADD-ONS · A1.4 · NO PAYMENT</div></section></main>';
     app.innerHTML = h;
     Array.prototype.forEach.call(app.querySelectorAll("[data-add]"), function(b){
       b.addEventListener("click", function(){ step(st, b.getAttribute("data-add")); });
